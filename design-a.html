@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enchanted Forest Music Clock</title>
+<style>
+/* Give every element predictable dimensions. */
+* { box-sizing: border-box; }
+
+:root {
+  --moon: #d9ffff;
+  --aqua: #75f5d2;
+  --violet: #c99cff;
+  --gold: #ffe59a;
+  --forest-dark: #03150f;
+}
+
+/* Build the moonlit forest atmosphere. */
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: #effffb;
+  font-family: Georgia, "Times New Roman", serif;
+  background:
+    radial-gradient(circle at 50% 10%, rgba(190,240,255,.2), transparent 25%),
+    linear-gradient(#071a28 0%, #073028 48%, #02130e 100%);
+}
+
+/* Create distant moonlight behind the clock. */
+.moon {
+  position: fixed;
+  left: 50%;
+  top: 6%;
+  width: min(42vw, 330px);
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 35%, #fff, #c9f4ed 52%, #77b6ae 100%);
+  box-shadow: 0 0 45px rgba(190,255,240,.52), 0 0 120px rgba(138,214,203,.25);
+  opacity: .76;
+}
+
+/* Add layered tree silhouettes for depth. */
+.forest-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.forest-back {
+  opacity: .35;
+  background:
+    linear-gradient(78deg, transparent 0 8%, #09251f 8% 11%, transparent 11% 100%),
+    linear-gradient(101deg, transparent 0 86%, #09251f 86% 90%, transparent 90%),
+    repeating-linear-gradient(100deg, transparent 0 85px, rgba(5,35,28,.72) 86px 102px, transparent 103px 170px);
+}
+
+.forest-front::before,
+.forest-front::after {
+  content: "";
+  position: absolute;
+  bottom: -7vh;
+  width: 31vw;
+  height: 115vh;
+  min-width: 180px;
+  background: linear-gradient(90deg, #020a07, #09251a 58%, #020b08);
+  filter: drop-shadow(0 0 20px #000);
+}
+
+.forest-front::before {
+  left: -15vw;
+  border-radius: 45% 65% 30% 20%;
+  transform: rotate(-7deg);
+}
+
+.forest-front::after {
+  right: -15vw;
+  border-radius: 65% 45% 20% 30%;
+  transform: rotate(7deg);
+}
+
+/* Let translucent fog move calmly across the lower forest. */
+.fog {
+  position: fixed;
+  left: -25vw;
+  bottom: 2vh;
+  width: 150vw;
+  height: 31vh;
+  pointer-events: none;
+  opacity: .27;
+  filter: blur(20px);
+  background:
+    radial-gradient(ellipse at 15% 60%, #b9e8df 0 8%, transparent 28%),
+    radial-gradient(ellipse at 48% 40%, #d3fff6 0 9%, transparent 29%),
+    radial-gradient(ellipse at 82% 65%, #9ddfd4 0 8%, transparent 27%);
+  animation: fogDrift 20s ease-in-out infinite alternate;
+}
+
+/* Hold the clock and title above the setting. */
+.clock-wrap {
+  position: relative;
+  z-index: 5;
+  width: min(94vw, 585px);
+  text-align: center;
+}
+
+h1 {
+  margin: 0 0 15px;
+  color: #e8fff7;
+  font-size: clamp(1.45rem, 5vw, 2.55rem);
+  font-weight: normal;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-shadow: 0 0 11px #8df6dc, 0 0 28px rgba(116,245,210,.45);
+}
+
+.subtitle {
+  margin: -7px 0 15px;
+  color: #b8dcd0;
+  font-size: clamp(.7rem, 2.5vw, .9rem);
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+
+/* Shape the outer frame to resemble intertwining magical branches. */
+.clock-frame {
+  position: relative;
+  width: min(80vw, 430px);
+  aspect-ratio: 1;
+  margin: 0 auto;
+  padding: 19px;
+  border: 8px ridge #49371f;
+  border-radius: 46% 54% 48% 52% / 52% 45% 55% 48%;
+  background:
+    repeating-conic-gradient(from 14deg, #2b1b10 0 5deg, #67512f 6deg 12deg, #322013 13deg 20deg);
+  box-shadow:
+    0 24px 55px rgba(0,0,0,.68),
+    0 0 0 5px rgba(22,66,42,.86),
+    0 0 36px rgba(80,233,177,.24),
+    inset 0 0 18px #020703;
+}
+
+/* Add leaves and branch tips around the frame. */
+.clock-frame::before,
+.clock-frame::after {
+  content: "❧  ❧  ❧";
+  position: absolute;
+  z-index: 8;
+  color: #50b77b;
+  font-size: clamp(1.4rem, 5vw, 2.15rem);
+  letter-spacing: .35em;
+  text-shadow: 0 0 10px #65e0a0;
+  pointer-events: none;
+}
+
+.clock-frame::before {
+  left: -4%;
+  top: 7%;
+  transform: rotate(-42deg);
+}
+
+.clock-frame::after {
+  right: -9%;
+  bottom: 7%;
+  transform: rotate(137deg);
+}
+
+.clock {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  border: 2px solid rgba(183,255,226,.42);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 24%, rgba(225,255,249,.15), transparent 26%),
+    radial-gradient(circle, rgba(12,57,48,.88), rgba(3,21,18,.98) 72%);
+  box-shadow:
+    inset 0 0 42px rgba(67,210,159,.25),
+    inset 0 0 0 8px rgba(110,210,173,.08),
+    0 0 25px rgba(92,241,189,.17);
+}
+
+.clock::before {
+  content: "";
+  position: absolute;
+  inset: 6%;
+  border: 1px dashed rgba(152,236,204,.22);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.note-slot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 7;
+  width: 0;
+  height: 0;
+}
+
+/* Make each note a free-floating forest spirit without a button circle. */
+.note {
+  position: absolute;
+  width: 49px;
+  height: 49px;
+  margin: -24.5px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  cursor: pointer;
+  color: var(--spirit-color);
+  background: transparent;
+  font: inherit;
+  font-size: clamp(1.45rem, 5vw, 2rem);
+  line-height: 49px;
+  text-align: center;
+  text-shadow: 0 0 7px #fff, 0 0 16px var(--spirit-color), 0 0 29px var(--spirit-color);
+  filter: brightness(1.08);
+  animation: spiritFloat var(--float-speed) ease-in-out infinite;
+  animation-delay: var(--float-delay);
+  transition: filter 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.note:hover,
+.note:focus-visible {
+  filter: brightness(1.55) drop-shadow(0 0 12px var(--spirit-color));
+}
+
+.note.flash {
+  animation: noteFlash .55s ease-out, spiritFloat var(--float-speed) ease-in-out infinite;
+  animation-delay: 0s, var(--float-delay);
+}
+
+/* Expand an enchanted glow from a selected note. */
+.ripple {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  width: 26px;
+  height: 26px;
+  margin: -13px;
+  border: 2px solid var(--ripple-color);
+  border-radius: 50%;
+  box-shadow: 0 0 13px var(--ripple-color), inset 0 0 8px var(--ripple-color);
+  pointer-events: none;
+  animation: rippleOut .95s ease-out forwards;
+}
+
+/* Add tiny magical sparks to each click. */
+.spark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 4;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 9px var(--spark-color);
+  pointer-events: none;
+  animation: sparkOut .72s ease-out forwards;
+}
+
+/* Shape the hands like luminous crystal branches. */
+.hand {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 5;
+  transform-origin: bottom center;
+  pointer-events: none;
+}
+
+.hour {
+  width: 8px;
+  height: 23%;
+  margin: -23% 0 0 -4px;
+  clip-path: polygon(50% 0, 100% 22%, 66% 100%, 34% 100%, 0 22%);
+  background: linear-gradient(#f3fff9, #73e2b7 48%, #2a745a);
+  filter: drop-shadow(0 0 6px #75f5d2);
+}
+
+.minute {
+  width: 6px;
+  height: 34%;
+  margin: -34% 0 0 -3px;
+  clip-path: polygon(50% 0, 95% 18%, 65% 100%, 35% 100%, 5% 18%);
+  background: linear-gradient(#fff, #c9a4ff 48%, #68459a);
+  filter: drop-shadow(0 0 6px #c99cff);
+}
+
+.second {
+  width: 2px;
+  height: 39%;
+  margin: -39% 0 0 -1px;
+  background: #ffe69a;
+  box-shadow: 0 0 9px #ffe69a;
+}
+
+.center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 6;
+  width: 19px;
+  height: 19px;
+  border: 3px solid #93edcb;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, #bdf6e4 38%, #3b9978);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 13px #75f5d2;
+  pointer-events: none;
+}
+
+.info {
+  margin-top: 22px;
+  color: #badfd1;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: .88rem;
+  letter-spacing: .05em;
+  text-shadow: 0 2px 3px #000;
+}
+
+/* Grow luminous mushrooms at the bottom of the scene. */
+.mushrooms {
+  position: fixed;
+  z-index: 4;
+  left: 50%;
+  bottom: -6px;
+  width: min(95vw, 760px);
+  height: 90px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.mushroom {
+  position: absolute;
+  bottom: 0;
+  width: var(--size);
+  height: calc(var(--size) * .95);
+}
+
+.mushroom::before {
+  content: "";
+  position: absolute;
+  left: 42%;
+  bottom: 0;
+  width: 18%;
+  height: 58%;
+  border-radius: 45% 45% 20% 20%;
+  background: linear-gradient(90deg, #6a806a, #dbefd5, #526853);
+}
+
+.mushroom::after {
+  content: "";
+  position: absolute;
+  left: 10%;
+  top: 10%;
+  width: 80%;
+  height: 43%;
+  border-radius: 55% 55% 35% 35%;
+  background: radial-gradient(circle at 35% 30%, #fff 0 4%, transparent 5%), linear-gradient(#d6b2ff, #7053a8);
+  box-shadow: 0 0 12px #ba8fff, 0 0 27px rgba(186,143,255,.55);
+  transition: filter .35s ease;
+}
+
+.mushroom.glow::after {
+  filter: brightness(1.8);
+  box-shadow: 0 0 20px #fff, 0 0 46px #c9a1ff;
+}
+
+/* Let fireflies drift naturally instead of moving in a synchronized rhythm. */
+.firefly {
+  position: fixed;
+  z-index: 3;
+  left: var(--x);
+  top: var(--y);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: #f6ff9a;
+  box-shadow: 0 0 6px #eaff75, 0 0 14px #c8ff66;
+  opacity: .35;
+  pointer-events: none;
+  animation: fly var(--duration) ease-in-out infinite alternate;
+  animation-delay: var(--delay);
+}
+
+.firefly.scatter { animation: scatter .8s ease-out; }
+
+@keyframes spiritFloat {
+  0%, 100% { transform: translate(0, 0) rotate(-3deg); }
+  34% { transform: translate(var(--drift-x), -10px) rotate(4deg); }
+  68% { transform: translate(calc(var(--drift-x) * -.6), 6px) rotate(-1deg); }
+}
+
+@keyframes noteFlash {
+  0% { transform: scale(1); filter: brightness(1); }
+  35% { transform: scale(1.62); filter: brightness(2.1) drop-shadow(0 0 14px #fff); }
+  100% { transform: scale(1); filter: brightness(1.08); }
+}
+
+@keyframes rippleOut {
+  0% { transform: scale(.35); opacity: 1; }
+  100% { transform: scale(5.5); opacity: 0; }
+}
+
+@keyframes sparkOut {
+  0% { transform: rotate(var(--spark-angle)) translateX(10px) scale(1); opacity: 1; }
+  100% { transform: rotate(var(--spark-angle)) translateX(75px) scale(.1); opacity: 0; }
+}
+
+@keyframes fly {
+  0% { transform: translate(0,0); opacity: .22; }
+  45% { opacity: 1; }
+  100% { transform: translate(var(--fly-x), var(--fly-y)); opacity: .4; }
+}
+
+@keyframes scatter {
+  0% { transform: translate(0,0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--scatter-x), var(--scatter-y)) scale(.3); opacity: 0; }
+}
+
+@keyframes fogDrift {
+  from { transform: translateX(-3%); }
+  to { transform: translateX(3%); }
+}
+
+@media (max-width: 470px) {
+  .clock-frame { padding: 13px; border-width: 6px; }
+  .note { width: 42px; height: 42px; margin: -21px; line-height: 42px; }
+  .mushrooms { opacity: .8; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note, .firefly, .fog { animation: none; }
+  .note.flash, .ripple, .spark { animation-duration: .01ms; }
+}
+</style>
+</head>
+<body>
+<div class="moon" aria-hidden="true"></div>
+<div class="forest-layer forest-back" aria-hidden="true"></div>
+<div class="forest-layer forest-front" aria-hidden="true"></div>
+<div class="fog" aria-hidden="true"></div>
+<div id="fireflies" aria-hidden="true"></div>
+
+
+<main class="clock-wrap">
+  <h1>Enchanted Melody Clock</h1>
+  <div class="subtitle">Where every hour awakens a song</div>
+  <div class="clock-frame">
+    <div class="clock" id="clock" aria-label="Enchanted analog clock showing the current local time">
+      <div class="hand hour" id="hour"></div>
+      <div class="hand minute" id="minute"></div>
+      <div class="hand second" id="second"></div>
+      <div class="center"></div>
+    </div>
+  </div>
+  <div class="info">Touch a floating spirit note to awaken the forest.</div>
+</main>
+
+<div class="mushrooms" id="mushrooms" aria-hidden="true"></div>
+
+<script>
+/* Store the symbols, colors, and musical pitches used by the forest spirits. */
+const clock = document.getElementById('clock');
+const musicNotes = ['♫', '♪', '♬', '♩', '♫', '♪', '♬', '♩', '♫', '♪', '♬', '♩'];
+const spiritColors = ['#75f5d2', '#c99cff', '#ffe59a', '#8ed9ff'];
+
+/* Create drifting fireflies with varied paths and speeds. */
+const fireflyField = document.getElementById('fireflies');
+for (let index = 0; index < 28; index += 1) {
+  const firefly = document.createElement('span');
+  firefly.className = 'firefly';
+  firefly.style.setProperty('--x', `${4 + Math.random() * 92}%`);
+  firefly.style.setProperty('--y', `${8 + Math.random() * 80}%`);
+  firefly.style.setProperty('--size', `${2 + Math.random() * 3}px`);
+  firefly.style.setProperty('--duration', `${4 + Math.random() * 7}s`);
+  firefly.style.setProperty('--delay', `${-Math.random() * 8}s`);
+  firefly.style.setProperty('--fly-x', `${-35 + Math.random() * 70}px`);
+  firefly.style.setProperty('--fly-y', `${-45 + Math.random() * 90}px`);
+  fireflyField.appendChild(firefly);
+}
+
+/* Grow a row of glowing mushrooms along the forest floor. */
+const mushroomField = document.getElementById('mushrooms');
+const mushroomPositions = [2, 10, 21, 71, 82, 92];
+mushroomPositions.forEach((position, index) => {
+  const mushroom = document.createElement('span');
+  mushroom.className = 'mushroom';
+  mushroom.style.left = `${position}%`;
+  mushroom.style.setProperty('--size', `${33 + (index % 3) * 13}px`);
+  mushroomField.appendChild(mushroom);
+});
+
+/* Briefly scatter nearby fireflies and brighten one mushroom. */
+function awakenForest() {
+  const fireflies = [...document.querySelectorAll('.firefly')];
+  fireflies.sort(() => Math.random() - 0.5).slice(0, 7).forEach(firefly => {
+    firefly.style.setProperty('--scatter-x', `${-90 + Math.random() * 180}px`);
+    firefly.style.setProperty('--scatter-y', `${-90 + Math.random() * 180}px`);
+    firefly.classList.remove('scatter');
+    void firefly.offsetWidth;
+    firefly.classList.add('scatter');
+    firefly.addEventListener('animationend', () => firefly.classList.remove('scatter'), { once: true });
+  });
+
+  const mushrooms = [...document.querySelectorAll('.mushroom')];
+  const chosen = mushrooms[Math.floor(Math.random() * mushrooms.length)];
+  chosen.classList.add('glow');
+  window.setTimeout(() => chosen.classList.remove('glow'), 800);
+}
+
+/* Place twelve musical forest spirits around the clock face. */
+musicNotes.forEach((symbol, index) => {
+  const slot = document.createElement('div');
+  const note = document.createElement('button');
+  const angle = (index / 12) * 360 - 90;
+  const color = spiritColors[index % spiritColors.length];
+
+  slot.className = 'note-slot';
+  note.className = 'note';
+  note.type = 'button';
+  note.textContent = symbol;
+  note.setAttribute('aria-label', `Awaken musical forest spirit ${index + 1}`);
+  note.style.setProperty('--spirit-color', color);
+  note.style.setProperty('--float-speed', `${3.5 + (index % 5) * .42}s`);
+  note.style.setProperty('--float-delay', `${-index * .34}s`);
+  note.style.setProperty('--drift-x', `${index % 2 === 0 ? 5 + index % 3 : -5 - index % 3}px`);
+
+  /* Flash the spirit, create a ripple and sparks, and awaken the forest. */
+  note.addEventListener('click', () => {
+    note.classList.remove('flash');
+    void note.offsetWidth;
+    note.classList.add('flash');
+
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple';
+    ripple.style.setProperty('--ripple-color', color);
+    slot.appendChild(ripple);
+    ripple.addEventListener('animationend', () => ripple.remove());
+
+    for (let sparkIndex = 0; sparkIndex < 8; sparkIndex += 1) {
+      const spark = document.createElement('span');
+      spark.className = 'spark';
+      spark.style.setProperty('--spark-angle', `${sparkIndex * 45}deg`);
+      spark.style.setProperty('--spark-color', color);
+      slot.appendChild(spark);
+      spark.addEventListener('animationend', () => spark.remove());
+    }
+    awakenForest();
+  });
+
+  note.addEventListener('animationend', event => {
+    if (event.animationName === 'noteFlash') note.classList.remove('flash');
+  });
+
+  slot.appendChild(note);
+  clock.appendChild(slot);
+
+  /* Keep every spirit evenly positioned when the browser size changes. */
+  const placeNote = () => {
+    const radius = clock.clientWidth * .4;
+    const radians = angle * Math.PI / 180;
+    slot.style.transform = `translate(${Math.cos(radians) * radius}px, ${Math.sin(radians) * radius}px)`;
+  };
+
+  placeNote();
+  window.addEventListener('resize', placeNote);
+});
+
+/* Continuously display the visitor's current local time. */
+function updateClock() {
+  const now = new Date();
+  const seconds = now.getSeconds() + now.getMilliseconds() / 1000;
+  const minutes = now.getMinutes() + seconds / 60;
+  const hours = (now.getHours() % 12) + minutes / 60;
+
+  document.getElementById('second').style.transform = `rotate(${seconds * 6}deg)`;
+  document.getElementById('minute').style.transform = `rotate(${minutes * 6}deg)`;
+  document.getElementById('hour').style.transform = `rotate(${hours * 30}deg)`;
+  requestAnimationFrame(updateClock);
+}
+
+updateClock();
+</script>
+</body>
+</html>
