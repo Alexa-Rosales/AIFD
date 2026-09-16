@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A.I. FOR DESIGNERS — Alexa Rosales</title>
+  
+  <!-- Font Imports: Playfair Display as serif fallback for Manofa -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       1. Custom Fonts & Reset
+       ========================================================================== */
+    @font-face {
+      font-family: 'Manofa Bold';
+      src: local('Manofa Bold'), local('Manofa-Bold');
+      font-weight: 700;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Manofa Light';
+      src: local('Manofa Light'), local('Manofa-Light');
+      font-weight: 300;
+      font-style: normal;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background-color: #80AEE8; /* Soft Sky Blue */
+      color: #5B0015; /* Deep Burgundy */
+      font-family: 'Manofa Light', 'Playfair Display', Georgia, serif;
+      overflow-x: hidden;
+    }
+
+    /* ==========================================================================
+       2. Canvas Background Animation
+       ========================================================================== */
+    #flowerCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ==========================================================================
+       3. Main Layout Container
+       ========================================================================== */
+    .page-wrapper {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ==========================================================================
+       4. Hero Banner (Full Width: 100vw)
+       ========================================================================== */
+    .hero-container {
+      width: 100vw;
+      min-height: 50vh;
+      background-image: linear-gradient(
+        180deg, 
+        rgba(128, 174, 232, 0.25) 0%, 
+        rgba(128, 174, 232, 0.85) 85%,
+        #80AEE8 100%
+      ), url('hero.jpg');
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 60px 4vw 40px 4vw;
+      border-bottom: 2px solid #5B0015;
+    }
+
+    .hero-title {
+      font-family: 'Manofa Bold', 'Playfair Display', Georgia, serif;
+      font-weight: 900;
+      text-transform: uppercase;
+      font-size: clamp(2.5rem, 6.5vw, 6rem);
+      line-height: 0.95;
+      color: #5B0015;
+      letter-spacing: 0.02em;
+      text-shadow: 0 2px 10px rgba(128, 174, 235, 0.5);
+      margin-bottom: 20px;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px 40px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #5B0015;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .hero-meta a {
+      color: #5B0015;
+      text-decoration: none;
+      border-bottom: 1.5px solid #5B0015;
+      transition: opacity 0.2s ease;
+    }
+
+    .hero-meta a:hover {
+      opacity: 0.75;
+    }
+
+    /* ==========================================================================
+       5. Content & Grid System
+       ========================================================================== */
+    .content-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 50px 4vw 80px 4vw;
+      width: 100%;
+      flex-grow: 1;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 35px;
+    }
+
+    .section-title {
+      font-family: 'Manofa Bold', 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #5B0015;
+    }
+
+    .section-divider {
+      flex-grow: 1;
+      height: 2px;
+      background-color: #5B0015;
+      opacity: 0.4;
+    }
+
+    /* Grid Layout for Work Items */
+    .work-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    /* Desktop Responsive Spans */
+    @media (max-width: 1200px) {
+      .work-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 850px) {
+      .work-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Mobile View: Single 1-column vertical feed */
+    @media (max-width: 600px) {
+      .work-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero-container {
+        padding: 40px 20px 30px 20px;
+        min-height: 40vh;
+      }
+    }
+
+    /* ==========================================================================
+       6. Interactive Work Items & Buttons
+       ========================================================================== */
+    .work-card {
+      background-color: rgba(128, 174, 235, 0.4);
+      border: 1px solid #5B0015;
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 180px;
+      backdrop-filter: blur(4px);
+    }
+
+    .card-tag {
+      font-family: 'Manofa Bold', 'Playfair Display', Georgia, serif;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #5B0015;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-family: 'Manofa Bold', 'Playfair Display', Georgia, serif;
+      font-size: 1.4rem;
+      color: #5B0015;
+      margin-bottom: 20px;
+      line-height: 1.2;
+    }
+
+    /* Pill Button Spec from Handoff */
+    .btn-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 12px 24px;
+      border-radius: 9999px;
+      background-color: #80AEEB; /* Accent Ice Blue */
+      color: #5B0015; /* Deep Burgundy */
+      border: 1px solid #5B0015;
+      text-decoration: none;
+      font-family: 'Manofa Bold', 'Playfair Display', Georgia, serif;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Hover State: Color Swap + Translate Y Lift */
+    .btn-pill:hover {
+      background-color: #5B0015; /* Flips to Burgundy */
+      color: #80AEEB; /* Flips to Ice Blue */
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(91, 0, 21, 0.25);
+    }
+
+    /* ==========================================================================
+       7. Footer Section
+       ========================================================================== */
+    .footer {
+      border-top: 1px solid #5B0015;
+      padding: 25px 4vw;
+      text-align: center;
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      opacity: 0.85;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Flower Canvas Particle System -->
+  <canvas id="flowerCanvas"></canvas>
+
+  <div class="page-wrapper">
+    
+    <!-- Hero Section -->
+    <header class="hero-container">
+      <h1 class="hero-title">A.I. FOR DESIGNERS — Alexa Rosales</h1>
+      <div class="hero-meta">
+        <span>ART 3041 · Fall 2026</span>
+        <a href="mailto:ALEXA.ROSALES24@login.cuny.edu">ALEXA.ROSALES24@login.cuny.edu</a>
+      </div>
+    </header>
+
+    <!-- Content & Work Grid -->
+    <main class="content-container">
+      <div class="section-header">
+        <h2 class="section-title">WORK</h2>
+        <div class="section-divider"></div>
+      </div>
+
+      <div class="work-grid">
+        
+        <!-- Item 01 -->
+        <article class="work-card">
+          <div>
+            <div class="card-tag">[01]</div>
+            <h3 class="card-title">Custom Instructions</h3>
+          </div>
+          <a href="#" class="btn-pill">View Project</a>
+        </article>
+
+        <!-- Item 02 -->
+        <article class="work-card">
+          <div>
+            <div class="card-tag">[02]</div>
+            <h3 class="card-title">A Style Guide for Your AI</h3>
+          </div>
+          <a href="#" class="btn-pill">View Project</a>
+        </article>
+
+        <!-- Item 03 -->
+        <article class="work-card">
+          <div>
+            <div class="card-tag">[03]</div>
+            <h3 class="card-title">Design a ___</h3>
+          </div>
+          <a href="#" class="btn-pill">View Project</a>
+        </article>
+
+        <!-- Item 04 -->
+        <article class="work-card">
+          <div>
+            <div class="card-tag">[04]</div>
+            <h3 class="card-title">Commute Story</h3>
+          </div>
+          <a href="#" class="btn-pill">View Project</a>
+        </article>
+
+        <!-- Item 05 -->
+        <article class="work-card">
+          <div>
+            <div class="card-tag">[05]</div>
+            <h3 class="card-title">Become a Crea(i)tive Director</h3>
+          </div>
+          <a href="#" class="btn-pill">View Project</a>
+        </article>
+
+        <!-- Item 06 -->
+        <article class="work-card">
+          <div>
+            <div class="card-tag">[06]</div>
+            <h3 class="card-title">Experimental AI Interface</h3>
+          </div>
+          <a href="#" class="btn-pill">View Project</a>
+        </article>
+
+        <!-- Item 07 -->
+        <article class="work-card">
+          <div>
+            <div class="card-tag">[07]</div>
+            <h3 class="card-title">Open</h3>
+          </div>
+          <a href="#" class="btn-pill">View Project</a>
+        </article>
+
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      SYSTEM STATUS: ONLINE · ART 3041 · FALL 2026
+    </footer>
+
+  </div>
+
+  <!-- Animated Flower Particle Script -->
+  <script>
+    (function() {
+      const canvas = document.getElementById('flowerCanvas');
+      const ctx = canvas.getContext('2d');
+
+      let width = canvas.width = window.innerWidth;
+      let height = canvas.height = window.innerHeight;
+
+      window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      // Accessibility: Check reduced motion settings
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Particle Configuration
+      const particleCount = prefersReducedMotion ? 12 : 45;
+      const particles = [];
+
+      class FlowerParticle {
+        constructor() {
+          this.reset(true);
+        }
+
+        reset(initial = false) {
+          this.x = Math.random() * width;
+          this.y = initial ? Math.random() * height : -30;
+          this.size = Math.random() * 12 + 8; // Flower radius
+          this.speedY = prefersReducedMotion ? Math.random() * 0.3 + 0.1 : Math.random() * 2.5 + 1.5;
+          this.speedX = prefersReducedMotion ? Math.random() * 0.2 - 0.1 : Math.random() * 1.5 + 0.5;
+          this.rotation = Math.random() * Math.PI * 2;
+          this.rotationSpeed = (Math.random() - 0.5) * 0.05;
+          this.opacity = Math.random() * 0.4 + 0.4; // 0.4 to 0.8 as specified
+          this.petals = 5;
+        }
+
+        update() {
+          this.y += this.speedY;
+          this.x += this.speedX;
+          this.rotation += this.rotationSpeed;
+
+          // Wrap around edges
+          if (this.y > height + 30 || this.x > width + 30) {
+            this.reset(false);
+          }
+        }
+
+        draw() {
+          ctx.save();
+          ctx.translate(this.x, this.y);
+          ctx.rotate(this.rotation);
+          ctx.globalAlpha = this.opacity;
+
+          // Draw 5-Petal Flower
+          ctx.fillStyle = '#5B0015'; // Deep Burgundy Accent Petals
+          for (let i = 0; i < this.petals; i++) {
+            ctx.beginPath();
+            ctx.rotate((Math.PI * 2) / this.petals);
+            ctx.ellipse(0, this.size / 2, this.size / 3, this.size / 2, 0, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          // Flower Center
+          ctx.beginPath();
+          ctx.arc(0, 0, this.size / 3.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#80AEEB'; // Accent Ice Blue Center
+          ctx.fill();
+
+          ctx.restore();
+        }
+      }
+
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new FlowerParticle());
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        particles.forEach(p => {
+          p.update();
+          p.draw();
+        });
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    })();
+  </script>
+</body>
+</html>
