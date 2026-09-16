@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alexa Rosales | A.I. For Designers</title>
+<style>
+:root{--bg:#80AEE8;--text:#5B0015;--accent:#80AEEB}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Georgia,serif;overflow-x:hidden}
+#flowers{position:fixed;inset:0;z-index:0;pointer-events:none}
+main{position:relative;z-index:2}
+.hero{width:100%;min-height:100vh;position:relative}
+.hero img{width:100%;height:60vh;object-fit:cover;display:block}
+.hero-content{padding:2rem 5vw}
+h1{font-size:clamp(3rem,10vw,7rem);text-transform:uppercase;line-height:.9;font-weight:900}
+.subtitle{margin-top:1rem;font-size:1.15rem}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;padding:2rem 5vw 4rem}
+.item{display:flex;gap:1rem;align-items:center;text-decoration:none;color:var(--text);padding:1.25rem;border:1px solid var(--text);border-radius:24px;background:rgba(255,255,255,.18);min-height:110px;transition:.15s cubic-bezier(.4,0,.2,1)}
+.item:hover{background:var(--text);color:var(--accent);transform:translateY(-2px)}
+.num{font-size:1.6rem;font-weight:700}
+.section-title{padding:0 5vw;font-size:2rem;text-transform:uppercase;margin-bottom:1rem}
+.footer{padding:2rem 5vw 4rem}
+@media(max-width:768px){.grid{grid-template-columns:1fr}.hero img{height:40vh}}
+</style>
+</head>
+<body>
+<canvas id="flowers"></canvas>
+<main>
+<section class="hero">
+<img src="hero.jpeg" alt="Hero image">
+<div class="hero-content">
+<h1>Alexa Rosales</h1>
+<p class="subtitle">A.I. FOR DESIGNERS • ART 3041 • FALL 2026</p>
+</div>
+</section>
+<h2 class="section-title">Work</h2>
+<section class="grid">
+<a class="item" href="#"><span class="num">01</span><span>Custom Instructions</span></a>
+<a class="item" href="#"><span class="num">02</span><span>A Style Guide for Your AI</span></a>
+<a class="item" href="#"><span class="num">03</span><span>Design a ___</span></a>
+<a class="item" href="#"><span class="num">04</span><span>Commute Story</span></a>
+<a class="item" href="#"><span class="num">05</span><span>Become a Crea(i)tive Director</span></a>
+<a class="item" href="#"><span class="num">06</span><span>Experimental AI Interface</span></a>
+<a class="item" href="#"><span class="num">07</span><span>Open</span></a>
+</section>
+<div class="footer">SYSTEM STATUS: ONLINE</div>
+</main>
+<script>
+const c=document.getElementById('flowers'),x=c.getContext('2d');
+let w,h,p=[];function r(){w=c.width=innerWidth;h=c.height=innerHeight}r();addEventListener('resize',r);
+for(let i=0;i<50;i++)p.push({x:Math.random()*w,y:Math.random()*h,s:8+Math.random()*10,v:1+Math.random()*2,o:.4+Math.random()*.4});
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function draw(){x.clearRect(0,0,w,h);p.forEach(f=>{x.globalAlpha=f.o;x.fillStyle='#ffd0e6';x.beginPath();for(let a=0;a<5;a++){x.lineTo(f.x+Math.cos(a*1.256)*f.s,f.y+Math.sin(a*1.256)*f.s)}x.fill();if(!reduce){f.y+=f.v;f.x+=f.v*.4;if(f.y>h+20){f.y=-20;f.x=Math.random()*w}}});requestAnimationFrame(draw)}draw();
+</script>
+</body>
+</html>
