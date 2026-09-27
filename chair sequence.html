@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chair Sequence</title>
+    <style>
+        /* CSS Reset & Variables */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg-color: #5B0015;
+            --text-color: #80AEE8;
+            --accent-color: #80AEEB;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Manofa Light', sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Typography */
+        h1, h2, h3, .heading-font {
+            font-family: 'Manofa Bold', serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            text-transform: uppercase;
+        }
+
+        /* Full-Width Hero Section */
+        .hero {
+            position: relative;
+            width: 100vw;
+            min-height: 50vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem 2rem;
+            text-align: center;
+            overflow: hidden;
+            border-bottom: 2px solid var(--text-color);
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 7rem);
+            color: var(--text-color);
+            letter-spacing: 0.05em;
+            z-index: 2;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            max-width: 600px;
+            z-index: 2;
+            letter-spacing: 0.02em;
+        }
+
+        /* Floating Flower Canvas / Animation Layer */
+        #flower-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Portfolio Grid Layout */
+        .portfolio-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .grid-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--text-color);
+            padding-bottom: 1rem;
+        }
+
+        .grid-header h2 {
+            font-size: 2rem;
+        }
+
+        .grid-header span {
+            font-size: 1rem;
+            letter-spacing: 0.1em;
+        }
+
+        /* Desktop: 3-column Grid | Mobile: 1-Column */
+        .chair-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .chair-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .chair-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Component */
+        .chair-card {
+            background: rgba(128, 174, 232, 0.1);
+            border: 1px solid var(--text-color);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .chair-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(128, 174, 232, 0.15);
+        }
+
+        .image-wrapper {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: #111;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .chair-card:hover .image-wrapper img {
+            transform: scale(1.03);
+        }
+
+        .card-content {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            flex-grow: 1;
+            justify-content: space-between;
+        }
+
+        .card-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .card-meta-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tag-badge {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            border: 1px solid var(--text-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            font-weight: bold;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            letter-spacing: 0.03em;
+            color: var(--text-color);
+        }
+
+        .card-prompt {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: var(--text-color);
+            opacity: 0.9;
+        }
+
+        /* Pill Button Styling & Micro-Interactions */
+        .pill-btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0.6rem 1.5rem;
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            border: 1px solid var(--text-color);
+            border-radius: 9999px;
+            font-family: 'Manofa Bold', serif;
+            text-transform: uppercase;
+            text-decoration: none;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            margin-top: auto;
+        }
+
+        .pill-btn:hover {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Full-Width Hero Section -->
+    <header class="hero">
+        <canvas id="flower-canvas"></canvas>
+        <h1>Chair Sequence</h1>
+        <p>A sequential exploration of image generation prompts, atmospheres, and forms across nine stages.</p>
+    </header>
+
+    <!-- Main Grid Section -->
+    <main class="portfolio-container">
+        <div class="grid-header">
+            <h2>Generations</h2>
+            <span>[01 — 09]</span>
+        </div>
+
+        <div class="chair-grid">
+            <!-- Item 1 -->
+            <article class="chair-card">
+                <div class="image-wrapper">
+                    <img src="chair 1.jpg" alt="Simple Room">
+                </div>
+                <div class="card-content">
+                    <div class="card-meta">
+                        <div class="card-meta-top">
+                            <span class="tag-badge">[01]</span>
+                            <h3 class="card-title">Simple Room</h3>
+                        </div>
+                        <p class="card-prompt">A simple wooden chair sitting alone in the middle of a sparse, empty room with light wooden floors and plain walls.</p>
+                    </div>
+                    <a href="chair 1.jpg" target="_blank" class="pill-btn">View Full Image</a>
+                </div>
+            </article>
+
+            <!-- Item 2 -->
+            <article class="chair-card">
+                <div class="image-wrapper">
+                    <img src="chair 2.jpg" alt="18th-Century European Room">
+                </div>
+                <div class="card-content">
+                    <div class="card-meta">
+                        <div class="card-meta-top">
+                            <span class="tag-badge">[02]</span>
+                            <h3 class="card-title">18th-Century European Room</h3>
+                        </div>
+                        <p class="card-prompt">A fluffy white armchair placed in the center of an 18th-century European room with decorative wall molding, crystal chandelier, and classic oil paintings.</p>
+                    </div>
+                    <a href="chair 2.jpg" target="_blank" class="pill-btn">View Full Image</a>
+                </div>
+            </article>
+
+            <!-- Item 3 -->
+            <article class="chair-card">
+                <div class="image-wrapper">
+                    <img src="chair 3.jpg" alt="Gothic Night Room">
+                </div>
+                <div class="card-content">
+                    <div class="card-meta">
+                        <div class="card-meta-top">
+                            <span class="tag-badge">[03]</span>
+                            <h3 class="card-title">Gothic Night Room</h3>
+                        </div>
+                        <p class="card-prompt">A pink velvet armchair in an empty 18th-century European room at night, featuring a large arched window showing a starry sky and a simple stone fireplace.</p>
+                    </div>
+                    <a href="chair 3.jpg" target="_blank" class="pill-btn">View Full Image</a>
+                </div>
+            </article>
+
+            <!-- Item 4 -->
+            <article class="chair-card">
+                <div class="image-wrapper">
+                    <img src="chair 4.jpg" alt="Dark Fantasy Atmosphere">
+                </div>
+                <div class="card-content">
+                    <div class="card-meta">
+                        <div class="card-meta-top">
+                            <span class="tag-badge">[04]</span>
+                            <h3 class="card-title">Dark Fantasy Atmosphere</h3>
+                        </div>
+                        <p class="card-prompt">A red fluffy armchair in a dimly lit, dark gothic room at night, with bat motifs carved into the fireplace, candelabras, and an arched window.</p>
+                    </div>
+                    <a href="chair 4.jpg" target="_blank" class="pill-btn">View Full Image</a>
+                </div>
+            </article>
+
+            <!-- Item 5 -->
+            <article class="chair-card">
+                <div class="image-wrapper">
+                    <img src="chair 5.jpg" alt="Side View Angle">
+                </div>
+                <div class="card-content">
+                    <div class="card-meta">
+                        <div class="card-meta-top">
+                            <span class="tag-badge">[05]</span>
+                            <h3 class="card-title">Side View Angle</h3>
+                        </div>
+                        <p class="card-prompt">A red fluffy armchair viewed from the right side in a dark vampire-fantasy room, with tall arched windows displaying a full moon and castle skyline.</p>
+                    </div>
+                    <a href="chair 5.jpg" target="_blank" class="pill-btn">View Full Image</a>
+                </div>
+            </article>
+
+            <!-- Item 6 -->
+            <article class="chair-card">
+                <div class="image-wrapper">
+                    <img src="chair 6.jpg" alt="Gothic Library Reference">
+                </div>
+                <div class="card-content">
+                    <div class="card-meta">
+                        <div class="card-meta-top">
+                            <span class="tag-badge">[06]</span>
+                            <h3 class="card-title">Gothic Library Reference</h3>
+                        </div>
+                        <p class="card-prompt">Reference of the Gothic Library to add.</p>
+                    </div>
+                    <a href="chair 6.jpg" target="_blank" class="pill-btn">View Full Image</a>
+                </div>
+            </article>
+
+            <!-- Item 7 -->
+            <article class="chair-card">
+                <div class="image-wrapper">
+                    <img src="chair 7.jpg" alt="Gothic Library Addition">
+                </div>
+                <div class="card-content">
+                    <div class="card-meta">
+                        <div class="card-meta-top">
+                            <span class="tag-badge">[07]</span>
+                            <h3 class="card-title">Gothic Library Addition</h3>
+                        </div>
+                        <p class="card-prompt">A red fluffy armchair on a vintage Persian rug in a dark vampire library, featuring floor-to-ceiling bookshelves, a grand staircase, and an ornate wrought-iron chandelier.</p>
+                    </div>
+                    <a href="chair 7.jpg" target="_blank" class="pill-btn">View Full Image</a>
+                </div>
+            </article>
+
+            <!-- Item 8 -->
+            <article class="chair-card">
+                <div class="image-wrapper">
+                    <img src="chair 8.jpg" alt="Alternative Version from ChatGPT">
+                </div>
+                <div class="card-content">
+                    <div class="card-meta">
+                        <div class="card-meta-top">
+                            <span class="tag-badge">[08]</span>
+                            <h3 class="card-title">Alternative Version from ChatGPT</h3>
+                        </div>
+                        <p class="card-prompt">A red fluffy armchair in the middle of a dark 18th-century European library room with a gothic vampire fantasy aesthetic. Shown from a 4:5 camera angle displaying the right side of the armchair on an ornate vintage Persian rug. In the background: a roaring stone fireplace with bat carvings, tall floor-to-ceiling wooden bookshelves filled with old books, an elaborate wrought-iron chandelier hanging from a dark red ceiling, and large arched windows revealing a starry night sky with a bright full moon. Dark, moody atmosphere, rich red and black color tones, cinematic lighting.</p>
+                    </div>
+                    <a href="chair 8.jpg" target="_blank" class="pill-btn">View Full Image</a>
+                </div>
+            </article>
+
+            <!-- Item 9 -->
+            <article class="chair-card">
+                <div class="image-wrapper">
+                    <img src="chair 9.jpg" alt="Final Result">
+                </div>
+                <div class="card-content">
+                    <div class="card-meta">
+                        <div class="card-meta-top">
+                            <span class="tag-badge">[09]</span>
+                            <h3 class="card-title">Final Result</h3>
+                        </div>
+                        <p class="card-prompt">A red, fluffy armchair in a dark gothic library, with a dark, carved wooden fireplace featuring bat sculptures that match the rich wood tone of the bookshelves and grand staircase.</p>
+                    </div>
+                    <a href="chair 9.jpg" target="_blank" class="pill-btn">View Full Image</a>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <!-- Background Fast-Drifting Flower Particle Script -->
+    <script>
+        const canvas = document.getElementById('flower-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let particles = [];
+        const particleCount = 25;
+
+        function resize() {
+            width = canvas.width = canvas.parentElement.offsetWidth;
+            height = canvas.height = canvas.parentElement.offsetHeight;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        class FlowerParticle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * -height;
+                this.size = Math.random() * 8 + 6;
+                this.speedY = Math.random() * 3 + 2; 
+                this.speedX = Math.random() * 2 - 1;
+                this.angle = Math.random() * Math.PI * 2;
+                this.spin = Math.random() * 0.05 - 0.025;
+                this.opacity = Math.random() * 0.4 + 0.4; 
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.angle += this.spin;
+
+                if (this.y > height + 20 || this.x < -20 || this.x > width + 20) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = '#80AEE8'; 
+
+                for (let i = 0; i < 5; i++) {
+                    ctx.beginPath();
+                    ctx.ellipse(0, this.size * 0.6, this.size * 0.35, this.size * 0.6, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.rotate((Math.PI * 2) / 5);
+                }
+                ctx.restore();
+            }
+        }
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new FlowerParticle());
+        }
+
+        const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+        let animateCanvas = !mediaQuery.matches;
+
+        mediaQuery.addEventListener('change', () => {
+            animateCanvas = !mediaQuery.matches;
+            if (animateCanvas) loop();
+        });
+
+        function loop() {
+            if (!animateCanvas) return;
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(loop);
+        }
+
+        if (animateCanvas) loop();
+    </script>
+</body>
+</html>
