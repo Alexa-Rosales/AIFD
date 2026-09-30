@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promotional Poster Sequence</title>
+  <style>
+    /* Design System Tokens extracted directly from the new Coraline cover background */
+    :root {
+      --bg-color: #3F4C9B;          /* Indigo Blue background from cover */
+      --bg-accent: #2E3875;        /* Deep navy-indigo gradient accent */
+      --text-color: #0F1626;        /* Dark silhouette blue-black */
+      --accent-color: #E28F38;      /* Warm golden-orange key highlights */
+      --card-bg: rgba(255, 255, 255, 0.85); /* Semi-transparent white for high readability */
+      --card-border: #0F1626;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      background-image: radial-gradient(circle at 50% 50%, var(--bg-color) 0%, var(--bg-accent) 100%);
+      color: #FFFFFF;
+      font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Floating Canvas Particles */
+    #particle-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Layout Wrapper */
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      padding: 2rem 1.5rem 4rem 1.5rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Hero Section */
+    .hero {
+      width: 100vw;
+      margin-left: calc(-50vw + 50%);
+      padding: 3rem 1.5rem 4rem 1.5rem;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .hero-title {
+      font-size: clamp(2.2rem, 7vw, 5.5rem);
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+      color: var(--accent-color);
+      -webkit-text-stroke: 1.5px var(--text-color);
+      text-shadow: 3px 3px 0px rgba(15, 22, 38, 0.4);
+    }
+
+    .hero-subtitle {
+      font-size: clamp(0.9rem, 2vw, 1.2rem);
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      color: #FFFFFF;
+      text-transform: uppercase;
+      opacity: 0.95;
+    }
+
+    /* Responsive Grid System */
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 1024px) {
+      .portfolio-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .portfolio-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Card Component */
+    .card {
+      background: var(--card-bg);
+      border: 2px solid var(--text-color);
+      border-radius: 12px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 6px 6px 0px var(--text-color);
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 8px 8px 0px var(--text-color);
+    }
+
+    .card-image-wrapper {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #FFFFFF;
+      border: 2px solid var(--text-color);
+    }
+
+    .card-image-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card-prompt {
+      margin-top: 1rem;
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      color: var(--text-color);
+      background: rgba(255, 255, 255, 0.9);
+      padding: 0.85rem;
+      border-radius: 8px;
+      border: 1px solid var(--text-color);
+      flex-grow: 1;
+    }
+
+    .card-prompt strong {
+      font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+      display: block;
+      margin-bottom: 0.35rem;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      color: #C8721B;
+    }
+
+    .card-info {
+      margin-top: 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-tag {
+      background-color: var(--text-color);
+      color: var(--accent-color);
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      border: 1.5px solid var(--text-color);
+      letter-spacing: 0.05em;
+    }
+
+    /* Interactive Pill Button Component */
+    .pill-button {
+      display: inline-block;
+      padding: 0.5rem 1.25rem;
+      border-radius: 9999px;
+      background-color: var(--accent-color);
+      color: var(--text-color);
+      border: 1.5px solid var(--text-color);
+      font-weight: 800;
+      font-size: 0.85rem;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .pill-button:hover {
+      background-color: var(--text-color);
+      color: var(--accent-color);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Silhouette Particles Canvas -->
+  <canvas id="particle-canvas"></canvas>
+
+  <div class="wrapper">
+    <header class="hero">
+      <h1 class="hero-title">PROMOTIONAL POSTER SEQUENCE</h1>
+      <p class="hero-subtitle">[ CONCEPT TO FINAL POSTER ITERATIONS ]</p>
+    </header>
+
+    <main class="portfolio-grid">
+      <!-- Item 0: Sketch -->
+      <article class="card">
+        <div class="card-image-wrapper">
+          <img src="sketch.jpg" alt="Initial Sketch">
+        </div>
+        <div class="card-prompt">
+          <strong>Prompt / Note:</strong>
+          I drew this sketch of a movie called Coraline, I wanted each piece of the drawing to represent an element of the movie, the hand of the witch, a big button in the center, and a rat running around the button. The background black and white. For the lettering, I want it to be bold, with the letter O as a button.
+        </div>
+        <div class="card-info">
+          <span class="card-tag">[00]</span>
+          <a href="sketch.jpg" class="pill-button" target="_blank">Sketch</a>
+        </div>
+      </article>
+
+      <!-- Item 1: Poster 1 -->
+      <article class="card">
+        <div class="card-image-wrapper">
+          <img src="poster 1.jpeg" alt="Poster Iteration 1">
+        </div>
+        <div class="card-prompt">
+          <strong>Prompt / Note:</strong>
+          I like the addition of the second rat; the only error was that it had two tails. So I had to get rid of it.
+        </div>
+        <div class="card-info">
+          <span class="card-tag">[01]</span>
+          <a href="poster 1.jpeg" class="pill-button" target="_blank">Poster 1</a>
+        </div>
+      </article>
+
+      <!-- Item 2: Poster 2 -->
+      <article class="card">
+        <div class="card-image-wrapper">
+          <img src="poster 2.jpeg" alt="Poster Iteration 2">
+        </div>
+        <div class="card-prompt">
+          <strong>Prompt / Note:</strong>
+          I like the way it turned out overall, but I felt like it was missing something. More color for this poster.
+        </div>
+        <div class="card-info">
+          <span class="card-tag">[02]</span>
+          <a href="poster 2.jpeg" class="pill-button" target="_blank">Poster 2</a>
+        </div>
+      </article>
+
+      <!-- Item 3: Poster 3 -->
+      <article class="card">
+        <div class="card-image-wrapper">
+          <img src="poster 3.jpeg" alt="Poster Iteration 3">
+        </div>
+        <div class="card-prompt">
+          <strong>Prompt / Note:</strong>
+          For my final result, I added a dark blue for the main button and yellow for the background to give it a pop of color.
+        </div>
+        <div class="card-info">
+          <span class="card-tag">[03]</span>
+          <a href="poster 3.jpeg" class="pill-button" target="_blank">Poster 3</a>
+        </div>
+      </article>
+    </main>
+  </div>
+
+  <script>
+    // Floating Key & Button Particle Animation matching the Indigo & Gold Cover Theme
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let width, height;
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    const particles = [];
+    const particleCount = 20;
+
+    class FloatingKeyParticle {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = Math.random() * width;
+        this.y = -30;
+        this.size = Math.random() * 12 + 8;
+        this.speedY = Math.random() * 1.5 + 0.8;
+        this.speedX = (Math.random() - 0.5) * 0.8;
+        this.rotation = Math.random() * Math.PI * 2;
+        this.rotSpeed = (Math.random() - 0.5) * 0.02;
+        this.opacity = Math.random() * 0.35 + 0.15;
+      }
+
+      update() {
+        this.y += this.speedY;
+        this.x += this.speedX;
+        this.rotation += this.rotSpeed;
+
+        if (this.y > height + 30) {
+          this.reset();
+        }
+      }
+
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        ctx.globalAlpha = this.opacity;
+
+        // Button Loop Key Top
+        ctx.fillStyle = '#E28F38';
+        ctx.beginPath();
+        ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#0F1626';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Button Hole Details
+        const holeOffset = this.size * 0.35;
+        const holeRadius = this.size * 0.18;
+        ctx.fillStyle = '#0F1626';
+
+        ctx.beginPath();
+        ctx.arc(-holeOffset, -holeOffset, holeRadius, 0, Math.PI * 2);
+        ctx.arc(holeOffset, -holeOffset, holeRadius, 0, Math.PI * 2);
+        ctx.arc(-holeOffset, holeOffset, holeRadius, 0, Math.PI * 2);
+        ctx.arc(holeOffset, holeOffset, holeRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+    }
+
+    for (let i = 0; i < particleCount; i++) {
+      const p = new FloatingKeyParticle();
+      p.y = Math.random() * height;
+      particles.push(p);
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
