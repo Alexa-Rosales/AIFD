@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parametric Poster Generator — Making Time 17</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300&family=Foldit:wght@400;700&family=Syne+Mono&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #0a0c10;
+      --panel-bg: #14171d;
+      --panel-border: #222733;
+      --accent: #00e5ff;
+      --text-main: #e0e6ed;
+      --text-muted: #8895a7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar Controls */
+    #sidebar {
+      width: 380px;
+      background: var(--panel-bg);
+      border-right: 1px solid var(--panel-border);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--panel-border);
+    }
+
+    .sidebar-header h1 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .sidebar-content {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .control-group {
+      margin-bottom: 24px;
+    }
+
+    .control-group h3 {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      margin-bottom: 6px;
+      color: var(--text-main);
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      background: #0a0c10;
+      border: 1px solid var(--panel-border);
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      margin-bottom: 12px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    .color-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .color-picker-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    input[type="color"] {
+      -webkit-appearance: none;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      cursor: pointer;
+      background: none;
+    }
+
+    .range-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+    }
+
+    /* Primary Actions */
+    .actions {
+      padding: 20px;
+      border-top: 1px solid var(--panel-border);
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .btn-primary {
+      background: #00e5ff;
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      background: #33ecff;
+    }
+
+    .btn-secondary {
+      background: #222733;
+      color: #fff;
+    }
+
+    .btn-secondary:hover {
+      background: #2d3444;
+    }
+
+    /* Workspace */
+    #workspace {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      background: #050608;
+      overflow: auto;
+    }
+
+    .svg-container {
+      box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+      max-height: 90vh;
+      max-width: 90vw;
+      aspect-ratio: 1 / 1.5;
+      background: #161618;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CONTROL PANEL -->
+  <aside id="sidebar">
+    <div class="sidebar-header">
+      <h1>Making Time 17 Generator</h1>
+    </div>
+
+    <div class="sidebar-content">
+      
+      <!-- Palette Controls -->
+      <div class="control-group">
+        <h3>1. Chromatic Palette</h3>
+        <div class="color-row">
+          <div class="color-picker-wrapper">
+            <input type="color" id="bg-color" value="#161618">
+            <label for="bg-color">Background</label>
+          </div>
+          <div class="color-picker-wrapper">
+            <input type="color" id="blob-fill-color" value="#d3cce3">
+            <label for="blob-fill-color">Blob Tone</label>
+          </div>
+        </div>
+        <div class="color-row">
+          <div class="color-picker-wrapper">
+            <input type="color" id="blob-stroke-color" value="#000000">
+            <label for="blob-stroke-color">Blob Outline</label>
+          </div>
+          <div class="color-picker-wrapper">
+            <input type="color" id="text-color" value="#ffffff">
+            <label for="text-color">Main Text</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Typography & Text Content -->
+      <div class="control-group">
+        <h3>2. Text Inputs</h3>
+        
+        <label for="title-text">Left Vertical Title (Foldit)</label>
+        <input type="text" id="title-text" value="MAKING TIME 17">
+
+        <label for="subtitle-text">Top Subtitle (Cormorant)</label>
+        <input type="text" id="subtitle-text" value="seventeen years">
+
+        <label for="date-text">Date Block (Cormorant)</label>
+        <textarea id="date-text">saturday&#10;may&#10;- 20 -&#10;2017&#10;9-3&#10;PM AM</textarea>
+
+        <label for="lineup-text">Lineup (Cormorant Italic)</label>
+        <textarea id="lineup-text">Jessy Lanza LIVE&#10;Red Axes LIVE&#10;Jacques Greene&#10;Dave P. Mike Z.&#10;Dave Pak. Broadzilla&#10;Rocktits! Greg D.&#10;&amp; Nadia Ksabia&#10;NTS / PHANTASY</textarea>
+
+        <label for="venue-text">Venue Details (Cormorant)</label>
+        <textarea id="venue-text" style="min-height:50px;">Underground Arts&#10;1200 Callowhill st&#10;PHILADELPHIA PA&#10;15 dollars</textarea>
+
+        <label for="tech-text">Badges & Footer (Syne Mono)</label>
+        <input type="text" id="tech-text" value="BITBY.TV | | WWW.MAKINGTIMEISRAD.COM">
+      </div>
+
+      <!-- Parametric Controls -->
+      <div class="control-group">
+        <h3>3. Geometry & Scale</h3>
+        
+        <label for="rose-scale">Glitch Flower Scale</label>
+        <div class="range-wrapper">
+          <input type="range" id="rose-scale" min="0.5" max="1.5" step="0.05" value="1.0">
+        </div>
+      </div>
+
+    </div>
+
+    <div class="actions">
+      <button class="btn-secondary" id="reset-btn">Reset</button>
+      <button class="btn-primary" id="export-btn">Export SVG</button>
+    </div>
+  </aside>
+
+  <!-- CANVAS / WORKSPACE -->
+  <main id="workspace">
+    <div class="svg-container">
+      <svg id="poster-svg" viewBox="0 0 600 900" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300&amp;family=Foldit:wght@400;700&amp;family=Syne+Mono&amp;display=swap');
+            
+            .font-foldit { font-family: 'Foldit', display; font-weight: 700; }
+            .font-cormorant { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; }
+            .font-syne { font-family: 'Syne Mono', monospace; }
+          </style>
+
+          <!-- Deep Burgundy & Cyber Tone Gradient for Glitch Rose -->
+          <radialGradient id="glitch-rose-grad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#99003d" />
+            <stop offset="55%" stop-color="#550022" />
+            <stop offset="100%" stop-color="#22000e" />
+          </radialGradient>
+
+          <!-- True Botanical Glitch Flower Definition -->
+          <g id="vector-rose">
+            <!-- Curved Cyber Stem with Thorns -->
+            <path d="M 0,-20 Q 15,90 -5,220" stroke="#00e5ff" stroke-width="2.5" fill="none" opacity="0.9" />
+            <path d="M 7,60 L 14,53 L 8,68 Z" fill="#00e5ff" opacity="0.8" />
+            <path d="M -8,130 L -16,122 L -9,138 Z" fill="#00e5ff" opacity="0.8" />
+
+            <!-- Organic Pointed Leaves -->
+            <path d="M -2,85 Q -45,70 -65,95 Q -40,115 -2,105 Z" fill="#360017" stroke="#00e5ff" stroke-width="1.5" />
+            <path d="M -4,140 Q 45,125 65,150 Q 35,175 -5,165 Z" fill="#360017" stroke="#00e5ff" stroke-width="1.5" />
+            
+            <!-- Multi-layered Blooming Rose Petals -->
+            <g transform="translate(0, -35)">
+              <!-- Outer Petal Layer (Scalloped Blooming Shape) -->
+              <path d="M 0,-75 C 45,-85 85,-45 75,0 C 85,45 45,85 0,75 C -45,85 -85,45 -75,0 C -85,-45 -45,-85 0,-75 Z" fill="url(#glitch-rose-grad)" stroke="#ff0055" stroke-width="2" />
+              
+              <!-- Intermediate Spiraling Petals -->
+              <path d="M -50,-50 Q 0,-95 50,-50 Q 80,0 45,45 Q 0,70 -45,45 Q -80,0 -50,-50 Z" fill="#4d001f" stroke="#00e5ff" stroke-width="1.2" opacity="0.9" />
+              <path d="M -30,-30 Q 0,-65 30,-30 Q 55,0 30,30 Q 0,50 -30,30 Q -55,0 -30,-30 Z" fill="#7a0033" stroke="#ff0055" stroke-width="1" />
+
+              <!-- Inner Core Receptacle -->
+              <circle cx="0" cy="0" r="28" fill="#2d0012" stroke="#00e5ff" stroke-width="1.5" />
+
+              <!-- Wave Modulation Lines (Petal Veins) -->
+              <g stroke="#ffffff" stroke-width="1" opacity="0.3" fill="none">
+                <path d="M -65,-45 Q -25,-60 0,-45 Q 25,-30 65,-45" />
+                <path d="M -72,0 Q -35,-20 0,0 Q 35,20 72,0" />
+                <path d="M -55,45 Q -25,30 0,45 Q 25,60 55,45" />
+              </g>
+
+              <!-- Digital Glitch / Cross-Stitch Stamen Overlay -->
+              <g fill="#ffffff" font-family="monospace" font-size="10" font-weight="bold" opacity="0.9">
+                <text x="-8" y="-12">+</text><text x="4" y="-16">x</text>
+                <text x="-16" y="4">x</text><text x="8" y="6">+</text>
+                <text x="-6" y="18">+</text><text x="-38" y="-22">x</text><text x="32" y="-28">+</text>
+                <text x="-52" y="18">+</text><text x="45" y="24">x</text>
+              </g>
+            </g>
+          </g>
+        </defs>
+
+        <!-- Base Background -->
+        <rect id="svg-bg" width="600" height="900" fill="#161618" />
+
+        <!-- Fluid Liquid Blobs -->
+        <g id="svg-abstract-shapes">
+          <path class="blob-path" d="M 90,55 C 90,30 110,15 140,20 C 180,25 220,10 260,25 C 310,40 330,20 370,30 C 420,40 450,15 480,25 C 500,32 505,65 480,85 C 440,115 385,100 340,110 C 290,120 250,105 210,115 C 160,125 90,105 90,55 Z" fill="#d3cce3" stroke="#000000" stroke-width="2.5" />
+          <path class="blob-path" d="M 90,185 C 90,165 125,160 150,170 C 190,185 220,165 260,175 C 300,185 320,215 310,250 C 300,285 275,290 240,300 C 200,310 165,290 145,280 C 105,265 90,215 90,185 Z" fill="#d3cce3" stroke="#000000" stroke-width="2.5" />
+          <path class="blob-path" d="M 380,140 C 410,125 450,145 490,135 C 535,122 565,145 575,185 C 585,225 565,260 525,270 C 480,280 425,250 390,265 C 355,280 335,230 345,190 C 355,155 355,155 380,140 Z" fill="#d3cce3" stroke="#000000" stroke-width="2.5" />
+          <path class="blob-path" d="M 90,345 C 135,330 175,365 210,345 C 245,325 270,370 255,420 C 240,460 195,485 155,475 C 115,465 85,425 90,385 C 95,355 85,355 90,345 Z" fill="#d3cce3" stroke="#000000" stroke-width="2.5" />
+          <path class="blob-path" d="M 90,540 C 120,510 170,535 210,520 C 260,500 295,550 280,600 C 265,650 215,670 175,655 C 135,640 115,665 95,630 C 75,595 75,570 90,540 Z" fill="#d3cce3" stroke="#000000" stroke-width="2.5" />
+          <path class="blob-path" d="M 90,750 C 130,730 180,755 230,745 C 290,735 340,765 355,815 C 370,865 330,895 280,890 C 230,885 170,895 120,880 C 75,865 65,775 90,750 Z" fill="#d3cce3" stroke="#000000" stroke-width="2.5" />
+          <path class="blob-path" d="M 420,830 C 465,815 515,835 560,820 C 595,810 610,845 615,875 C 620,905 570,905 525,900 C 480,895 440,900 395,885 C 375,875 395,840 420,830 Z" fill="#d3cce3" stroke="#000000" stroke-width="2.5" />
+        </g>
+
+        <!-- Central Glitch Flower Instance -->
+        <g id="svg-rose-container" transform="translate(230, 290) scale(1.0)">
+          <use href="#vector-rose" />
+        </g>
+
+        <!-- Left Vertical Title (Foldit) - Stretched to Top -->
+        <g transform="translate(68, 890) rotate(-90)">
+          <text id="svg-title" class="font-foldit" font-size="94" fill="#ffffff" textLength="880" lengthAdjust="spacingAndGlyphs">MAKING TIME 17</text>
+        </g>
+
+        <!-- Top Right Subtitle (Cormorant) -->
+        <g transform="translate(475, 80)">
+          <text class="font-cormorant sub-text-el" font-size="28" fill="#ffffff" text-anchor="middle">M</text>
+          <text class="font-cormorant sub-text-el" font-size="16" fill="#ffffff" text-anchor="middle" y="18">+</text>
+          <text id="svg-subtitle" class="font-cormorant sub-text-el" font-size="18" fill="#ffffff" text-anchor="middle" y="40">seventeen years</text>
+        </g>
+
+        <!-- Center-Left Date Block (Cormorant) -->
+        <g id="svg-date-group" transform="translate(210, 560)" class="font-cormorant" font-size="18" fill="#ffffff" text-anchor="middle">
+          <!-- Populated via JS -->
+        </g>
+
+        <!-- Right Side Lineup (Cormorant) -->
+        <g id="svg-lineup-group" transform="translate(540, 315)" class="font-cormorant" font-size="19" fill="#ffffff" text-anchor="end">
+          <!-- Populated via JS -->
+        </g>
+
+        <!-- Bottom Right Venue Details (Cormorant) -->
+        <g id="svg-venue-group" transform="translate(540, 620)" class="font-cormorant" font-size="16" fill="#ffffff" text-anchor="end">
+          <!-- Populated via JS -->
+        </g>
+
+        <!-- Badges & Footer (Syne Mono) -->
+        <g class="font-syne" font-size="11" fill="#ffffff">
+          <text id="svg-badge-1" x="210" y="685" text-anchor="middle">BITBY.TV</text>
+          <text id="svg-badge-2" x="540" y="585" text-anchor="end"></text>
+          <text id="svg-footer" x="325" y="875" text-anchor="middle" letter-spacing="3">WWW.MAKINGTIMEISRAD.COM</text>
+        </g>
+      </svg>
+    </div>
+  </main>
+
+  <script>
+    const bgColorInput = document.getElementById('bg-color');
+    const blobFillInput = document.getElementById('blob-fill-color');
+    const blobStrokeInput = document.getElementById('blob-stroke-color');
+    const textColorInput = document.getElementById('text-color');
+
+    const titleInput = document.getElementById('title-text');
+    const subtitleInput = document.getElementById('subtitle-text');
+    const dateInput = document.getElementById('date-text');
+    const lineupInput = document.getElementById('lineup-text');
+    const venueInput = document.getElementById('venue-text');
+    const techInput = document.getElementById('tech-text');
+
+    const roseScaleInput = document.getElementById('rose-scale');
+    const resetBtn = document.getElementById('reset-btn');
+    const exportBtn = document.getElementById('export-btn');
+
+    const svgBg = document.getElementById('svg-bg');
+    const blobPaths = document.querySelectorAll('.blob-path');
+
+    const svgRoseContainer = document.getElementById('svg-rose-container');
+    const svgTitle = document.getElementById('svg-title');
+    const svgSubtitle = document.getElementById('svg-subtitle');
+    const subTextElements = document.querySelectorAll('.sub-text-el');
+    const svgDateGroup = document.getElementById('svg-date-group');
+    const svgLineupGroup = document.getElementById('svg-lineup-group');
+    const svgVenueGroup = document.getElementById('svg-venue-group');
+    const svgBadge1 = document.getElementById('svg-badge-1');
+    const svgBadge2 = document.getElementById('svg-badge-2');
+    const svgFooter = document.getElementById('svg-footer');
+
+    function renderMultilineText(container, text, lineGap, align = "end") {
+      container.innerHTML = '';
+      const lines = text.split('\n');
+      lines.forEach((line, index) => {
+        const tspan = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        tspan.textContent = line;
+        tspan.setAttribute("x", "0");
+        tspan.setAttribute("y", index * lineGap);
+        tspan.setAttribute("text-anchor", align);
+        tspan.setAttribute("fill", textColorInput.value);
+        container.appendChild(tspan);
+      });
+    }
+
+    function updatePoster() {
+      svgBg.setAttribute('fill', bgColorInput.value);
+      
+      const fillCol = blobFillInput.value;
+      const strokeCol = blobStrokeInput.value;
+      blobPaths.forEach(path => {
+        path.setAttribute('fill', fillCol);
+        path.setAttribute('stroke', strokeCol);
+      });
+
+      const textCol = textColorInput.value;
+      svgTitle.setAttribute('fill', textCol);
+      svgSubtitle.setAttribute('fill', textCol);
+      subTextElements.forEach(el => el.setAttribute('fill', textCol));
+      svgBadge1.setAttribute('fill', textCol);
+      svgBadge2.setAttribute('fill', textCol);
+      svgFooter.setAttribute('fill', textCol);
+
+      svgTitle.textContent = titleInput.value;
+      svgSubtitle.textContent = subtitleInput.value;
+
+      renderMultilineText(svgDateGroup, dateInput.value, 22, "middle");
+      renderMultilineText(svgLineupGroup, lineupInput.value, 24, "end");
+      renderMultilineText(svgVenueGroup, venueInput.value, 20, "end");
+
+      const techParts = techInput.value.split('|');
+      svgBadge1.textContent = techParts[0] ? techParts[0].trim() : '';
+      svgBadge2.textContent = techParts[1] ? techParts[1].trim() : '';
+      svgFooter.textContent = techParts[2] ? techParts[2].trim() : '';
+
+      const scale = roseScaleInput.value;
+      svgRoseContainer.setAttribute('transform', `translate(230, 290) scale(${scale})`);
+    }
+
+    function resetDefaults() {
+      bgColorInput.value = '#161618';
+      blobFillInput.value = '#d3cce3';
+      blobStrokeInput.value = '#000000';
+      textColorInput.value = '#ffffff';
+      roseScaleInput.value = '1.0';
+      updatePoster();
+    }
+
+    function exportSVG() {
+      const svgData = document.getElementById('poster-svg').outerHTML;
+      const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+      const svgUrl = URL.createObjectURL(svgBlob);
+      const downloadLink = document.createElement("a");
+      
+      downloadLink.href = svgUrl;
+      downloadLink.download = `making_time_17_${Date.now()}.svg`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    }
+
+    const inputs = [
+      bgColorInput, blobFillInput, blobStrokeInput, textColorInput,
+      titleInput, subtitleInput, dateInput, lineupInput, venueInput, techInput,
+      roseScaleInput
+    ];
+
+    inputs.forEach(input => input.addEventListener('input', updatePoster));
+    resetBtn.addEventListener('click', resetDefaults);
+    exportBtn.addEventListener('click', exportSVG);
+
+    updatePoster();
+  </script>
+</body>
+</html>
