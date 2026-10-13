@@ -1,91 +1,44 @@
-# Portfolio Design Specification & Developer Handoff
+# Project Handoff: Parametric Poster Generator — Making Time 17
 
-This document outlines the detailed design system and implementation specifications for the portfolio website. The project combines the high-impact layout structure and dynamic energy of **The Governors Ball** website with the elegant, serif-focused aesthetic of **Flower Knows**.
-
----
-
-## 1. Design Overview & Vision
-
-- **Vibe / Aesthetic:** High-impact editorial elegance. Combines bold serif typography and soft pastel tones with aggressive modular layouts and dynamic motion.
-- **Key References:**
-  - *Governors Ball:* Grid layout, mobile responsiveness, full-width hero header, crisp hover micro-interactions, bold uppercase header hierarchy.
-  - *Flower Knows:* Elegant serif typography, soft romantic palette, subtle decorative accents.
+## 1. Project Overview
+* **Project Name:** Parametric Poster Generator — Making Time 17
+* **Design Aesthetic:** David Rudnick / *Making Time* graphic design style—featuring heavy modular display typography, classical serif lineup lists, geometric background container shapes, scientific grid crosshairs, and high-contrast chromatic palettes.
+* **Core Technology Stack:** 
+  * Single-file HTML5 application (`index.html`)
+  * Embedded modular SVG canvas
+  * Google Fonts (`Foldit`, `Cormorant Garamond`, `Space Mono`, `Syne Mono`)
+  * Client-side vector-preserving PDF export via `jsPDF` & `svg2pdf.js`
 
 ---
 
-## 2. Typography
+## 2. Key Features & Implementation Architecture
 
-- **Heading Font:** `Manofa Bold`
-- **Body Font:** `Manofa Light`
-- **Scale & Treatment:**
-  - **Headings:** Massive, uppercase, bold serif. Headings should feel commanding and expressive.
-  - **Hero Header:** Displays the user's name prominently at the top of the full-width hero section.
-  - **Body / Subtext:** Set in `Manofa Light` with relaxed line-height for readability against soft blue backgrounds.
+### A. Dynamic Botanical Specimen Generator
+* Contains **four distinct multi-layered vector specimens** (`#specimen-rose`, `#specimen-fern`, `#specimen-lotus`, `#specimen-blossom`), each built with radial glow gradients, scientific coordinate grids, and unique cyberpunk colorways.
+* Randomization cycles through the specimen library while dynamically updating the corresponding archival name and classification numbers.
 
----
+### B. Archival Proximity Labeling
+* Scientific classification text metadata (Specimen number, botanical archive title, and coordinate grid data `X / Y / Z`) is positioned directly alongside the botanical illustration asset to emulate authentic archival museum charts.
 
-## 3. Color Palette & Usage
+### C. High-Contrast Typography & Layer Separation
+* Decoupled the outer workspace background from the actual SVG poster background (`<rect id="svg-bg">`) to guarantee clean structural framing.
+* Placed all typography and titles on the topmost layer (`<g id="layer-typography">`) with forced high-contrast text fills so elements never blend into or get hidden behind background blobs.
 
-| Element | Color Code | Visual Description | Usage / Application |
-| :--- | :--- | :--- | :--- |
-| **Background** | `#80AEE8` | Soft Sky Blue | Main page background, primary canvas |
-| **Text** | `#5B0015` | Deep Burgundy / Wine | All primary headings, body text, contrast elements |
-| **Accent** | `#80AEEB` | Vibrant Ice Blue | Links, button fills, card borders, tag badges, outline accents |
+### D. Interactive Control Sidebar
+* **Chromatic Palettes:** Quick presets (*Acid Neon*, *Monochrome*, *Sunset*) plus custom color pickers for background, blob tones, outlines, and main text.
+* **Typography & Content Editor:** Real-time text inputs and textareas for the vertical title, subtitle, date block, line-up, venue details, and footer badges.
+* **Geometry & Scaling:** Fine-tune slider for archive specimen scaling.
+* **Randomize & Reset:** One-click full randomization of colors, specimen types, layout variations, and typography presets, alongside a reset defaults button.
 
-### Accent Usage Rules
-The accent color (`#80AEEB`) is utilized for:
-1. Primary button fills & interactive link containers.
-2. Section dividers and structural card borders.
-3. Category badges / project tags (e.g., `[01]`, `[PROJECT TYPE]`).
-4. Subtle text-stroke outlines on decorative background text elements in the hero section.
+### E. Vector-Preserving PDF Export
+* Direct client-side export using `jsPDF` and `svg2pdf.js`, generating crisp, high-resolution vector PDFs at exact poster dimensions (`600x900 pt`) without rasterization loss.
 
 ---
 
-## 4. Layout Architecture & Grid System
+## 3. File Structure & Deployment
 
-### Hero Section
-- **Width:** `100vw` (Full-width / Edge-to-edge).
-- **Placement:** The site owner's name sits prominently at the very top of the hero container.
-- **Background Layer:** Fast-drifting flower animation rendering full-screen behind the hero text content.
+* **`index.html`**: Self-contained application file incorporating HTML markup, embedded CSS styling, SVG template definitions, and vanilla JavaScript control logic. No build tools, package managers, or server environments are required.
 
-### Grid Layout
-- **Desktop (Laptop & Monitor):** Modular **3-to-4 block grid** layout for featured works, case studies, and info modules.
-- **Mobile View (Phone Width):** Collapses strictly into a **single 1-column vertical feed** for seamless vertical scrolling.
-
-```
-DESKTOP (3 to 4 Columns)                 MOBILE (1 Column Vertical Feed)
-+-----------------------------------+     +-----------------------------------+
-|  [ NAME ]                         |     |  [ NAME ]                         |
-|  FULL-WIDTH HERO CONTAINER        |     |  HERO CONTAINER                   |
-+-----------------------------------+     +-----------------------------------+
-| [ ITEM 1 ] [ ITEM 2 ] [ ITEM 3 ]  |     | [ ITEM 1 ]                        |
-+-----------------------------------+     | [ ITEM 2 ]                        |
-                                          | [ ITEM 3 ]                        |
-                                          +-----------------------------------+
-```
-
----
-
-## 5. Interactive Components & Micro-Interactions
-
-### Work List Buttons & Links
-- **Default State:**
-  - Shape: Rounded pill corners (`border-radius: 9999px`).
-  - Fill: `#80AEEB` (Accent Ice Blue).
-  - Text: `#5B0015` (Deep Burgundy).
-  - Border: 1px solid `#5B0015`.
-- **Hover State:**
-  - **Color Swap:** Background flips to `#5B0015` (Burgundy) and text flips to `#80AEEB` (Ice Blue).
-  - Transition: Snappy micro-interaction (`150ms cubic-bezier(0.4, 0, 0.2, 1)`).
-  - Optional Transform: Slight scale lift (`transform: translateY(-2px)`).
-
----
-
-## 6. Motion & Background Animation
-
-- **Concept:** Fast-drifting flower particles across the viewport canvas.
-- **Speed:** Fast velocity drifting diagonally or downward across the hero container.
-- **Implementation Guidelines:**
-  - Built using HTML5 Canvas or CSS keyframe SVG particles.
-  - Flowers should feature slight opacity variations (`opacity: 0.4` to `0.8`) to keep foreground text legible (`#5B0015`).
-  - Must support `prefers-reduced-motion` media queries to pause or slow down animation if requested by user accessibility settings.
+### How to Run:
+1. Save the application code into a file named `index.html`.
+2. Open the file directly in any modern web browser (Chrome, Firefox, Safari, or Edge).
