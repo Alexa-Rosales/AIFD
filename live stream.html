@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Open-Meteo Radar & Poster Generator — Making Time 17</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300&family=Foldit:wght@400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne+Mono&display=swap" rel="stylesheet">
+
+  <!-- jsPDF & svg2pdf.js for vector-preserving PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/svg2pdf.js@2.8.1/dist/svg2pdf.umd.min.js"></script>
+  
+  <!-- QRCode.js library for dynamic SVG/Image QR rendering -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #070b12;
+      --panel-bg: #0d1420;
+      --panel-border: #1a2638;
+      --accent: #00f0ff;
+      --accent-glow: rgba(0, 240, 255, 0.2);
+      --text-main: #e2e8f0;
+      --text-muted: #7b8fae;
+      --radar-green: #00ffcc;
+      --weather-alert: #ff007f;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Space Mono', monospace, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Weather Station Sidebar */
+    #sidebar {
+      width: 460px;
+      background: var(--panel-bg);
+      border-right: 1px solid var(--panel-border);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+      box-shadow: inset -5px 0 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .sidebar-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--panel-border);
+      background: #090f19;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-header h1 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .station-badge {
+      font-size: 0.65rem;
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    .sidebar-content {
+      padding: 18px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .control-group {
+      margin-bottom: 22px;
+      background: rgba(26, 38, 56, 0.3);
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      padding: 14px;
+    }
+
+    .control-group h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Live Weather Radar Panel */
+    .stream-box {
+      background: #05080e;
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+      padding: 12px;
+      margin-top: 6px;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    .stream-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 0.7rem;
+      color: var(--radar-green);
+    }
+
+    .pulsing-dot {
+      width: 7px;
+      height: 7px;
+      background-color: var(--weather-alert);
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 8px var(--weather-alert);
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.2; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.3); }
+      100% { opacity: 0.2; transform: scale(0.8); }
+    }
+
+    /* Telemetry Log Terminal */
+    .telemetry-log {
+      background: #020407;
+      border: 1px solid #142030;
+      border-radius: 3px;
+      padding: 8px;
+      font-size: 0.65rem;
+      color: var(--radar-green);
+      height: 95px;
+      overflow-y: auto;
+      margin-top: 8px;
+      white-space: pre-wrap;
+      line-height: 1.3;
+    }
+
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .btn-preset {
+      padding: 8px 4px;
+      font-size: 0.7rem;
+      font-family: inherit;
+      border: 1px solid var(--panel-border);
+      border-radius: 3px;
+      background: #090f19;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-preset:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Weather Showcase Grids */
+    .weather-showcase-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+    }
+
+    .btn-gallery, .btn-weather-showcase {
+      padding: 8px 2px;
+      font-size: 0.7rem;
+      font-family: inherit;
+      font-weight: 700;
+      border: 1px solid var(--panel-border);
+      border-radius: 3px;
+      background: #111a28;
+      color: var(--accent);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .btn-gallery:hover, .btn-weather-showcase:hover {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
+
+    .btn-weather-showcase {
+      color: var(--weather-alert);
+      background: #1a0d18;
+      border-color: #381a2f;
+    }
+
+    .btn-weather-showcase:hover {
+      background: var(--weather-alert);
+      color: #fff;
+      border-color: var(--weather-alert);
+    }
+
+    /* Docs & Handbooks Buttons */
+    .docs-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-doc {
+      flex: 1;
+      padding: 7px;
+      font-size: 0.7rem;
+      font-family: inherit;
+      font-weight: 600;
+      border: 1px solid var(--panel-border);
+      border-radius: 3px;
+      background: #111a28;
+      color: var(--radar-green);
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .btn-doc:hover {
+      background: var(--radar-green);
+      color: #000;
+    }
+
+    /* Doc Modal Viewer */
+    #doc-modal {
+      display: none;
+      background: #05080e;
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+      padding: 12px;
+      margin-top: 10px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    #doc-modal pre {
+      font-family: inherit;
+      font-size: 0.7rem;
+      white-space: pre-wrap;
+      color: #a5b4fc;
+    }
+
+    .doc-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .close-doc {
+      background: none;
+      border: none;
+      color: var(--weather-alert);
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.72rem;
+      margin-bottom: 4px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input[type="text"], textarea, select {
+      width: 100%;
+      background: #05080e;
+      border: 1px solid var(--panel-border);
+      color: var(--text-main);
+      padding: 7px 9px;
+      border-radius: 3px;
+      font-size: 0.78rem;
+      font-family: inherit;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"]:focus, textarea:focus, select:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .color-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .color-picker-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    input[type="color"] {
+      -webkit-appearance: none;
+      border: 1px solid var(--panel-border);
+      width: 24px;
+      height: 24px;
+      border-radius: 3px;
+      cursor: pointer;
+      background: none;
+    }
+
+    .range-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent);
+    }
+
+    .actions {
+      padding: 16px 20px;
+      border-top: 1px solid var(--panel-border);
+      background: #090f19;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .actions-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 3px;
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      background: #33f3ff;
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .btn-secondary {
+      background: #1a2638;
+      color: #fff;
+      border: 1px solid var(--panel-border);
+    }
+
+    .btn-secondary:hover {
+      background: #23334d;
+    }
+
+    .btn-accent {
+      background: var(--weather-alert);
+      color: #fff;
+    }
+
+    .btn-accent:hover {
+      background: #ff3399;
+      box-shadow: 0 0 10px rgba(255, 0, 127, 0.4);
+    }
+
+    #workspace {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      background: #030508;
+      overflow: auto;
+    }
+
+    .svg-container {
+      box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 0 1px var(--panel-border);
+      max-height: 90vh;
+      max-width: 90vw;
+      aspect-ratio: 1 / 1.5;
+      background: #161618;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Hidden container for client-side QR rendering */
+    #qr-temp-container {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hidden QR Render Div -->
+  <div id="qr-temp-container"></div>
+
+  <!-- CONTROL PANEL -->
+  <aside id="sidebar">
+    <div class="sidebar-header">
+      <h1>Open-Meteo Radar 17</h1>
+      <span class="station-badge">STATION: LIVE</span>
+    </div>
+
+    <div class="sidebar-content">
+      
+      <!-- Live Open-Meteo Weather Stream & Process Log -->
+      <div class="control-group">
+        <h3>Live Open-Meteo Telemetry Stream</h3>
+        <label for="city-select">Target Radar Station</label>
+        <select id="city-select">
+          <option value="newyork">New York, US (40.71, -74.00)</option>
+          <option value="paris">Paris, FR (48.85, 2.35)</option>
+          <option value="philadelphia">Philadelphia, PA (40.00, -75.16)</option>
+          <option value="tokyo">Tokyo, JP (35.67, 139.65)</option>
+          <option value="reykjavik">Reykjavík, IS (64.14, -21.94)</option>
+          <option value="london">London, UK (51.50, -0.12)</option>
+        </select>
+        <div class="actions-row" style="margin-top: 6px;">
+          <button class="btn-primary" id="toggle-stream-btn" type="button">Connect Radar Stream</button>
+        </div>
+
+        <div class="stream-box">
+          <div class="stream-status">
+            <span>RADAR: <strong id="stream-state-text">OFFLINE</strong></span>
+            <span class="pulsing-dot" id="stream-dot" style="display:none;"></span>
+          </div>
+          <!-- Weather Process Log Viewer -->
+          <div class="telemetry-log" id="telemetry-log">SYSTEM READY. AWAITING TELEMETRY STREAM...</div>
+        </div>
+      </div>
+
+      <!-- Weather State Showcase Gallery -->
+      <div class="control-group">
+        <h3>Weather States</h3>
+        <div class="weather-showcase-grid">
+          <button class="btn-weather-showcase" data-weather="clear" type="button">Clear</button>
+          <button class="btn-weather-showcase" data-weather="rain" type="button">Rain</button>
+          <button class="btn-weather-showcase" data-weather="storm" type="button">Storm</button>
+          <button class="btn-weather-showcase" data-weather="snow" type="button">Snow</button>
+          <button class="btn-weather-showcase" data-weather="heat" type="button">Heat</button>
+        </div>
+      </div>
+
+      <!-- Poster Samples Showcase -->
+      <div class="control-group">
+        <h3>Poster Samples</h3>
+        <div class="gallery-grid">
+          <button class="btn-gallery" data-sample="1" type="button">Pic 1</button>
+          <button class="btn-gallery" data-sample="2" type="button">Pic 2</button>
+          <button class="btn-gallery" data-sample="3" type="button">Pic 3</button>
+          <button class="btn-gallery" data-sample="4" type="button">Pic 4</button>
+          <button class="btn-gallery" data-sample="5" type="button">Pic 5</button>
+        </div>
+      </div>
+
+      <!-- Project Docs & Handbook -->
+      <div class="control-group">
+        <h3>Documentation</h3>
+        <div class="docs-row">
+          <button class="btn-doc" id="btn-view-skills" type="button">skills.md</button>
+          <button class="btn-doc" id="btn-view-handoff" type="button">handoff.md</button>
+        </div>
+
+        <!-- Documentation Modal Viewer -->
+        <div id="doc-modal">
+          <div class="doc-modal-header">
+            <span id="doc-title">Document</span>
+            <button class="close-doc" id="close-doc-btn" type="button">×</button>
+          </div>
+          <pre id="doc-content"></pre>
+        </div>
+      </div>
+
+      <!-- Presets & Colors -->
+      <div class="control-group">
+        <h3>Chromatic Palettes</h3>
+        <div class="preset-grid">
+          <button class="btn-preset" id="preset-cyber" type="button">Acid Neon</button>
+          <button class="btn-preset" id="preset-mono" type="button">Monochrome</button>
+          <button class="btn-preset" id="preset-sunset" type="button">Sunset</button>
+        </div>
+
+        <div class="color-row">
+          <div class="color-picker-wrapper">
+            <input type="color" id="bg-color" value="#161618">
+            <label for="bg-color">Canvas</label>
+          </div>
+          <div class="color-picker-wrapper">
+            <input type="color" id="blob-fill-color" value="#d3cce3">
+            <label for="blob-fill-color">Blob Tone</label>
+          </div>
+        </div>
+        <div class="color-row">
+          <div class="color-picker-wrapper">
+            <input type="color" id="blob-stroke-color" value="#000000">
+            <label for="blob-stroke-color">Outline</label>
+          </div>
+          <div class="color-picker-wrapper">
+            <input type="color" id="text-color" value="#ffffff">
+            <label for="text-color">Text Ink</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Typography -->
+      <div class="control-group">
+        <h3>Typography & Event Data</h3>
+        
+        <label for="font-preset-select">Font Family Preset</label>
+        <select id="font-preset-select">
+          <option value="avant">Avant-Garde (Foldit + Cormorant)</option>
+          <option value="techno">Brutalist Techno (Syne Mono + Space Mono)</option>
+          <option value="editorial">Editorial Serif (Cormorant + Space Mono)</option>
+        </select>
+
+        <label for="title-text">Left Vertical Title</label>
+        <input type="text" id="title-text" value="MAKING TIME 17">
+
+        <label for="subtitle-text">Top Subtitle</label>
+        <input type="text" id="subtitle-text" value="seventeen years">
+
+        <label for="date-text">Date Block</label>
+        <textarea id="date-text">saturday&#10;may 20&#10;2017&#10;9 PM - 3 AM</textarea>
+
+        <label for="lineup-text">Lineup</label>
+        <textarea id="lineup-text">Jessy Lanza LIVE&#10;Red Axes LIVE&#10;Jacques Greene&#10;Dave P. Mike Z.&#10;Dave Pak. Broadzilla&#10;Rocktits! Greg D.&#10;&amp; Nadia Ksabia&#10;NTS / PHANTASY</textarea>
+
+        <label for="venue-text">Venue Details</label>
+        <textarea id="venue-text" style="min-height:50px;">Underground Arts&#10;1200 Callowhill st&#10;PHILADELPHIA PA&#10;15 dollars</textarea>
+
+        <label for="tech-text">Badges & Footer</label>
+        <input type="text" id="tech-text" value="BITBY.TV | | WWW.MAKINGTIMEISRAD.COM">
+      </div>
+
+      <!-- Geometry -->
+      <div class="control-group">
+        <h3>Specimen Scale</h3>
+        <div class="range-wrapper">
+          <input type="range" id="rose-scale" min="0.5" max="1.5" step="0.05" value="0.95">
+        </div>
+      </div>
+
+    </div>
+
+    <div class="actions">
+      <div class="actions-row">
+        <button class="btn-accent" id="randomize-btn" type="button">Randomize</button>
+        <button class="btn-secondary" id="reset-btn" type="button">Reset</button>
+      </div>
+      <button class="btn-primary" id="export-pdf-btn" type="button">Export Vector PDF</button>
+    </div>
+  </aside>
+
+  <!-- CANVAS / WORKSPACE -->
+  <main id="workspace">
+    <div class="svg-container">
+      <svg id="poster-svg" viewBox="0 0 600 900" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300&amp;family=Foldit:wght@400;700&amp;family=Space+Mono:ital,wght@0,400;0,700;1,400&amp;family=Syne+Mono&amp;display=swap');
+            
+            .font-title-dynamic { font-family: 'Foldit', display; font-weight: 700; }
+            .font-body-dynamic { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; }
+            .font-badge-dynamic { font-family: 'Syne Mono', monospace; }
+          </style>
+
+          <radialGradient id="specimen-glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ff007f" stop-opacity="0.9" />
+            <stop offset="60%" stop-color="#990044" stop-opacity="0.6" />
+            <stop offset="100%" stop-color="#12061a" stop-opacity="0" />
+          </radialGradient>
+
+          <radialGradient id="blob-lighting" cx="30%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35" />
+            <stop offset="70%" stop-color="#000000" stop-opacity="0.1" />
+            <stop offset="100%" stop-color="#000000" stop-opacity="0.4" />
+          </radialGradient>
+
+          <!-- Specimen 1: Neon Orchid -->
+          <g id="specimen-rose">
+            <circle cx="0" cy="0" r="140" fill="url(#specimen-glow)" />
+            <line x1="-150" y1="0" x2="150" y2="0" stroke="#bfff00" stroke-width="0.75" stroke-dasharray="3,3" opacity="0.6" />
+            <line x1="0" y1="-150" x2="0" y2="150" stroke="#bfff00" stroke-width="0.75" stroke-dasharray="3,3" opacity="0.6" />
+            <g fill="none" stroke="#ff77bb" stroke-width="2.5" opacity="0.85">
+              <ellipse cx="0" cy="0" rx="30" ry="70" transform="rotate(0)" />
+              <ellipse cx="0" cy="0" rx="30" ry="70" transform="rotate(60)" />
+              <ellipse cx="0" cy="0" rx="30" ry="70" transform="rotate(120)" />
+              <ellipse cx="0" cy="0" rx="45" ry="90" transform="rotate(30)" stroke="#ff007f" stroke-width="1.5" />
+              <ellipse cx="0" cy="0" rx="45" ry="90" transform="rotate(90)" stroke="#ff007f" stroke-width="1.5" />
+              <ellipse cx="0" cy="0" rx="45" ry="90" transform="rotate(150)" stroke="#ff007f" stroke-width="1.5" />
+            </g>
+            <circle cx="0" cy="0" r="18" fill="#bfff00" />
+            <circle cx="0" cy="0" r="8" fill="#ffffff" />
+            <path d="M 0,50 Q 25,110 -15,180" stroke="#bfff00" stroke-width="2.5" fill="none" opacity="0.9" />
+          </g>
+
+          <!-- Specimen 2: Spore Matrix Fern -->
+          <g id="specimen-fern">
+            <circle cx="0" cy="0" r="140" fill="url(#specimen-glow)" />
+            <line x1="-150" y1="0" x2="150" y2="0" stroke="#00e5ff" stroke-width="0.75" stroke-dasharray="3,3" opacity="0.6" />
+            <line x1="0" y1="-150" x2="0" y2="150" stroke="#00e5ff" stroke-width="0.75" stroke-dasharray="3,3" opacity="0.6" />
+            <g fill="none" stroke="#00e5ff" stroke-width="2.2" opacity="0.9">
+              <path d="M0,80 Q -60,20 -30,-40 Q -10,-80 0,-110 Q 10,-80 30,-40 Q 60,20 0,80" />
+              <path d="M-80,0 Q -40,-40 0,-50 Q 40,-40 80,0 Q 40,40 0,50 Q -40,40 -80,0" stroke="#79ffff" stroke-width="1.5" />
+            </g>
+            <circle cx="0" cy="0" r="14" fill="#00e5ff" />
+            <circle cx="0" cy="0" r="6" fill="#ffffff" />
+          </g>
+
+          <!-- Specimen 3: Cybernetic Lotus -->
+          <g id="specimen-lotus">
+            <circle cx="0" cy="0" r="140" fill="url(#specimen-glow)" />
+            <line x1="-150" y1="0" x2="150" y2="0" stroke="#ffaa00" stroke-width="0.75" stroke-dasharray="3,3" opacity="0.6" />
+            <line x1="0" y1="-150" x2="0" y2="150" stroke="#ffaa00" stroke-width="0.75" stroke-dasharray="3,3" opacity="0.6" />
+            <g fill="none" stroke="#ffaa00" stroke-width="2.2" opacity="0.9">
+              <polygon points="0,-85 65,-30 50,55 -50,55 -65,-30" />
+              <polygon points="0,-60 45,-20 35,35 -35,35 -45,-20" stroke="#ffdd55" stroke-width="1.5" />
+              <polygon points="0,-35 25,-10 20,20 -20,20 -25,-10" fill="#ffaa00" opacity="0.5" />
+            </g>
+            <circle cx="0" cy="0" r="12" fill="#ffffff" />
+          </g>
+
+          <!-- Specimen 4: Astral Blossom -->
+          <g id="specimen-blossom">
+            <circle cx="0" cy="0" r="140" fill="url(#specimen-glow)" />
+            <line x1="-150" y1="0" x2="150" y2="0" stroke="#cc44ff" stroke-width="0.75" stroke-dasharray="3,3" opacity="0.6" />
+            <line x1="0" y1="-150" x2="0" y2="150" stroke="#cc44ff" stroke-width="0.75" stroke-dasharray="3,3" opacity="0.6" />
+            <g stroke="#cc44ff" stroke-width="2.2" fill="none" opacity="0.9">
+              <line x1="0" y1="-90" x2="0" y2="-30" />
+              <line x1="64" y1="-64" x2="21" y2="-21" />
+              <line x1="90" y1="0" x2="30" y2="0" />
+              <line x1="64" y1="64" x2="21" y2="21" />
+              <line x1="0" y1="90" x2="0" y2="30" />
+              <line x1="-64" y1="64" x2="-21" y2="21" />
+              <line x1="-90" y1="0" x2="-30" y2="0" />
+              <line x1="-64" y1="-64" x2="-21" y2="-21" />
+            </g>
+            <circle cx="0" cy="0" r="40" fill="none" stroke="#cc44ff" stroke-width="1.5" stroke-dasharray="4,4" />
+            <circle cx="0" cy="0" r="16" fill="#cc44ff" opacity="0.8" />
+            <circle cx="0" cy="0" r="6" fill="#ffffff" />
+          </g>
+        </defs>
+
+        <!-- 1. Background Layer -->
+        <g id="layer-background">
+          <rect id="svg-bg" width="600" height="900" fill="#161618" />
+          <g stroke="#ffffff" stroke-width="0.5" opacity="0.15">
+            <line x1="20" y1="20" x2="40" y2="20" />
+            <line x1="20" y1="20" x2="20" y2="40" />
+            <line x1="580" y1="20" x2="560" y2="20" />
+            <line x1="580" y1="20" x2="580" y2="40" />
+            <line x1="20" y1="880" x2="40" y2="880" />
+            <line x1="20" y1="880" x2="20" y2="860" />
+            <line x1="580" y1="880" x2="560" y2="880" />
+            <line x1="580" y1="880" x2="580" y2="860" />
+            <line x1="300" y1="0" x2="300" y2="900" stroke-dasharray="2,8" />
+            <line x1="0" y1="450" x2="600" y2="450" stroke-dasharray="2,8" />
+          </g>
+        </g>
+
+        <!-- 2. Blobs Layer -->
+        <g id="layer-blobs">
+          <g><circle class="blob-path" cx="170" cy="90" r="28" fill="#d3cce3" stroke="#000000" stroke-width="1.5" /><circle cx="170" cy="90" r="28" fill="url(#blob-lighting)" pointer-events="none" /></g>
+          <g><circle class="blob-path" cx="390" cy="110" r="22" fill="#d3cce3" stroke="#000000" stroke-width="1.5" /><circle cx="390" cy="110" r="22" fill="url(#blob-lighting)" pointer-events="none" /></g>
+          <g><circle class="blob-path" cx="150" cy="210" r="32" fill="#d3cce3" stroke="#000000" stroke-width="1.5" /><circle cx="150" cy="210" r="32" fill="url(#blob-lighting)" pointer-events="none" /></g>
+          <g><circle class="blob-path" cx="420" cy="270" r="25" fill="#d3cce3" stroke="#000000" stroke-width="1.5" /><circle cx="420" cy="270" r="25" fill="url(#blob-lighting)" pointer-events="none" /></g>
+          <g><circle class="blob-path" cx="160" cy="380" r="35" fill="#d3cce3" stroke="#000000" stroke-width="1.5" /><circle cx="160" cy="380" r="35" fill="url(#blob-lighting)" pointer-events="none" /></g>
+          <g><circle class="blob-path" cx="410" cy="460" r="28" fill="#d3cce3" stroke="#000000" stroke-width="1.5" /><circle cx="410" cy="460" r="28" fill="url(#blob-lighting)" pointer-events="none" /></g>
+          <g><circle class="blob-path" cx="150" cy="560" r="24" fill="#d3cce3" stroke="#000000" stroke-width="1.5" /><circle cx="150" cy="560" r="24" fill="url(#blob-lighting)" pointer-events="none" /></g>
+          <g><circle class="blob-path" cx="430" cy="730" r="30" fill="#d3cce3" stroke="#000000" stroke-width="1.5" /><circle cx="430" cy="730" r="30" fill="url(#blob-lighting)" pointer-events="none" /></g>
+          <g><circle class="blob-path" cx="170" cy="820" r="26" fill="#d3cce3" stroke="#000000" stroke-width="1.5" /><circle cx="170" cy="820" r="26" fill="url(#blob-lighting)" pointer-events="none" /></g>
+          <g><circle class="blob-path" cx="380" cy="850" r="34" fill="#d3cce3" stroke="#000000" stroke-width="1.5" /><circle cx="380" cy="850" r="34" fill="url(#blob-lighting)" pointer-events="none" /></g>
+
+          <g><circle class="blob-path" cx="260" cy="130" r="75" fill="#d3cce3" stroke="#000000" stroke-width="2.5" /><circle cx="260" cy="130" r="75" fill="url(#blob-lighting)" pointer-events="none" /></g>
+          <g><circle class="blob-path" cx="360" cy="180" r="45" fill="#d3cce3" stroke="#000000" stroke-width="2.5" /><circle cx="360" cy="180" r="45" fill="url(#blob-lighting)" pointer-events="none" /></g>
+          <g><circle class="blob-path" cx="210" cy="280" r="60" fill="#d3cce3" stroke="#000000" stroke-width="2.5" /><circle cx="210" cy="280" r="60" fill="url(#blob-lighting)" pointer-events="none" /></g>
+          <g><circle class="blob-path" cx="330" cy="340" r="85" fill="#d3cce3" stroke="#000000" stroke-width="2.5" /><circle cx="330" cy="340" r="85" fill="url(#blob-lighting)" pointer-events="none" /></g>
+          <g><circle class="blob-path" cx="190" cy="450" r="50" fill="#d3cce3" stroke="#000000" stroke-width="2.5" /><circle cx="190" cy="450" r="50" fill="url(#blob-lighting)" pointer-events="none" /></g>
+          <g><circle class="blob-path" cx="280" cy="520" r="70" fill="#d3cce3" stroke="#000000" stroke-width="2.5" /><circle cx="280" cy="520" r="70" fill="url(#blob-lighting)" pointer-events="none" /></g>
+          <g><circle class="blob-path" cx="350" cy="630" r="55" fill="#d3cce3" stroke="#000000" stroke-width="2.5" /><circle cx="350" cy="630" r="55" fill="url(#blob-lighting)" pointer-events="none" /></g>
+          <g><circle class="blob-path" cx="230" cy="710" r="80" fill="#d3cce3" stroke="#000000" stroke-width="2.5" /><circle cx="230" cy="710" r="80" fill="url(#blob-lighting)" pointer-events="none" /></g>
+          <g><circle class="blob-path" cx="310" cy="800" r="40" fill="#d3cce3" stroke="#000000" stroke-width="2.5" /><circle cx="310" cy="800" r="40" fill="url(#blob-lighting)" pointer-events="none" /></g>
+        </g>
+
+        <!-- 3. Botanical Illustration Layer -->
+        <g id="layer-illustration">
+          <g id="svg-rose-container" transform="translate(260, 290) scale(0.95)">
+            <use id="specimen-use" href="#specimen-rose" />
+          </g>
+          <!-- Specimen Data Labels Positioned Closely Beside the Flower -->
+          <g font-family="monospace" font-size="10" fill="#ffffff" opacity="0.95">
+            <text id="specimen-label-num" x="350" y="240">Specimen 17: Neon Orchid</text>
+            <text id="specimen-label-name" x="350" y="255" fill="#00e5ff">DIGITAL BOTANICAL SPECIMEN</text>
+            <text id="specimen-coords" x="350" y="275" fill="#bfff00">X: 052.4 | Y: 141.0 | Z: 17</text>
+          </g>
+        </g>
+
+        <!-- 4. Typography & Layout Elements Layer -->
+        <g id="layer-typography">
+          <!-- Left Vertical Title with Chromatic Aberration Effect -->
+          <g transform="translate(64, 890) rotate(-90)">
+            <text class="font-title-dynamic" font-size="94" fill="#ff007f" opacity="0.7" x="3" y="-3" textLength="880" lengthAdjust="spacingAndGlyphs">MAKING TIME 17</text>
+            <text class="font-title-dynamic" font-size="94" fill="#00e5ff" opacity="0.7" x="-3" y="3" textLength="880" lengthAdjust="spacingAndGlyphs">MAKING TIME 17</text>
+            <text id="svg-title" class="font-title-dynamic" font-size="94" fill="#ffffff" textLength="880" lengthAdjust="spacingAndGlyphs">MAKING TIME 17</text>
+          </g>
+
+          <!-- Top Right Subtitle -->
+          <g transform="translate(420, 80)">
+            <text class="font-title-dynamic sub-text-el" font-size="28" fill="#ffffff" text-anchor="middle">M</text>
+            <text class="font-body-dynamic sub-text-el" font-size="16" fill="#ffffff" text-anchor="middle" y="18">+</text>
+            <text id="svg-subtitle" class="font-body-dynamic sub-text-el" font-size="18" fill="#ffffff" text-anchor="middle" y="40">seventeen years</text>
+          </g>
+
+          <!-- Center-Left Date Block -->
+          <g id="svg-date-group" transform="translate(190, 570)" class="font-body-dynamic" font-size="18" fill="#ffffff" text-anchor="middle"></g>
+
+          <!-- Lineup & Venue Group Placed in Right Container Box Area -->
+          <g id="svg-combined-group" transform="translate(560, 430)" class="font-body-dynamic" font-size="16" fill="#ffffff" text-anchor="end"></g>
+
+          <!-- 24-Hour Sparkline Graph (Starts at X=100 clear of left vertical title) -->
+          <g id="svg-sparkline-group" transform="translate(100, 785)">
+            <text x="460" y="-6" font-family="monospace" font-size="8" fill="#00e5ff" letter-spacing="1" text-anchor="end">24H TEMPERATURE SPARKLINE</text>
+            <rect x="0" y="0" width="460" height="28" fill="#07090e" stroke="#222733" stroke-width="1" />
+            <polyline id="sparkline-polyline" fill="none" stroke="#00ffcc" stroke-width="1.5" points="0,22 45,18 90,20 135,12 180,8 225,15 270,12 315,6 360,12 405,18 440,8 460,4" />
+          </g>
+
+          <!-- Compact QR Code in Bottom Right Corner -->
+          <g id="svg-qr-group" transform="translate(500, 835)">
+            <text id="data-hash-text" x="50" y="-4" font-family="monospace" font-size="7" fill="#8895a7" letter-spacing="0.5" text-anchor="end">METEO TELEMETRY</text>
+            <rect x="18" y="2" width="32" height="32" fill="#ffffff" rx="2" />
+            <image id="qr-code-image" x="19" y="3" width="30" height="30" href="" />
+            <text x="12" y="16" font-family="monospace" font-size="7" fill="#ffffff" opacity="0.9" text-anchor="end">SCAN</text>
+            <text x="12" y="26" font-family="monospace" font-size="7" fill="#00e5ff" text-anchor="end">METEO</text>
+          </g>
+
+          <!-- Badges & Footer -->
+          <g class="font-badge-dynamic" font-size="11" fill="#ffffff">
+            <text id="svg-badge-1" x="230" y="750" text-anchor="middle">BITBY.TV</text>
+            <text id="svg-footer" x="300" y="875" text-anchor="middle" letter-spacing="3">WWW.MAKINGTIMEISRAD.COM</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+  </main>
+
+  <script>
+    const bgColorInput = document.getElementById('bg-color');
+    const blobFillInput = document.getElementById('blob-fill-color');
+    const blobStrokeInput = document.getElementById('blob-stroke-color');
+    const textColorInput = document.getElementById('text-color');
+
+    const fontPresetSelect = document.getElementById('font-preset-select');
+    const titleInput = document.getElementById('title-text');
+    const subtitleInput = document.getElementById('subtitle-text');
+    const dateInput = document.getElementById('date-text');
+    const lineupInput = document.getElementById('lineup-text');
+    const venueInput = document.getElementById('venue-text');
+    const techInput = document.getElementById('tech-text');
+
+    const roseScaleInput = document.getElementById('rose-scale');
+    const resetBtn = document.getElementById('reset-btn');
+    const randomizeBtn = document.getElementById('randomize-btn');
+    const exportPdfBtn = document.getElementById('export-pdf-btn');
+
+    const presetCyber = document.getElementById('preset-cyber');
+    const presetMono = document.getElementById('preset-mono');
+    const presetSunset = document.getElementById('preset-sunset');
+
+    const svgBg = document.getElementById('svg-bg');
+    const blobPaths = document.querySelectorAll('.blob-path');
+
+    const svgRoseContainer = document.getElementById('svg-rose-container');
+    const specimenUse = document.getElementById('specimen-use');
+    const specimenLabelNum = document.getElementById('specimen-label-num');
+    const specimenLabelName = document.getElementById('specimen-label-name');
+    const specimenCoords = document.getElementById('specimen-coords');
+
+    const svgTitle = document.getElementById('svg-title');
+    const svgSubtitle = document.getElementById('svg-subtitle');
+    const subTextElements = document.querySelectorAll('.sub-text-el');
+    const svgDateGroup = document.getElementById('svg-date-group');
+    const svgCombinedGroup = document.getElementById('svg-combined-group');
+    const svgBadge1 = document.getElementById('svg-badge-1');
+    const svgFooter = document.getElementById('svg-footer');
+    const sparklinePolyline = document.getElementById('sparkline-polyline');
+    const dataHashText = document.getElementById('data-hash-text');
+    const qrCodeImage = document.getElementById('qr-code-image');
+    const qrTempContainer = document.getElementById('qr-temp-container');
+
+    const fontTitleDynamic = document.querySelectorAll('.font-title-dynamic');
+    const fontBodyDynamic = document.querySelectorAll('.font-body-dynamic');
+
+    // Live Stream & Telemetry Log Elements
+    const toggleStreamBtn = document.getElementById('toggle-stream-btn');
+    const streamStateText = document.getElementById('stream-state-text');
+    const streamDot = document.getElementById('stream-dot');
+    const citySelect = document.getElementById('city-select');
+    const telemetryLog = document.getElementById('telemetry-log');
+    let streamInterval = null;
+    let isStreamActive = false;
+
+    // City Specific Aesthetic Themes (Colors & Font Presets)
+    const cityThemes = {
+      newyork: {
+        bg: '#111318',
+        blobFill: '#c0c5cd',
+        blobStroke: '#000000',
+        text: '#ffffff',
+        fontPreset: 'techno',
+        specimenIdx: 0,
+        log: 'Loaded New York Brutalist Techno aesthetic.'
+      },
+      paris: {
+        bg: '#141217',
+        blobFill: '#e2d9ec',
+        blobStroke: '#221929',
+        text: '#fdfbf7',
+        fontPreset: 'editorial',
+        specimenIdx: 3,
+        log: 'Loaded Paris Editorial Serif aesthetic.'
+      },
+      philadelphia: {
+        bg: '#0a0c10',
+        blobFill: '#d3cce3',
+        blobStroke: '#000000',
+        text: '#ffffff',
+        fontPreset: 'avant',
+        specimenIdx: 0,
+        log: 'Loaded Philadelphia Acid Club aesthetic.'
+      },
+      tokyo: {
+        bg: '#060a12',
+        blobFill: '#00e5ff',
+        blobStroke: '#000000',
+        text: '#ff007f',
+        fontPreset: 'techno',
+        specimenIdx: 2,
+        log: 'Loaded Tokyo Cyberpunk aesthetic.'
+      },
+      reykjavik: {
+        bg: '#0a1118',
+        blobFill: '#88ccff',
+        blobStroke: '#032030',
+        text: '#ffffff',
+        fontPreset: 'editorial',
+        specimenIdx: 1,
+        log: 'Loaded Reykjavík Glacial Aurora aesthetic.'
+      },
+      london: {
+        bg: '#121212',
+        blobFill: '#b0b0b0',
+        blobStroke: '#1a1a1a',
+        text: '#e0e0e0',
+        fontPreset: 'techno',
+        specimenIdx: 3,
+        log: 'Loaded London Industrial Slate aesthetic.'
+      }
+    };
+
+    const cityCoordinates = {
+      newyork: { lat: 40.71, lon: -74.00, name: "NEW YORK US" },
+      paris: { lat: 48.85, lon: 2.35, name: "PARIS FR" },
+      philadelphia: { lat: 40.00, lon: -75.16, name: "PHILADELPHIA PA" },
+      tokyo: { lat: 35.67, lon: 139.65, name: "TOKYO JP" },
+      reykjavik: { lat: 64.14, lon: -21.94, name: "REYJAVIK IS" },
+      london: { lat: 51.50, lon: -0.12, name: "LONDON UK" }
+    };
+
+    const specimens = [
+      { id: '#specimen-rose', num: 'Specimen 17: Neon Orchid', name: 'DIGITAL BOTANICAL SPECIMEN' },
+      { id: '#specimen-fern', num: 'Specimen 42: Spore Matrix Fern', name: 'PTERIDOPHYTE ARCHIVE' },
+      { id: '#specimen-lotus', num: 'Specimen 88: Cybernetic Lotus', name: 'CRYSTALLINE FLORA ARCHIVE' },
+      { id: '#specimen-blossom', num: 'Specimen 09: Astral Blossom', name: 'POLYGONAL FLOWER ARCHIVE' }
+    ];
+
+    function logTelemetry(message) {
+      const timestamp = new Date().toLocaleTimeString();
+      telemetryLog.textContent = `[${timestamp}] ${message}\n` + telemetryLog.textContent;
+    }
+
+    function updateQRCode(url) {
+      qrTempContainer.innerHTML = '';
+      new QRCode(qrTempContainer, {
+        text: url,
+        width: 128,
+        height: 128,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.M
+      });
+
+      setTimeout(() => {
+        const img = qrTempContainer.querySelector('img');
+        const canvas = qrTempContainer.querySelector('canvas');
+        if (img && img.src) {
+          qrCodeImage.setAttribute('href', img.src);
+        } else if (canvas) {
+          qrCodeImage.setAttribute('href', canvas.toDataURL("image/png"));
+        }
+      }, 50);
+    }
+
+    function updateSparkline(temps) {
+      if (!temps || temps.length === 0) return;
+      const min = Math.min(...temps);
+      const max = Math.max(...temps);
+      const range = max - min || 1;
+      
+      const points = temps.map((t, i) => {
+        const x = (i / (temps.length - 1)) * 460;
+        const y = 22 - ((t - min) / range) * 18;
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      }).join(' ');
+
+      sparklinePolyline.setAttribute('points', points);
+    }
+
+    const docContents = {
+      skills: `# SKILL: David Rudnick "Making Time" Aesthetic Generator Rules
+
+## 1. Composition & Layout Framework
+- Outer Canvas: Solid deep black (#000000).
+- Canvas Subdivision: 5-column asymmetric grid.
+  - Column 1 (Left 20%): Vertical 90-degree rotated macro-display text running bottom-to-top.
+  - Columns 2–3 (Center 40%): Interlocking geometric container paths enclosing central 3D/pixel graphic.
+  - Columns 4–5 (Right 40%): Curved negative space cutouts housing metadata text blocks.
+- Frame Margin: 16px solid black outer border with a subtle top/bottom inner line.
+
+## 2. Color Palette System
+- Canvas Base: #000000 (Black)
+- Container Fill: #E0DEEA (Pale Lavender Grey)
+- Focal Graphic Accents: Magenta/Pink (#E28DBA), Deep Green (#237144), Neon Cyan (#00E5FF)
+- Text Inks: #FFFFFF (White on black) and #000000 (Black on lavender)
+
+## 3. Typographic Scale & Rules
+- Scale Ratio: Extreme contrast (1:8 ratio between body copy and left display rail).
+- Display Class (Left Rail): Heavy modular/blackletter display font, tracking tight, 90° rotation counter-clockwise.
+- Lineup & Meta Class (Right Side): High-contrast Classical Serif (Italic).
+  - Primary Lineup (H1): 24pt, Italic, Right-aligned.
+  - Secondary Lineup (H2): 16pt, Italic, Right-aligned.
+  - Venue / Details (Body): 14pt, Italic, Right-aligned.
+- Stamp Class (Top Center): Monogram logo above small italic serif description.
+- Technical Label Class (Bottom): Compressed Mono, 10pt, All-Caps.
+
+## 4. Graphical Elements & Rules
+- Central Feature: Pixelated or voxel-rendered organic object (e.g., rose, flower) mounted on a thin geometric multi-segment stem.
+- Container Lines: Continuous variable-stroke curves creating enclosed "island" masks.`,
+
+      handoff: `# Project Handoff: Parametric Poster Generator — Making Time 17 (City-Themed Weather Station Edition)
+
+## 1. Project Overview
+* Project Name: Parametric Poster Generator — Making Time 17 (City-Themed Weather Station Edition)
+* Design Aesthetic: David Rudnick / Making Time style combined with Open-Meteo Weather Station UI telemetry and city-specific typography/color mapping.
+* Core Technology Stack: 
+  * Single-file HTML5 application (index.html)
+  * Embedded modular SVG canvas
+  * Google Fonts & Open-Meteo Weather API Integration with Right-Aligned Lineup Block and Non-Overlapping Sparkline Graph
+  * Client-side vector-preserving PDF export via jsPDF & svg2pdf.js`
+    };
+
+    // Modal view handlers
+    const docModal = document.getElementById('doc-modal');
+    const docTitle = document.getElementById('doc-title');
+    const docContent = document.getElementById('doc-content');
+
+    document.getElementById('btn-view-skills').addEventListener('click', () => {
+      docTitle.textContent = 'skills.md';
+      docContent.textContent = docContents.skills;
+      docModal.style.display = 'block';
+    });
+
+    document.getElementById('btn-view-handoff').addEventListener('click', () => {
+      docTitle.textContent = 'handoff.md';
+      docContent.textContent = docContents.handoff;
+      docModal.style.display = 'block';
+    });
+
+    document.getElementById('close-doc-btn').addEventListener('click', () => {
+      docModal.style.display = 'none';
+    });
+
+    // Apply City Theme (Colors + Fonts + Specimen)
+    function applyCityTheme(cityKey) {
+      const theme = cityThemes[cityKey];
+      if (!theme) return;
+
+      bgColorInput.value = theme.bg;
+      blobFillInput.value = theme.blobFill;
+      blobStrokeInput.value = theme.blobStroke;
+      textColorInput.value = theme.text;
+      
+      fontPresetSelect.value = theme.fontPreset;
+      applyFontPreset(theme.fontPreset);
+
+      const chosenSpecimen = specimens[theme.specimenIdx];
+      specimenUse.setAttribute('href', chosenSpecimen.id);
+      specimenLabelNum.textContent = chosenSpecimen.num;
+      specimenLabelName.textContent = chosenSpecimen.name;
+
+      logTelemetry(theme.log);
+      updatePoster();
+    }
+
+    // Weather Showcase Presets
+    const weatherShowcases = {
+      clear: { specimenIdx: 0, bg: '#080d16', blobFill: '#00e5ff', blobStroke: '#000000', text: '#ffffff', title: 'MAKING TIME 17', subtitle: 'ATMOSPHERE: CLEAR SKY · 22°C', venue: 'METEOROLOGICAL SHOWCASE\nCONDITION: CLEAR & SUNNY\nSOLAR RADIATION: HIGH\nBAROMETER: 1014 HPA', scale: '1.00', temps: [18, 19, 20, 22, 25, 27, 26, 24, 21, 19, 18, 17], log: 'Loaded Clear Weather showcase preset.' },
+      rain: { specimenIdx: 1, bg: '#0a0c10', blobFill: '#3b7a82', blobStroke: '#ffffff', text: '#00ffff', title: 'MAKING TIME 17', subtitle: 'ATMOSPHERE: MODERATE RAIN · 11°C', venue: 'METEOROLOGICAL SHOWCASE\nCONDITION: PRECIPITATION\nRAINFALL: 4.8 MM/H\nHUMIDITY: 92%', scale: '0.85', temps: [12, 11, 11, 10, 10, 11, 12, 11, 10, 10, 9, 9], log: 'Loaded Rain Weather showcase preset.' },
+      storm: { specimenIdx: 2, bg: '#160826', blobFill: '#ff5500', blobStroke: '#000000', text: '#ff007f', title: 'MAKING TIME 17', subtitle: 'ATMOSPHERE: ELECTRIC STORM · 18°C', venue: 'METEOROLOGICAL SHOWCASE\nCONDITION: SEVERE THUNDER\nWIND GUSTS: 65 KM/H\nDISCHARGE: ACTIVE', scale: '1.25', temps: [15, 17, 21, 23, 20, 18, 16, 17, 19, 18, 16, 15], log: 'Loaded Storm Weather showcase preset.' },
+      snow: { specimenIdx: 3, bg: '#0d1117', blobFill: '#d3cce3', blobStroke: '#000000', text: '#ffffff', title: 'MAKING TIME 17', subtitle: 'ATMOSPHERE: FROST CRYSTALS · -4°C', venue: 'METEOROLOGICAL SHOWCASE\nCONDITION: SNOWFALL\nSNOW DEPTH: 12 CM\nVISIBILITY: LOW', scale: '0.90', temps: [-2, -3, -4, -5, -4, -3, -3, -4, -5, -6, -5, -4], log: 'Loaded Snow Weather showcase preset.' },
+      heat: { specimenIdx: 0, bg: '#1c0c08', blobFill: '#ffaa00', blobStroke: '#000000', text: '#ffff00', title: 'MAKING TIME 17', subtitle: 'ATMOSPHERE: HEATWAVE · 38°C', venue: 'METEOROLOGICAL SHOWCASE\nCONDITION: EXTREME HEAT\nUV INDEX: 11+ (EXTREME)\nTHERMAL LOAD: PEAK', scale: '1.40', temps: [30, 32, 35, 38, 40, 41, 39, 37, 34, 32, 31, 30], log: 'Loaded Heatwave Weather showcase preset.' }
+    };
+
+    function loadWeatherShowcase(weatherKey) {
+      if (isStreamActive) toggleLiveStream();
+      const w = weatherShowcases[weatherKey];
+      if (!w) return;
+
+      bgColorInput.value = w.bg;
+      blobFillInput.value = w.blobFill;
+      blobStrokeInput.value = w.blobStroke;
+      textColorInput.value = w.text;
+      subtitleInput.value = w.subtitle;
+      venueInput.value = w.venue;
+      roseScaleInput.value = w.scale;
+
+      const chosenSpecimen = specimens[w.specimenIdx];
+      specimenUse.setAttribute('href', chosenSpecimen.id);
+      specimenLabelNum.textContent = chosenSpecimen.num;
+      specimenLabelName.textContent = chosenSpecimen.name;
+
+      updateSparkline(w.temps);
+      updateQRCode(`https://open-meteo.com/en/docs#weather-preset-${weatherKey}`);
+      dataHashText.textContent = `LINK: OPEN-METEO.COM/SHOWCASE/${weatherKey.toUpperCase()}`;
+      logTelemetry(w.log);
+      updatePoster();
+    }
+
+    document.querySelectorAll('.btn-weather-showcase').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        loadWeatherShowcase(e.target.getAttribute('data-weather'));
+      });
+    });
+
+    // Poster Samples Data (Pic 1 to Pic 5)
+    const posterSamples = {
+      1: { specimenIdx: 3, bg: '#161618', blobFill: '#d3cce3', blobStroke: '#000000', text: '#ffffff', title: 'MAKING TIME 17', subtitle: 'seventeen years', date: 'saturday\nmay 20\n2017\n9 PM - 3 AM', lineup: 'Jessy Lanza LIVE\nRed Axes LIVE\nJacques Greene\nDave P. Mike Z.\nDave Pak. Broadzilla\nRocktits! Greg D.\n& Nadia Ksabia\nNTS / PHANTASY', venue: 'Underground Arts\n1200 Callowhill st\nPHILADELPHIA PA\n15 dollars', tech: 'BITBY.TV | | WWW.MAKINGTIMEISRAD.COM', temps: [15, 16, 18, 20, 22, 21, 19, 17, 16, 15, 14, 15] },
+      2: { specimenIdx: 0, bg: '#0a0c10', blobFill: '#ff77bb', blobStroke: '#ffffff', text: '#ffffff', title: 'MAKING TIME 17', subtitle: 'seventeen years', date: 'saturday\nmay 20\n2017\n9 PM - 3 AM', lineup: 'Jessy Lanza LIVE\nRed Axes LIVE\nJacques Greene\nDave P. Mike Z.\nDave Pak. Broadzilla\nRocktits! Greg D.\n& Nadia Ksabia\nNTS / PHANTASY', venue: 'Underground Arts\n1200 Callowhill st\nPHILADELPHIA PA\n15 dollars', tech: 'BITBY.TV | | WWW.MAKINGTIMEISRAD.COM', temps: [20, 22, 25, 28, 29, 27, 24, 22, 21, 20, 19, 19] },
+      3: { specimenIdx: 2, bg: '#120826', blobFill: '#ffaa00', blobStroke: '#000000', text: '#00e5ff', title: 'MAKING TIME 17', subtitle: 'seventeen years', date: 'saturday\nmay 20\n2017\n9 PM - 3 AM', lineup: 'Jessy Lanza LIVE\nRed Axes LIVE\nJacques Greene\nDave P. Mike Z.\nDave Pak. Broadzilla\nRocktits! Greg D.\n& Nadia Ksabia\nNTS / PHANTASY', venue: 'Underground Arts\n1200 Callowhill st\nPHILADELPHIA PA\n15 dollars', tech: 'BITBY.TV | | WWW.MAKINGTIMEISRAD.COM', temps: [10, 12, 15, 18, 16, 14, 12, 11, 10, 10, 9, 9] },
+      4: { specimenIdx: 3, bg: '#050505', blobFill: '#cc44ff', blobStroke: '#ffffff', text: '#ffffff', title: 'MAKING TIME 17', subtitle: 'seventeen years', date: 'saturday\nmay 20\n2017\n9 PM - 3 AM', lineup: 'Jessy Lanza LIVE\nRed Axes LIVE\nJacques Greene\nDave P. Mike Z.\nDave Pak. Broadzilla\nRocktits! Greg D.\n& Nadia Ksabia\nNTS / PHANTASY', venue: 'Underground Arts\n1200 Callowhill st\nPHILADELPHIA PA\n15 dollars', tech: 'BITBY.TV | | WWW.MAKINGTIMEISRAD.COM', temps: [5, 6, 8, 10, 11, 9, 8, 7, 6, 5, 5, 4] },
+      5: { specimenIdx: 1, bg: '#161618', blobFill: '#00e5ff', blobStroke: '#000000', text: '#ffffff', title: 'MAKING TIME 17', subtitle: 'seventeen years', date: 'saturday\nmay 20\n2017\n9 PM - 3 AM', lineup: 'Jessy Lanza LIVE\nRed Axes LIVE\nJacques Greene\nDave P. Mike Z.\nDave Pak. Broadzilla\nRocktits! Greg D.\n& Nadia Ksabia\nNTS / PHANTASY', venue: 'Underground Arts\n1200 Callowhill st\nPHILADELPHIA PA\n15 dollars', tech: 'BITBY.TV | | WWW.MAKINGTIMEISRAD.COM', temps: [14, 15, 17, 19, 20, 18, 16, 15, 14, 13, 13, 12] }
+    };
+
+    function loadPosterSample(sampleId) {
+      if (isStreamActive) toggleLiveStream();
+      const sample = posterSamples[sampleId];
+      if (!sample) return;
+
+      bgColorInput.value = sample.bg;
+      blobFillInput.value = sample.blobFill;
+      blobStrokeInput.value = sample.blobStroke;
+      textColorInput.value = sample.text;
+
+      titleInput.value = sample.title;
+      subtitleInput.value = sample.subtitle;
+      dateInput.value = sample.date;
+      lineupInput.value = sample.lineup;
+      venueInput.value = sample.venue;
+      techInput.value = sample.tech;
+
+      const chosenSpecimen = specimens[sample.specimenIdx];
+      specimenUse.setAttribute('href', chosenSpecimen.id);
+      specimenLabelNum.textContent = chosenSpecimen.num;
+      specimenLabelName.textContent = chosenSpecimen.name;
+
+      updateSparkline(sample.temps);
+      updateQRCode(`https://open-meteo.com/en/docs#sample-${sampleId}`);
+      dataHashText.textContent = `LINK: OPEN-METEO.COM/SAMPLE/${sampleId}`;
+      logTelemetry(`Loaded Poster Sample Pic ${sampleId}.`);
+      updatePoster();
+    }
+
+    document.querySelectorAll('.btn-gallery').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        loadPosterSample(e.target.getAttribute('data-sample'));
+      });
+    });
+
+    async function fetchWeatherData() {
+      const selectedCityKey = citySelect.value;
+      const city = cityCoordinates[selectedCityKey];
+      logTelemetry(`Polling Open-Meteo for ${city.name} (${city.lat}, ${city.lon})...`);
+      
+      const targetApiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,wind_speed_10m,weather_code&hourly=temperature_2m`;
+
+      try {
+        const response = await fetch(targetApiUrl);
+        if (!response.ok) throw new Error('Network response failed');
+        const data = await response.json();
+        
+        const temp = data.current.temperature_2m;
+        const wind = data.current.wind_speed_10m;
+        const code = data.current.weather_code;
+        
+        const hourlyTemps = data.hourly.temperature_2m.slice(0, 24);
+        updateSparkline(hourlyTemps);
+
+        subtitleInput.value = `${city.name} · ${temp}°C · ${wind} KM/H`;
+        venueInput.value = `OPEN-METEO LIVE TELEMETRY\nWIND: ${wind} KM/H WIND SPD\nWEATHER CODE: ${code}\nSYNCED: ${new Date().toLocaleTimeString()}`;
+
+        updateQRCode(targetApiUrl);
+        dataHashText.textContent = `LINK: OPEN-METEO.COM/${selectedCityKey.toUpperCase()}`;
+
+        logTelemetry(`SUCCESS: Temp ${temp}°C, Wind ${wind} km/h, Code ${code}. QR Code generated.`);
+        updatePoster();
+      } catch (err) {
+        logTelemetry(`ERROR: Stream sync failed (${err.message})`);
+      }
+    }
+
+    function toggleLiveStream() {
+      isStreamActive = !isStreamActive;
+      if (isStreamActive) {
+        streamStateText.textContent = "CONNECTED (LIVE)";
+        streamDot.style.display = "inline-block";
+        toggleStreamBtn.textContent = "Disconnect Stream";
+        toggleStreamBtn.style.background = "#ff007f";
+        toggleStreamBtn.style.color = "#fff";
+        logTelemetry("Live radar telemetry stream connected.");
+        fetchWeatherData();
+        streamInterval = setInterval(fetchWeatherData, 15000);
+      } else {
+        streamStateText.textContent = "OFFLINE";
+        streamDot.style.display = "none";
+        toggleStreamBtn.textContent = "Connect Radar Stream";
+        toggleStreamBtn.style.background = "#00f0ff";
+        toggleStreamBtn.style.color = "#000";
+        logTelemetry("Live radar telemetry stream disconnected.");
+        clearInterval(streamInterval);
+      }
+    }
+
+    if (toggleStreamBtn) {
+      toggleStreamBtn.addEventListener('click', toggleLiveStream);
+    }
+    if (citySelect) {
+      citySelect.addEventListener('change', (e) => {
+        const cityKey = e.target.value;
+        logTelemetry(`Target radar station changed to ${cityKey.toUpperCase()}. Applying city theme...`);
+        applyCityTheme(cityKey);
+        if (isStreamActive) fetchWeatherData();
+      });
+    }
+
+    function updatePoster() {
+      if (svgBg) svgBg.setAttribute('fill', bgColorInput.value);
+      
+      const fillCol = blobFillInput.value;
+      const strokeCol = blobStrokeInput.value;
+      blobPaths.forEach(path => {
+        path.setAttribute('fill', fillCol);
+        path.setAttribute('stroke', strokeCol);
+      });
+
+      const textCol = textColorInput.value;
+      if (svgTitle) svgTitle.setAttribute('fill', textCol);
+      if (svgSubtitle) svgSubtitle.setAttribute('fill', textCol);
+      subTextElements.forEach(el => el.setAttribute('fill', textCol));
+      if (svgBadge1) svgBadge1.setAttribute('fill', textCol);
+      if (svgFooter) svgFooter.setAttribute('fill', textCol);
+
+      if (svgTitle) svgTitle.textContent = titleInput.value;
+      if (svgSubtitle) svgSubtitle.textContent = subtitleInput.value;
+
+      if (svgDateGroup) {
+        svgDateGroup.innerHTML = '';
+        dateInput.value.split('\n').forEach((line, index) => {
+          const tspan = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          tspan.textContent = line;
+          tspan.setAttribute("x", "0");
+          tspan.setAttribute("y", index * 22);
+          tspan.setAttribute("text-anchor", "middle");
+          tspan.setAttribute("fill", textCol);
+          tspan.setAttribute("class", "font-body-dynamic");
+          svgDateGroup.appendChild(tspan);
+        });
+      }
+
+      if (svgCombinedGroup) {
+        svgCombinedGroup.innerHTML = '';
+        const lineupLines = lineupInput.value.split('\n');
+        const venueLines = venueInput.value.split('\n');
+        
+        let currentY = 0;
+        const lineGap = 20;
+
+        lineupLines.forEach(line => {
+          const tspan = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          tspan.textContent = line;
+          tspan.setAttribute("x", "0");
+          tspan.setAttribute("y", currentY);
+          tspan.setAttribute("text-anchor", "end");
+          tspan.setAttribute("fill", textCol);
+          tspan.setAttribute("class", "font-body-dynamic");
+          svgCombinedGroup.appendChild(tspan);
+          currentY += lineGap;
+        });
+
+        currentY += 16; 
+
+        venueLines.forEach(line => {
+          const tspan = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          tspan.textContent = line;
+          tspan.setAttribute("x", "0");
+          tspan.setAttribute("y", currentY);
+          tspan.setAttribute("text-anchor", "end");
+          tspan.setAttribute("fill", textCol);
+          tspan.setAttribute("class", "font-body-dynamic");
+          svgCombinedGroup.appendChild(tspan);
+          currentY += 18;
+        });
+      }
+
+      const techParts = techInput.value.split('|');
+      if (svgBadge1) svgBadge1.textContent = techParts[0] ? techParts[0].trim() : '';
+      if (svgFooter) svgFooter.textContent = techParts[2] ? techParts[2].trim() : '';
+
+      const scale = roseScaleInput.value;
+      if (svgRoseContainer) {
+        svgRoseContainer.setAttribute('transform', `translate(260, 290) scale(${scale})`);
+      }
+    }
+
+    function applyFontPreset(preset) {
+      let titleFont = "'Foldit', display";
+      let bodyFont = "'Cormorant Garamond', serif";
+
+      if (preset === 'techno') {
+        titleFont = "'Syne Mono', monospace";
+        bodyFont = "'Space Mono', monospace";
+      } else if (preset === 'editorial') {
+        titleFont = "'Cormorant Garamond', serif";
+        bodyFont = "'Space Mono', monospace";
+      } else if (preset === 'avant') {
+        titleFont = "'Foldit', display";
+        bodyFont = "'Cormorant Garamond', serif";
+      }
+
+      fontTitleDynamic.forEach(el => { el.style.fontFamily = titleFont; });
+      fontBodyDynamic.forEach(el => { el.style.fontFamily = bodyFont; });
+    }
+
+    if (fontPresetSelect) {
+      fontPresetSelect.addEventListener('change', (e) => applyFontPreset(e.target.value));
+    }
+
+    function applyTheme(bg, fill, stroke, text) {
+      bgColorInput.value = bg;
+      blobFillInput.value = fill;
+      blobStrokeInput.value = stroke;
+      textColorInput.value = text;
+      updatePoster();
+    }
+
+    if (presetCyber) presetCyber.addEventListener('click', () => applyTheme('#050505', '#bfff00', '#000000', '#ff007f'));
+    if (presetMono) presetMono.addEventListener('click', () => applyTheme('#1e1e1e', '#ffffff', '#000000', '#ffffff'));
+    if (presetSunset) presetSunset.addEventListener('click', () => applyTheme('#120826', '#ff5500', '#120826', '#00e5ff'));
+
+    function getRandomColor(isBackground = false) {
+      const letters = '0123456789ABCDEF';
+      if (isBackground) {
+        let color = '#';
+        for (let i = 0; i < 3; i++) {
+          color += letters[Math.floor(Math.random() * 4)];
+        }
+        return color;
+      } else {
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+          color += letters[Math.floor(Math.random() * 6) + 10];
+        }
+        return color;
+      }
+    }
+
+    function randomizePoster() {
+      if (isStreamActive) toggleLiveStream();
+      bgColorInput.value = getRandomColor(true);
+      blobFillInput.value = getRandomColor(false);
+      blobStrokeInput.value = Math.random() > 0.5 ? '#000000' : '#ffffff';
+      textColorInput.value = '#ffffff';
+
+      const randomScale = (Math.random() * 0.5 + 0.65).toFixed(2);
+      roseScaleInput.value = randomScale;
+
+      const chosenSpecimen = specimens[Math.floor(Math.random() * specimens.length)];
+      specimenUse.setAttribute('href', chosenSpecimen.id);
+      specimenLabelNum.textContent = chosenSpecimen.num;
+      specimenLabelName.textContent = chosenSpecimen.name;
+      if (specimenCoords) {
+        specimenCoords.textContent = `X: ${(Math.random()*100).toFixed(1)} | Y: ${(Math.random()*200).toFixed(1)} | Z: ${Math.floor(Math.random()*30)}`;
+      }
+
+      blobPaths.forEach((circle) => {
+        const randomXOffset = (Math.random() * 80 - 40).toFixed(1);
+        const randomYOffset = (Math.random() * 80 - 40).toFixed(1);
+        const randomScaleCircle = (Math.random() * 0.5 + 0.75).toFixed(2);
+        
+        circle.style.opacity = Math.random() > 0.15 ? '0.9' : '0.4';
+        circle.setAttribute('transform', `translate(${randomXOffset}, ${randomYOffset}) scale(${randomScaleCircle})`);
+      });
+
+      const fontPresets = ['avant', 'techno', 'editorial'];
+      const chosenPreset = fontPresets[Math.floor(Math.random() * fontPresets.length)];
+      fontPresetSelect.value = chosenPreset;
+      applyFontPreset(chosenPreset);
+
+      updateSparkline([15, 18, 22, 25, 24, 21, 19, 17, 16, 18, 20, 19]);
+      updateQRCode("https://open-meteo.com/");
+      dataHashText.textContent = `LINK: OPEN-METEO.COM/RANDOMIZED`;
+      logTelemetry("Randomized all poster parameters & generated synthetic QR Code.");
+      updatePoster();
+    }
+
+    function resetDefaults() {
+      if (isStreamActive) toggleLiveStream();
+      applyCityTheme('newyork');
+      roseScaleInput.value = '0.95';
+      updateSparkline([18, 19, 20, 22, 25, 27, 26, 24, 21, 19, 18, 17]);
+      updateQRCode("https://open-meteo.com/");
+      dataHashText.textContent = `LINK: OPEN-METEO.COM/STATIC`;
+      logTelemetry("Reset poster to New York default settings.");
+      updatePoster();
+    }
+
+    async function exportPDF() {
+      const { jsPDF } = window.jspdf;
+      const svgElement = document.getElementById('poster-svg');
+
+      try {
+        const doc = new jsPDF({
+          orientation: 'portrait',
+          unit: 'pt',
+          format: [600, 900]
+        });
+
+        await doc.svg(svgElement, {
+          x: 0,
+          y: 0,
+          width: 600,
+          height: 900,
+          loadExternalResources: true
+        });
+
+        doc.save(`making_time_weather_specimen_${Date.now()}.pdf`);
+        logTelemetry("Successfully exported vector PDF.");
+      } catch (error) {
+        console.error("PDF Export failed:", error);
+        logTelemetry("ERROR: Failed to generate PDF.");
+        alert("Failed to generate PDF. Check console for details.");
+      }
+    }
+
+    const inputs = [
+      bgColorInput, blobFillInput, blobStrokeInput, textColorInput,
+      titleInput, subtitleInput, dateInput, lineupInput, venueInput, techInput,
+      roseScaleInput
+    ];
+
+    inputs.forEach(input => {
+      if (input) input.addEventListener('input', updatePoster);
+    });
+
+    if (resetBtn) resetBtn.addEventListener('click', resetDefaults);
+    if (randomizeBtn) randomizeBtn.addEventListener('click', randomizePoster);
+    if (exportPdfBtn) exportPdfBtn.addEventListener('click', exportPDF);
+
+    // Initial load: New York Theme & QR Code Render
+    applyCityTheme('newyork');
+    updateQRCode("https://open-meteo.com/");
+    updatePoster();
+  </script>
+</body>
+</html>
