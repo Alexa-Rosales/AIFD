@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mission Patch — Concept Sequence</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* RESET & CORE VARIABLES */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-color: #0b111e;
+      --card-bg: rgba(16, 26, 48, 0.75);
+      --accent-color: #80AEEB;
+      --accent-glow: rgba(128, 174, 235, 0.35);
+      --text-color: #e2ecf9;
+      --subtext-color: #9cb3d6;
+      --border-color: rgba(128, 174, 235, 0.25);
+      --font-heading: 'Cinzel', serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* STARFIELD CANVAS BACKGROUND */
+    #starfield {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* MAIN CONTAINER */
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 5rem;
+    }
+
+    /* HERO HEADER */
+    header {
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+
+    .badge-pill {
+      display: inline-block;
+      padding: 0.35rem 1.1rem;
+      border-radius: 9999px;
+      background: var(--accent-glow);
+      color: var(--accent-color);
+      border: 1px solid var(--accent-color);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+
+    h1 {
+      font-family: var(--font-heading);
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #ffffff;
+      text-shadow: 0 0 20px var(--accent-glow);
+      margin-bottom: 0.75rem;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: var(--subtext-color);
+      max-width: 650px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* CONCEPT SPACE 2x2 GRID */
+    .sequence-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+
+    /* CARD STYLING */
+    .sequence-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.25rem;
+      backdrop-filter: blur(12px);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                  box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  border-color 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sequence-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--accent-color);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px var(--accent-glow);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .step-number {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--accent-color);
+    }
+
+    .step-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--subtext-color);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* IMAGE CONTAINER (FIT ALL CONTENT WITHOUT CROPPING) */
+    .img-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #050810;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .img-wrapper img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sequence-card:hover .img-wrapper img {
+      transform: scale(1.03);
+    }
+
+    .zoom-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(11, 17, 30, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .img-wrapper:hover .zoom-overlay {
+      opacity: 1;
+    }
+
+    .zoom-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      background: var(--accent-color);
+      color: #0b111e;
+      font-weight: 700;
+      font-size: 0.85rem;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+    }
+
+    /* LIGHTBOX MODAL */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(5, 8, 16, 0.92);
+      backdrop-filter: blur(15px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .lightbox.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 85vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 0 30px var(--accent-glow);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      background: var(--accent-color);
+      color: #0b111e;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 1.5rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* RESPONSIVE DESIGN */
+    @media (max-width: 768px) {
+      .sequence-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .container {
+        padding-top: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Animated Starfield Background -->
+  <canvas id="starfield"></canvas>
+
+  <div class="container">
+    <!-- Header Section -->
+    <header>
+      <span class="badge-pill">Baruch College • Spring 2027 ISS Mission</span>
+      <h1>Mission Patch</h1>
+      <p class="subtitle">Session 01 Sequence: Translating research, microgravity concepts, and community identity into space mission patch artwork.</p>
+    </header>
+
+    <!-- 2x2 Concept Space Grid -->
+    <main class="sequence-grid">
+      
+      <!-- Pic 1 -->
+      <article class="sequence-card">
+        <div class="card-header">
+          <span class="step-number">[01]</span>
+          <span class="step-title">Visual Translation Game</span>
+        </div>
+        <div class="img-wrapper" onclick="openLightbox('pic 1.jpg')">
+          <img src="pic 1.jpg" alt="Visual Translation Sketches" loading="lazy" />
+          <div class="zoom-overlay">
+            <button class="zoom-btn">View Full Size</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Pic 2 -->
+      <article class="sequence-card">
+        <div class="card-header">
+          <span class="step-number">[02]</span>
+          <span class="step-title">Symbol Mapping</span>
+        </div>
+        <div class="img-wrapper" onclick="openLightbox('pic 2.jpg')">
+          <img src="pic 2.jpg" alt="Symbol Mapping Diagrams" loading="lazy" />
+          <div class="zoom-overlay">
+            <button class="zoom-btn">View Full Size</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Pic 3 -->
+      <article class="sequence-card">
+        <div class="card-header">
+          <span class="step-number">[03]</span>
+          <span class="step-title">Rapid Concept Patches</span>
+        </div>
+        <div class="img-wrapper" onclick="openLightbox('pic 3.jpg')">
+          <img src="pic 3.jpg" alt="Rapid Concept Sketches" loading="lazy" />
+          <div class="zoom-overlay">
+            <button class="zoom-btn">View Full Size</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Pic 4 -->
+      <article class="sequence-card">
+        <div class="card-header">
+          <span class="step-number">[04]</span>
+          <span class="step-title">Finished Concept Sketch</span>
+        </div>
+        <div class="img-wrapper" onclick="openLightbox('pic 4.jpg')">
+          <img src="pic 4.jpg" alt="Finished Concept Sketch" loading="lazy" />
+          <div class="zoom-overlay">
+            <button class="zoom-btn">View Full Size</button>
+          </div>
+        </div>
+      </article>
+
+    </main>
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+    <img id="lightbox-img" src="" alt="Enlarged Concept View" />
+  </div>
+
+  <script>
+    /* STARFIELD BACKGROUND ANIMATION */
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      initStars();
+    }
+
+    function initStars() {
+      stars = [];
+      const count = Math.floor((canvas.width * canvas.height) / 3000);
+      for (let i = 0; i < count; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 1.5,
+          alpha: Math.random(),
+          speed: Math.random() * 0.3 + 0.05
+        });
+      }
+    }
+
+    function animateStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#ffffff';
+
+      stars.forEach(star => {
+        ctx.globalAlpha = star.alpha;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        star.y += star.speed;
+        if (star.y > canvas.height) {
+          star.y = 0;
+          star.x = Math.random() * canvas.width;
+        }
+      });
+
+      requestAnimationFrame(animateStars);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    animateStars();
+
+    /* LIGHTBOX FUNCTIONALITY */
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+
+    function openLightbox(src) {
+      lightboxImg.src = src;
+      lightbox.classList.add('active');
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+    }
+  </script>
+</body>
+</html>
