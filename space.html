@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baruch Celestial Mission Patch Generator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&family=Michroma&display=swap" rel="stylesheet">
+    <!-- FontAwesome for UI Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #050507;
+            color: #E2E8F0;
+        }
+        .font-cinzel { font-family: 'Cinzel', serif; }
+        .font-cinzel-dec { font-family: 'Cinzel Decorative', serif; }
+        .font-mono-space { font-family: 'Space Mono', monospace; }
+
+        /* Custom Scrollbar for Controls */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0F172A;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+
+        /* Canvas Frame styling to strictly mimic a physical 3.5" x 3.5" patch */
+        .patch-container {
+            width: 336px;
+            height: 336px;
+            box-shadow: 0 0 35px rgba(226, 192, 133, 0.15), 0 0 0 2px rgba(226, 192, 133, 0.3);
+            position: relative;
+            background-color: #0A0A0C;
+        }
+
+        /* Small-Scale Recognizability Badge */
+        .mini-scale-card {
+            background: rgba(15, 23, 42, 0.94);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(226, 192, 133, 0.4);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-amber-500 selection:text-black">
+
+    <!-- Header Section -->
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50 py-3 px-4 md:px-8 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shadow-lg">
+                <i class="fa-solid fa-compass"></i>
+            </div>
+            <div>
+                <h1 class="text-base md:text-lg font-bold tracking-wider font-cinzel text-amber-100 flex items-center gap-2">
+                    BARUCH <span class="text-xs px-2 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-800/50">MISSION PATCH LAB</span>
+                </h1>
+                <p class="text-xs text-slate-400 font-mono-space hidden sm:block">CELESTIAL PATCH GENERATOR ENGINE</p>
+            </div>
+        </div>
+
+        <!-- Size Verification Badge -->
+        <div class="flex items-center gap-2 bg-emerald-950/50 border border-emerald-800/60 text-emerald-300 px-3 py-1 rounded-full text-xs font-mono-space">
+            <i class="fa-solid fa-circle-check text-emerald-400"></i>
+            <span>3.5″ × 3.5″ VERIFIED (1050×1050 px @ 300 DPI)</span>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-grow container mx-auto p-4 md:p-6 lg:p-8 flex flex-col lg:flex-row gap-8 items-start justify-center">
+
+        <!-- Left Column: Interactive Patch Preview & Specifications -->
+        <div class="w-full lg:w-auto flex flex-col items-center justify-center space-y-4 mx-auto">
+            
+            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 backdrop-blur flex flex-col items-center justify-center space-y-4 shadow-2xl relative w-full max-w-md">
+                
+                <!-- Mission Question Banner -->
+                <div class="w-full text-center border-b border-slate-800 pb-3">
+                    <span class="text-[10px] uppercase font-mono-space text-amber-400/80 tracking-widest block mb-1">CORE MISSION QUESTION</span>
+                    <p class="text-xs md:text-sm font-cinzel text-slate-200 italic">
+                        "What message would Baruch send into space?"
+                    </p>
+                </div>
+
+                <!-- Canvas Render Frame (Exact 3.5" x 3.5" aspect ratio) -->
+                <div class="relative group">
+                    <div class="patch-container rounded-lg overflow-hidden transition-all duration-300">
+                        <canvas id="patchCanvas" width="1050" height="1050" class="w-full h-full block cursor-crosshair"></canvas>
+                    </div>
+
+                    <!-- Dimension Overlay Info -->
+                    <div class="absolute -bottom-6 left-0 right-0 flex justify-between text-[10px] font-mono-space text-slate-500 px-1">
+                        <span>W: 3.5 INCHES (1050px)</span>
+                        <span>H: 3.5 INCHES (1050px)</span>
+                    </div>
+
+                    <!-- Live Small-Scale Recognizability Preview Widget -->
+                    <div id="miniScaleCard" class="mini-scale-card absolute bottom-3 right-3 rounded-xl p-2 flex flex-col items-center gap-1 transition-all duration-200 z-20">
+                        <span class="text-[9px] font-mono-space text-amber-300 font-bold tracking-wider uppercase">Small Scale Check</span>
+                        <div class="w-[80px] h-[80px] border border-slate-700 rounded overflow-hidden bg-slate-950">
+                            <canvas id="miniPatchCanvas" width="200" height="200" class="w-full h-full block"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Action Buttons -->
+                <div class="w-full pt-6 flex flex-col gap-2">
+                    <div class="flex gap-3 justify-center w-full">
+                        <button id="btnRandomize" class="flex-1 py-2.5 px-4 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-semibold rounded-lg text-xs md:text-sm shadow-lg shadow-amber-900/20 flex items-center justify-center gap-2 transition-all active:scale-95">
+                            <i class="fa-solid fa-dice text-slate-950"></i>
+                            <span>Generate Random</span>
+                        </button>
+
+                        <button id="btnExport" class="flex-1 py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-100 font-semibold rounded-lg text-xs md:text-sm border border-slate-700 flex items-center justify-center gap-2 transition-all active:scale-95">
+                            <i class="fa-solid fa-download text-amber-400"></i>
+                            <span>Export PNG (3.5″)</span>
+                        </button>
+                    </div>
+
+                    <!-- Reset to Defaults Button in Left Console -->
+                    <button id="btnResetConsole" class="w-full py-2 px-4 bg-slate-950/80 hover:bg-slate-900 text-slate-300 hover:text-amber-300 font-mono-space rounded-lg text-xs border border-slate-800 flex items-center justify-center gap-2 transition-all active:scale-95">
+                        <i class="fa-solid fa-rotate-left text-amber-400"></i>
+                        <span>Reset to Defaults</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quadrant Architecture Legend -->
+            <div class="w-full max-w-md bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 text-xs font-mono-space text-slate-400 grid grid-cols-2 gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span>
+                    <span>BASE: Sun & Solar Rays</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-sky-400 inline-block"></span>
+                    <span>LEFT: Curved Milky Way</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-slate-300 inline-block"></span>
+                    <span>TOP-RIGHT: Planets Canopy</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-purple-400 inline-block"></span>
+                    <span>RIGHT: Border Constellations</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Control Panel & Parametric Sliders -->
+        <div class="w-full lg:w-[480px] bg-slate-900/70 border border-slate-800 rounded-2xl p-6 backdrop-blur space-y-6">
+            
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h2 class="text-sm font-bold font-mono-space text-amber-300 uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i> Patch Parametric Engine
+                </h2>
+                <button id="btnReset" class="text-[11px] font-mono-space text-slate-400 hover:text-amber-400 transition-colors">
+                    Reset Controls
+                </button>
+            </div>
+
+            <div class="space-y-5 max-h-[600px] overflow-y-auto pr-2">
+                
+                <!-- Message & Typography Settings -->
+                <div class="space-y-3 bg-slate-950/40 p-4 rounded-xl border border-slate-800/80">
+                    <label class="text-xs font-semibold text-slate-200 uppercase tracking-wider font-mono-space block">
+                        1. Center Focal Message
+                    </label>
+                    <input type="text" id="textInput" value="Baruch" placeholder="e.g. Baruch, Knowledge Unbound..." 
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-amber-100 focus:outline-none focus:border-amber-500 font-cinzel">
+                    
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <div>
+                            <label class="text-[10px] font-mono-space text-slate-400 block mb-1">Typography Style</label>
+                            <select id="fontStyleSelect" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-amber-500">
+                                <option value="FallSerif">Celestial 'FALL' Serif (Star 'A')</option>
+                                <option value="Cinzel">Astronomical Serif</option>
+                                <option value="Cinzel Decorative">Rustic Decorative</option>
+                                <option value="Space Mono">Monoline Cosmic</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-mono-space text-slate-400 block mb-1">Text Size</label>
+                            <input type="range" id="fontSizeSlider" min="40" max="110" value="70" class="w-full accent-amber-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Palette Selector -->
+                <div class="space-y-2 bg-slate-950/40 p-4 rounded-xl border border-slate-800/80">
+                    <label class="text-xs font-semibold text-slate-200 uppercase tracking-wider font-mono-space block">
+                        2. Mission Palette
+                    </label>
+                    <select id="paletteSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-amber-200 focus:outline-none focus:border-amber-500 font-mono-space">
+                        <option value="skills">Celestial Gold & Cosmic Blue (Inspiration Standard)</option>
+                        <option value="monochrome">Graphite Sketch (Pencil Inversion)</option>
+                        <option value="deepSpace">Deep Nebula Blue & Bronze</option>
+                        <option value="solarAura">Solar Flare Warmth</option>
+                    </select>
+                </div>
+
+                <!-- Parametric Sliders -->
+                <div class="space-y-4 bg-slate-950/40 p-4 rounded-xl border border-slate-800/80">
+                    <label class="text-xs font-semibold text-slate-200 uppercase tracking-wider font-mono-space block">
+                        3. Element Controls
+                    </label>
+
+                    <!-- Ray Count -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-mono-space text-slate-300">
+                            <span>Base Solar Rays:</span>
+                            <span id="rayCountVal" class="text-amber-400 font-bold">32</span>
+                        </div>
+                        <input type="range" id="rayCountSlider" min="12" max="48" value="32" class="w-full accent-amber-500">
+                    </div>
+
+                    <!-- Sun Radius -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-mono-space text-slate-300">
+                            <span>Sun Dome Radius:</span>
+                            <span id="sunRadiusVal" class="text-amber-400 font-bold">260</span>
+                        </div>
+                        <input type="range" id="sunRadiusSlider" min="180" max="340" value="260" class="w-full accent-amber-500">
+                    </div>
+
+                    <!-- Milky Way Wave Contour Density -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-mono-space text-slate-300">
+                            <span>Milky Way Flow Density:</span>
+                            <span id="waveCurvatureVal" class="text-amber-400 font-bold">5</span>
+                        </div>
+                        <input type="range" id="waveCurvatureSlider" min="1" max="10" value="5" class="w-full accent-amber-500">
+                    </div>
+
+                    <!-- Planet Count -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-mono-space text-slate-300">
+                            <span>Top-Right Planets:</span>
+                            <span id="planetCountVal" class="text-amber-400 font-bold">3</span>
+                        </div>
+                        <input type="range" id="planetCountSlider" min="1" max="5" value="3" class="w-full accent-amber-500">
+                    </div>
+
+                    <!-- Plant Constellation Density -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-mono-space text-slate-300">
+                            <span>Right Constellation Lines:</span>
+                            <span id="constellationDensityVal" class="text-amber-400 font-bold">12</span>
+                        </div>
+                        <input type="range" id="constellationDensitySlider" min="4" max="20" value="12" class="w-full accent-amber-500">
+                    </div>
+
+                </div>
+
+                <!-- Toggle Options -->
+                <div class="space-y-2 bg-slate-950/40 p-4 rounded-xl border border-slate-800/80">
+                    <label class="text-xs font-semibold text-slate-200 uppercase tracking-wider font-mono-space block mb-2">
+                        4. Overlays & Viewport
+                    </label>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-slate-300 font-mono-space">Cosmic Stardust Overlay</span>
+                        <input type="checkbox" id="chkStardust" checked class="w-4 h-4 accent-amber-500 rounded cursor-pointer">
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+                        <span class="text-xs text-slate-300 font-mono-space">Outer Gold Crest Border</span>
+                        <input type="checkbox" id="chkBorder" checked class="w-4 h-4 accent-amber-500 rounded cursor-pointer">
+                    </div>
+                    <!-- Small-Scale Check Toggle Feature -->
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+                        <span class="text-xs text-slate-300 font-mono-space">Small-Scale Recognizability Check</span>
+                        <input type="checkbox" id="chkMiniCheck" checked class="w-4 h-4 accent-amber-500 rounded cursor-pointer">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/60 py-3 text-center text-xs font-mono-space text-slate-500">
+        BARUCH CELESTIAL MISSION PATCH GENERATOR — 3.5" x 3.5" EMBROIDERY-READY VECTOR ENGINE
+    </footer>
+
+    <!-- JavaScript Canvas Logic -->
+    <script>
+        // DOM Elements
+        const canvas = document.getElementById('patchCanvas');
+        const ctx = canvas.getContext('2d');
+        const miniCanvas = document.getElementById('miniPatchCanvas');
+        const miniCtx = miniCanvas.getContext('2d');
+        const miniScaleCard = document.getElementById('miniScaleCard');
+
+        // Inputs
+        const textInput = document.getElementById('textInput');
+        const fontStyleSelect = document.getElementById('fontStyleSelect');
+        const fontSizeSlider = document.getElementById('fontSizeSlider');
+        const paletteSelect = document.getElementById('paletteSelect');
+        const rayCountSlider = document.getElementById('rayCountSlider');
+        const sunRadiusSlider = document.getElementById('sunRadiusSlider');
+        const waveCurvatureSlider = document.getElementById('waveCurvatureSlider');
+        const planetCountSlider = document.getElementById('planetCountSlider');
+        const constellationDensitySlider = document.getElementById('constellationDensitySlider');
+        const chkStardust = document.getElementById('chkStardust');
+        const chkBorder = document.getElementById('chkBorder');
+        const chkMiniCheck = document.getElementById('chkMiniCheck');
+
+        const btnRandomize = document.getElementById('btnRandomize');
+        const btnReset = document.getElementById('btnReset');
+        const btnResetConsole = document.getElementById('btnResetConsole');
+        const btnExport = document.getElementById('btnExport');
+
+        // Random Seed state
+        let seed = 42;
+
+        // Color Palettes
+        const palettes = {
+            skills: {
+                bg: '#0A0A0C',
+                gold: '#E2C085',
+                sun: '#F5F2EB',
+                waves: '#A8C3D8',
+                planets: '#C87D55',
+                constellations: '#B8A5D6',
+                white: '#FFFFFF'
+            },
+            monochrome: {
+                bg: '#121214',
+                gold: '#D1D5DB',
+                sun: '#FFFFFF',
+                waves: '#9CA3AF',
+                planets: '#6B7280',
+                constellations: '#E5E7EB',
+                white: '#FFFFFF'
+            },
+            deepSpace: {
+                bg: '#030712',
+                gold: '#F59E0B',
+                sun: '#FEF3C7',
+                waves: '#38BDF8',
+                planets: '#F97316',
+                constellations: '#C084FC',
+                white: '#FFFFFF'
+            },
+            solarAura: {
+                bg: '#180202',
+                gold: '#FBBF24',
+                sun: '#FFFBEB',
+                waves: '#F43F5E',
+                planets: '#EA580C',
+                constellations: '#F472B6',
+                white: '#FFFFFF'
+            }
+        };
+
+        // Pseudo-random generator with seed
+        function pseudoRandom(s) {
+            let x = Math.sin(s++) * 10000;
+            return x - Math.floor(x);
+        }
+
+        // Helper: Draw 4-point celestial star
+        function drawStarSeed(ctx, cx, cy, color, size) {
+            ctx.save();
+            ctx.fillStyle = color;
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - size);
+            ctx.quadraticCurveTo(cx, cy, cx + size, cy);
+            ctx.quadraticCurveTo(cx, cy, cx, cy + size);
+            ctx.quadraticCurveTo(cx, cy, cx - size, cy);
+            ctx.quadraticCurveTo(cx, cy, cx, cy - size);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // 1. LEFT QUADRANT: Topographic Glowing Blue Contour Field Hugging Left Border Curve
+        function drawMilkyWayWaves(ctx, w, h, palette) {
+            const densityLevel = parseInt(waveCurvatureSlider.value);
+            ctx.save();
+
+            let mwSeed = seed + 15;
+            const innerLeftBorder = 50;
+
+            const glowGrad = ctx.createRadialGradient(innerLeftBorder + 40, h / 2, 20, innerLeftBorder + 40, h / 2, 320);
+            glowGrad.addColorStop(0, 'rgba(30, 64, 175, 0.55)');
+            glowGrad.addColorStop(0.5, 'rgba(14, 116, 144, 0.3)');
+            glowGrad.addColorStop(1, 'transparent');
+
+            ctx.fillStyle = glowGrad;
+            ctx.beginPath();
+            ctx.arc(innerLeftBorder + 40, h / 2, 350, 0, Math.PI * 2);
+            ctx.fill();
+
+            const numLines = 22 + densityLevel * 4;
+            ctx.lineWidth = 1.2;
+
+            for (let i = 0; i < numLines; i++) {
+                const offset = (i - numLines / 2) * 9;
+                const alpha = Math.max(0.15, 1 - Math.abs(offset) / 160);
+
+                ctx.beginPath();
+                ctx.moveTo(innerLeftBorder + 60 + offset, 40);
+                
+                ctx.bezierCurveTo(
+                    innerLeftBorder + 210 + offset, 180,
+                    innerLeftBorder + 170 + offset, 420,
+                    innerLeftBorder + 20 + offset, h - 80
+                );
+
+                ctx.strokeStyle = i % 3 === 0 ? '#93C5FD' : (i % 2 === 0 ? '#38BDF8' : '#1D4ED8');
+                ctx.globalAlpha = alpha * 0.8;
+                ctx.stroke();
+            }
+
+            const clusterParticleCount = 380 + densityLevel * 50;
+            for (let k = 0; k < clusterParticleCount; k++) {
+                const t = pseudoRandom(mwSeed++);
+                
+                const p0x = innerLeftBorder + 60,  p0y = 40;
+                const p1x = innerLeftBorder + 210, p1y = 180;
+                const p2x = innerLeftBorder + 170, p2y = 420;
+                const p3x = innerLeftBorder + 20,  p3y = h - 80;
+
+                const cx = Math.pow(1 - t, 3) * p0x + 3 * Math.pow(1 - t, 2) * t * p1x + 3 * (1 - t) * Math.pow(t, 2) * p2x + Math.pow(t, 3) * p3x;
+                const cy = Math.pow(1 - t, 3) * p0y + 3 * Math.pow(1 - t, 2) * t * p1y + 3 * (1 - t) * Math.pow(t, 2) * p2y + Math.pow(t, 3) * p3y;
+
+                const spreadX = (pseudoRandom(mwSeed++) - 0.5) * (110 + densityLevel * 8);
+                const spreadY = (pseudoRandom(mwSeed++) - 0.5) * 30;
+
+                const starSize = pseudoRandom(mwSeed++) * 2.6 + 0.5;
+                const alpha = pseudoRandom(mwSeed++) * 0.9 + 0.1;
+
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                const randCol = pseudoRandom(mwSeed++);
+                if (randCol < 0.4) ctx.fillStyle = '#FFFFFF';
+                else if (randCol < 0.7) ctx.fillStyle = '#BAE6FD';
+                else if (randCol < 0.9) ctx.fillStyle = palette.gold;
+                else ctx.fillStyle = '#60A5FA';
+
+                ctx.beginPath();
+                ctx.arc(cx + spreadX, cy + spreadY, starSize, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            for (let s = 0; s < 18; s++) {
+                const t = pseudoRandom(mwSeed++);
+                const spX = (1 - t) * (innerLeftBorder + 60) + t * (innerLeftBorder + 30) + (pseudoRandom(mwSeed++) - 0.5) * 90;
+                const spY = 50 + t * (h - 140);
+                const spSize = pseudoRandom(mwSeed++) * 5 + 3.5;
+                drawStarSeed(ctx, spX, spY, palette.white, spSize);
+            }
+
+            ctx.restore();
+        }
+
+        // 2. TOP-RIGHT QUADRANT: Planetary Canopy & Orbits anchored at top-right corner (w, 0)
+        function drawPlanetaryCanopy(ctx, w, h, palette) {
+            const count = parseInt(planetCountSlider.value);
+            ctx.save();
+
+            let pSeed = seed + 42;
+            const cornerX = w - 40;
+            const cornerY = 40;
+
+            const baseRadii = [260, 420, 580, 720, 860];
+
+            for (let i = 0; i < Math.min(count, 5); i++) {
+                const arcRadius = baseRadii[i];
+
+                ctx.beginPath();
+                ctx.arc(cornerX, cornerY, arcRadius, Math.PI * 0.5, Math.PI);
+                ctx.strokeStyle = palette.gold;
+                ctx.lineWidth = 1.2;
+                ctx.globalAlpha = 0.5;
+                ctx.setLineDash([8, 12]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                const angle = Math.PI * 0.78 + (pseudoRandom(pSeed++) - 0.5) * 0.28;
+                const px = cornerX + Math.cos(angle) * arcRadius;
+                const py = cornerY + Math.sin(angle) * arcRadius;
+
+                const planetRadius = 18 + pseudoRandom(pSeed++) * 24;
+
+                ctx.globalAlpha = 1.0;
+                ctx.fillStyle = palette.bg;
+                ctx.beginPath();
+                ctx.arc(px, py, planetRadius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = palette.planets;
+                ctx.beginPath();
+                ctx.arc(px, py, planetRadius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = palette.gold;
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+
+                if (i % 2 === 0) {
+                    ctx.save();
+                    ctx.translate(px, py);
+                    ctx.rotate(-Math.PI / 6);
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, planetRadius * 1.8, planetRadius * 0.45, 0, 0, Math.PI * 2);
+                    ctx.strokeStyle = palette.gold;
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+
+            ctx.restore();
+        }
+
+        // 3. RIGHT QUADRANT: Plant Constellations connecting directly to border frame edge
+        function drawPlantConstellations(ctx, w, h, palette) {
+            const density = parseInt(constellationDensitySlider.value);
+            ctx.save();
+
+            let cSeed = seed + 88;
+            const innerBorderRight = w - 50;
+
+            ctx.strokeStyle = palette.constellations;
+            ctx.lineWidth = 1.6;
+
+            const mainRoots = [
+                { x: w - 300, y: 190, targetBorderY: 100 },
+                { x: w - 260, y: 270, targetBorderY: 190 },
+                { x: w - 230, y: 350, targetBorderY: 290 },
+                { x: w - 200, y: 430, targetBorderY: 390 }
+            ];
+
+            mainRoots.forEach((root) => {
+                ctx.beginPath();
+                ctx.moveTo(root.x, root.y);
+                const cpX = (root.x + innerBorderRight) / 2;
+                const cpY = (root.y + root.targetBorderY) / 2;
+                ctx.quadraticCurveTo(cpX, cpY, innerBorderRight, root.targetBorderY);
+                ctx.strokeStyle = palette.constellations;
+                ctx.globalAlpha = 0.85;
+                ctx.stroke();
+
+                ctx.fillStyle = palette.sun;
+                ctx.globalAlpha = 1.0;
+                ctx.beginPath();
+                ctx.arc(innerBorderRight, root.targetBorderY, 4, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            const numBranches = Math.min(density, 20);
+
+            for (let i = 0; i < numBranches; i++) {
+                const parent = mainRoots[i % mainRoots.length];
+                const angle = (pseudoRandom(cSeed++) - 0.5) * Math.PI * 0.6 - (Math.PI / 5);
+                const dist = 25 + pseudoRandom(cSeed++) * 35;
+
+                const nx = parent.x + Math.cos(angle) * dist;
+                const ny = parent.y + Math.sin(angle) * dist;
+
+                ctx.beginPath();
+                ctx.moveTo(parent.x, parent.y);
+                ctx.lineTo(nx, ny);
+                ctx.strokeStyle = palette.constellations;
+                ctx.globalAlpha = 0.8;
+                ctx.stroke();
+
+                ctx.fillStyle = palette.gold;
+                ctx.globalAlpha = 1.0;
+                ctx.beginPath();
+                ctx.arc(nx, ny, 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.moveTo(nx, ny);
+                ctx.lineTo(innerBorderRight, ny);
+                ctx.strokeStyle = palette.constellations;
+                ctx.globalAlpha = 0.75;
+                ctx.lineWidth = 1.2;
+                ctx.stroke();
+
+                ctx.fillStyle = palette.sun;
+                ctx.beginPath();
+                ctx.arc(innerBorderRight, ny, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.restore();
+        }
+
+        // 4. LOWER BASE: Sun Dome and Radiating Solar Rays
+        function drawSunAndRays(ctx, w, h, palette) {
+            const rayCount = parseInt(rayCountSlider.value);
+            const sunRadius = parseInt(sunRadiusSlider.value);
+            const centerX = w / 2;
+            const centerY = h + 20;
+
+            ctx.save();
+
+            const angleStep = Math.PI / (rayCount + 1);
+            for (let i = 1; i <= rayCount; i++) {
+                const angle = Math.PI + i * angleStep;
+                const innerR = sunRadius + 15;
+                const outerR = sunRadius + 220 + (i % 2 === 0 ? 80 : 0);
+
+                const x1 = centerX + Math.cos(angle) * innerR;
+                const y1 = centerY + Math.sin(angle) * innerR;
+                const x2 = centerX + Math.cos(angle) * outerR;
+                const y2 = centerY + Math.sin(angle) * outerR;
+
+                ctx.strokeStyle = palette.gold;
+                ctx.lineWidth = i % 2 === 0 ? 3 : 1.5;
+
+                if (i % 3 === 0) {
+                    ctx.save();
+                    ctx.setLineDash([4, 8]);
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.stroke();
+                    ctx.restore();
+                } else {
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.stroke();
+                }
+
+                ctx.fillStyle = palette.sun;
+                ctx.beginPath();
+                ctx.arc(x2, y2, i % 2 === 0 ? 4 : 2.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, sunRadius, Math.PI, 0);
+            ctx.fillStyle = palette.bg;
+            ctx.fill();
+
+            ctx.strokeStyle = palette.gold;
+            ctx.lineWidth = 6;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, sunRadius - 18, Math.PI, 0);
+            ctx.strokeStyle = palette.sun;
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        // 5. CENTER FOCAL MESSAGE ("Baruch" with FALL-inspired star 'A' typography)
+        function drawCenterText(ctx, w, h, palette) {
+            const rawText = textInput.value.trim() || 'Baruch';
+            const fontFamily = fontStyleSelect.value;
+            const sliderFontSize = parseInt(fontSizeSlider.value);
+            const fontSize = Math.min(sliderFontSize, 58); 
+            const sunRadius = parseInt(sunRadiusSlider.value);
+
+            ctx.save();
+            const textY = h - (sunRadius * 0.28);
+
+            if (fontFamily === 'FallSerif') {
+                ctx.font = `600 ${fontSize}px "Cinzel", serif`;
+                ctx.fillStyle = palette.gold;
+                ctx.shadowColor = palette.gold;
+                ctx.shadowBlur = 12;
+
+                const uppercaseText = rawText.toUpperCase();
+
+                if (uppercaseText.includes('A')) {
+                    const tracking = fontSize * 0.18;
+                    const letters = uppercaseText.split('');
+                    
+                    let totalWidth = 0;
+                    letters.forEach((char) => {
+                        totalWidth += ctx.measureText(char).width + tracking;
+                    });
+                    totalWidth -= tracking;
+
+                    let startX = (w - totalWidth) / 2;
+
+                    letters.forEach((char) => {
+                        const charWidth = ctx.measureText(char).width;
+                        const charCenterX = startX + charWidth / 2;
+
+                        if (char === 'A') {
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText('A', charCenterX, textY);
+
+                            const starSize = fontSize * 0.22;
+                            drawStarSeed(ctx, charCenterX, textY + (fontSize * 0.03), palette.gold, starSize);
+                        } else {
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(char, charCenterX, textY);
+                        }
+
+                        startX += charWidth + tracking;
+                    });
+                } else {
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(uppercaseText, w / 2, textY);
+                }
+            } else {
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.font = `${fontSize}px "${fontFamily}", serif`;
+
+                ctx.fillStyle = palette.gold;
+                ctx.shadowColor = palette.gold;
+                ctx.shadowBlur = 12;
+
+                ctx.fillText(rawText, w / 2, textY);
+            }
+
+            ctx.restore();
+        }
+
+        // Main Render Dispatcher
+        function renderPatch() {
+            const w = canvas.width;  // 1050
+            const h = canvas.height; // 1050
+            const activePalette = palettes[paletteSelect.value];
+
+            // 1. Clear & Background Void
+            ctx.fillStyle = activePalette.bg;
+            ctx.fillRect(0, 0, w, h);
+
+            // 2. Cosmic Stardust Background Texture
+            if (chkStardust.checked) {
+                let localSeed = seed;
+                ctx.fillStyle = activePalette.white;
+                for (let i = 0; i < 220; i++) {
+                    const sx = pseudoRandom(localSeed++) * w;
+                    const sy = pseudoRandom(localSeed++) * h;
+                    const size = pseudoRandom(localSeed++) * 2.5 + 0.5;
+                    const alpha = pseudoRandom(localSeed++) * 0.7 + 0.2;
+                    ctx.globalAlpha = alpha;
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1.0;
+            }
+
+            // 3. Render Patch Sub-elements
+            drawMilkyWayWaves(ctx, w, h, activePalette);
+            drawPlanetaryCanopy(ctx, w, h, activePalette);
+            drawPlantConstellations(ctx, w, h, activePalette);
+            drawSunAndRays(ctx, w, h, activePalette);
+            drawCenterText(ctx, w, h, activePalette);
+
+            // 4. Decorative Patch Crest Frame
+            if (chkBorder.checked) {
+                ctx.save();
+                ctx.strokeStyle = activePalette.gold;
+                ctx.lineWidth = 14;
+                ctx.strokeRect(20, 20, w - 40, h - 40);
+
+                ctx.strokeStyle = activePalette.white;
+                ctx.lineWidth = 3;
+                ctx.strokeRect(40, 40, w - 80, h - 80);
+
+                ctx.strokeStyle = activePalette.gold;
+                ctx.lineWidth = 1.5;
+                ctx.strokeRect(48, 48, w - 96, h - 96);
+                ctx.restore();
+            }
+
+            // Update Small-Scale Check Viewport
+            if (chkMiniCheck.checked) {
+                miniScaleCard.classList.remove('hidden');
+                miniScaleCard.style.display = 'flex';
+                miniCtx.clearRect(0, 0, miniCanvas.width, miniCanvas.height);
+                miniCtx.drawImage(canvas, 0, 0, miniCanvas.width, miniCanvas.height);
+            } else {
+                miniScaleCard.classList.add('hidden');
+                miniScaleCard.style.display = 'none';
+            }
+        }
+
+        // Synchronize UI Labels
+        function updateLabels() {
+            document.getElementById('rayCountVal').textContent = rayCountSlider.value;
+            document.getElementById('sunRadiusVal').textContent = sunRadiusSlider.value;
+            document.getElementById('waveCurvatureVal').textContent = waveCurvatureSlider.value;
+            document.getElementById('planetCountVal').textContent = planetCountSlider.value;
+            document.getElementById('constellationDensityVal').textContent = constellationDensitySlider.value;
+        }
+
+        // Reset All Controls Function
+        function resetControls() {
+            textInput.value = 'Baruch';
+            fontStyleSelect.value = 'FallSerif';
+            fontSizeSlider.value = '70';
+            paletteSelect.value = 'skills';
+            rayCountSlider.value = '32';
+            sunRadiusSlider.value = '260';
+            waveCurvatureSlider.value = '5';
+            planetCountSlider.value = '3';
+            constellationDensitySlider.value = '12';
+            chkStardust.checked = true;
+            chkBorder.checked = true;
+            chkMiniCheck.checked = true;
+
+            updateLabels();
+            renderPatch();
+        }
+
+        // Event Listeners
+        const inputs = [
+            textInput, fontStyleSelect, fontSizeSlider, paletteSelect,
+            rayCountSlider, sunRadiusSlider, waveCurvatureSlider,
+            planetCountSlider, constellationDensitySlider, chkStardust, chkBorder, chkMiniCheck
+        ];
+
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                updateLabels();
+                renderPatch();
+            });
+        });
+
+        // Randomize Button
+        btnRandomize.addEventListener('click', () => {
+            seed = Math.random();
+            rayCountSlider.value = Math.floor(Math.random() * 30) + 18;
+            sunRadiusSlider.value = Math.floor(Math.random() * 100) + 200;
+            waveCurvatureSlider.value = Math.floor(Math.random() * 6) + 3;
+            planetCountSlider.value = Math.floor(Math.random() * 4) + 1;
+            constellationDensitySlider.value = Math.floor(Math.random() * 16) + 8;
+            
+            const paletteKeys = Object.keys(palettes);
+            paletteSelect.value = paletteKeys[Math.floor(Math.random() * paletteKeys.length)];
+
+            updateLabels();
+            renderPatch();
+        });
+
+        // Reset Buttons
+        btnReset.addEventListener('click', resetControls);
+        btnResetConsole.addEventListener('click', resetControls);
+
+        // Export Functionality
+        btnExport.addEventListener('click', () => {
+            const dataUrl = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `Baruch_Mission_Patch_3.5x3.5.png`;
+            link.href = dataUrl;
+            link.click();
+        });
+
+        // Initial Trigger on Window Load
+        window.onload = () => {
+            updateLabels();
+            renderPatch();
+        };
+    </script>
+</body>
+</html>
