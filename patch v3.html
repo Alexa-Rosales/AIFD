@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baruch Celestial Mission Patch Generator (Version 2)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&family=Michroma&display=swap" rel="stylesheet">
+    <!-- FontAwesome for UI Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #050507;
+            color: #E2E8F0;
+        }
+        .font-cinzel { font-family: 'Cinzel', serif; }
+        .font-cinzel-dec { font-family: 'Cinzel Decorative', serif; }
+        .font-mono-space { font-family: 'Space Mono', monospace; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0F172A;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+
+        /* Canvas Frame styling */
+        .patch-container {
+            width: 336px;
+            height: 336px;
+            box-shadow: 0 0 35px rgba(226, 192, 133, 0.15), 0 0 0 2px rgba(226, 192, 133, 0.3);
+            position: relative;
+            background-color: #0A0A0C;
+        }
+
+        .mini-scale-card {
+            background: rgba(15, 23, 42, 0.94);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(226, 192, 133, 0.4);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-amber-500 selection:text-black">
+
+    <!-- Header Section -->
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50 py-3 px-4 md:px-8 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shadow-lg">
+                <i class="fa-solid fa-rocket"></i>
+            </div>
+            <div>
+                <h1 class="text-base md:text-lg font-bold tracking-wider font-cinzel text-amber-100 flex items-center gap-2">
+                    BARUCH <span class="text-xs px-2 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-800/50">MISSION PATCH LAB v2</span>
+                </h1>
+                <p class="text-xs text-slate-400 font-mono-space hidden sm:block">ROCKET LAUNCH & COSMIC NEBULA GENERATOR ENGINE</p>
+            </div>
+        </div>
+
+        <!-- Size Verification Badge -->
+        <div class="flex items-center gap-2 bg-emerald-950/50 border border-emerald-800/60 text-emerald-300 px-3 py-1 rounded-full text-xs font-mono-space">
+            <i class="fa-solid fa-circle-check text-emerald-400"></i>
+            <span>3.5″ × 3.5″ VERIFIED (1050×1050 px @ 300 DPI)</span>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-grow container mx-auto p-4 md:p-6 lg:p-8 flex flex-col lg:flex-row gap-8 items-start justify-center">
+
+        <!-- Left Column: Interactive Patch Preview & Specifications -->
+        <div class="w-full lg:w-auto flex flex-col items-center justify-center space-y-4 mx-auto">
+            
+            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 backdrop-blur flex flex-col items-center justify-center space-y-4 shadow-2xl relative w-full max-w-md">
+                
+                <!-- Mission Question Banner -->
+                <div class="w-full text-center border-b border-slate-800 pb-3">
+                    <span class="text-[10px] uppercase font-mono-space text-amber-400/80 tracking-widest block mb-1">VERSION 2 DESIGN MOTTO</span>
+                    <p class="text-xs md:text-sm font-cinzel text-slate-200 italic">
+                        "ASCENDING THROUGH COSMIC CLOUDS TOWARD NEW HORIZONS"
+                    </p>
+                </div>
+
+                <!-- Canvas Render Frame -->
+                <div class="relative group w-full flex flex-col items-center">
+                    <div class="patch-container rounded-lg overflow-hidden transition-all duration-300">
+                        <canvas id="patchCanvas" width="1050" height="1050" class="w-full h-full block cursor-crosshair"></canvas>
+                    </div>
+
+                    <!-- Small-Scale Check overlay -->
+                    <div id="miniScaleCard" class="mini-scale-card p-2 rounded-xl flex flex-col items-center gap-1.5 transition-all duration-200 z-20 shadow-2xl absolute -right-24 bottom-2 hidden md:flex">
+                        <div class="flex items-center justify-between w-full gap-2 border-b border-slate-700/80 pb-1">
+                            <span class="text-[9px] font-mono-space text-amber-300 font-bold tracking-wider uppercase flex items-center gap-1">
+                                <i class="fa-solid fa-compress text-amber-400"></i> Small
+                            </span>
+                            <span class="text-[8px] font-mono-space text-slate-400">1.0″</span>
+                        </div>
+                        <div class="w-[64px] h-[64px] border border-slate-700 rounded-lg overflow-hidden bg-slate-950 shadow-inner">
+                            <canvas id="miniPatchCanvas" width="200" height="200" class="w-full h-full block"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Dimension Overlay Info -->
+                    <div class="mt-2 w-full flex justify-between text-[10px] font-mono-space text-slate-500 px-1">
+                        <span>W: 3.5 INCHES (1050px)</span>
+                        <span>H: 3.5 INCHES (1050px)</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="w-full pt-4 flex flex-col gap-2">
+                    <div class="flex gap-2 justify-center w-full">
+                        <button id="btnRandomize" class="flex-1 py-2.5 px-3 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-semibold rounded-lg text-xs md:text-sm shadow-lg shadow-amber-900/20 flex items-center justify-center gap-1.5 transition-all active:scale-95">
+                            <i class="fa-solid fa-dice text-slate-950"></i>
+                            <span>Randomize</span>
+                        </button>
+
+                        <button id="btnToggleAnim" class="py-2.5 px-3.5 bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold rounded-lg text-xs md:text-sm border border-slate-700 flex items-center justify-center gap-1.5 transition-all active:scale-95">
+                            <i id="animIcon" class="fa-solid fa-pause"></i>
+                            <span id="animText">Pause</span>
+                        </button>
+
+                        <button id="btnExport" class="flex-1 py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-100 font-semibold rounded-lg text-xs md:text-sm border border-slate-700 flex items-center justify-center gap-1.5 transition-all active:scale-95">
+                            <i class="fa-solid fa-download text-amber-400"></i>
+                            <span>Export PNG</span>
+                        </button>
+                    </div>
+
+                    <button id="btnResetConsole" class="w-full py-2 px-4 bg-slate-950/80 hover:bg-slate-900 text-slate-300 hover:text-amber-300 font-mono-space rounded-lg text-xs border border-slate-800 flex items-center justify-center gap-2 transition-all active:scale-95">
+                        <i class="fa-solid fa-rotate-left text-amber-400"></i>
+                        <span>Reset to Original V2 Sketch</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quadrant Legend -->
+            <div class="w-full max-w-md bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 text-xs font-mono-space text-slate-400 grid grid-cols-2 gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span>
+                    <span>BASE: Sun, Rays & Rocket</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block"></span>
+                    <span>LEFT/RIGHT: Nebula Clouds</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-400 inline-block"></span>
+                    <span>FLOW: S-Curve Milky Wave</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-orange-400 inline-block"></span>
+                    <span>TOP: Planetary Orbits</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Control Panel & Parametric Sliders -->
+        <div class="w-full lg:w-[480px] bg-slate-900/70 border border-slate-800 rounded-2xl p-6 backdrop-blur space-y-6">
+            
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h2 class="text-sm font-bold font-mono-space text-amber-300 uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i> Version 2 Parametric Controls
+                </h2>
+                <button id="btnReset" class="text-[11px] font-mono-space text-slate-400 hover:text-amber-400 transition-colors">
+                    Reset Controls
+                </button>
+            </div>
+
+            <!-- Multi-Scale Demonstration -->
+            <div class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800 space-y-2">
+                <div class="flex justify-between items-center border-b border-slate-800/80 pb-1.5">
+                    <span class="text-[10px] font-semibold text-slate-300 uppercase font-mono-space tracking-wider">
+                        <i class="fa-solid fa-layer-group text-amber-400 mr-1"></i> Multi-Scale Demonstration
+                    </span>
+                    <span class="text-[9px] text-amber-400/80 font-mono-space">Real-time Size Scalability</span>
+                </div>
+                
+                <div class="flex items-end justify-between gap-2 pt-1 px-1">
+                    <div class="flex flex-col items-center gap-1">
+                        <div class="w-24 h-24 rounded-lg border border-amber-500/40 bg-slate-950 overflow-hidden shadow-md">
+                            <canvas id="demoCanvasLarge" width="200" height="200" class="w-full h-full block"></canvas>
+                        </div>
+                        <span class="text-[9px] font-mono-space text-slate-400">3.5″ (100%)</span>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-1">
+                        <div class="w-16 h-16 rounded-lg border border-amber-500/30 bg-slate-950 overflow-hidden shadow-md">
+                            <canvas id="demoCanvasMedium" width="150" height="150" class="w-full h-full block"></canvas>
+                        </div>
+                        <span class="text-[9px] font-mono-space text-slate-400">2.0″ (57%)</span>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-1">
+                        <div class="w-10 h-10 rounded border border-amber-500/30 bg-slate-950 overflow-hidden shadow-md">
+                            <canvas id="demoCanvasSmall" width="100" height="100" class="w-full h-full block"></canvas>
+                        </div>
+                        <span class="text-[9px] font-mono-space text-slate-400">1.0″ (28%)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-5 max-h-[500px] overflow-y-auto pr-2">
+
+                <!-- Outer Silhouette Controls -->
+                <div class="space-y-3 bg-slate-950/40 p-4 rounded-xl border border-slate-800/80">
+                    <label class="text-xs font-semibold text-slate-200 uppercase tracking-wider font-mono-space block">
+                        1. Outer Frame Geometry
+                    </label>
+                    <select id="shapeSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-amber-200 focus:outline-none focus:border-amber-500 font-mono-space">
+                        <option value="square" selected>Classic Square Patch (Sketch Frame)</option>
+                        <option value="diamond">Celestial Diamond (Rhombus)</option>
+                        <option value="circle">Classic NASA Roundel (Outer Circle)</option>
+                        <option value="shield">Heraldic Shield Crest</option>
+                        <option value="octagon">Aerospace Octagon</option>
+                        <option value="arch">Observatory Vault (Arch)</option>
+                    </select>
+                </div>
+
+                <!-- Text Controls -->
+                <div class="space-y-3 bg-slate-950/40 p-4 rounded-xl border border-slate-800/80">
+                    <label class="text-xs font-semibold text-slate-200 uppercase tracking-wider font-mono-space block">
+                        2. Center Title & Typography
+                    </label>
+                    <input type="text" id="textInput" value="Baruch" placeholder="e.g. Baruch..." 
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-amber-100 focus:outline-none focus:border-amber-500 font-cinzel">
+                    
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <div>
+                            <label class="text-[10px] font-mono-space text-slate-400 block mb-1">Typography Style</label>
+                            <select id="fontStyleSelect" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-amber-500">
+                                <option value="FallSerif" selected>Celestial 'FALL' Serif (Star 'A')</option>
+                                <option value="Cinzel">Astronomical Serif (Cinzel)</option>
+                                <option value="Cinzel Decorative">Rustic Decorative</option>
+                                <option value="Space Mono">Monoline Cosmic (Space Mono)</option>
+                                <option value="Michroma">Tactical Aerospace (Michroma)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-mono-space text-slate-400 block mb-1">Text Size</label>
+                            <input type="range" id="fontSizeSlider" min="30" max="90" value="55" class="w-full accent-amber-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Palette Selector -->
+                <div class="space-y-2 bg-slate-950/40 p-4 rounded-xl border border-slate-800/80">
+                    <label class="text-xs font-semibold text-slate-200 uppercase tracking-wider font-mono-space block">
+                        3. Version 2 Palette Theme
+                    </label>
+                    <select id="paletteSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-amber-200 focus:outline-none focus:border-amber-500 font-mono-space">
+                        <option value="skills" selected>Vibrant Multi-Hue Celestial (Default)</option>
+                        <option value="deepSpace">Deep Space Neon & Bronze</option>
+                        <option value="solarAura">Solar Flare Thermal</option>
+                        <option value="emeraldAbyss">Emerald Abyss & Gold</option>
+                        <option value="imperialViolet">Imperial Cyber Violet</option>
+                        <option value="monochrome">Graphite Monochrome</option>
+                    </select>
+                </div>
+
+                <!-- Parametric Sliders -->
+                <div class="space-y-4 bg-slate-950/40 p-4 rounded-xl border border-slate-800/80">
+                    <label class="text-xs font-semibold text-slate-200 uppercase tracking-wider font-mono-space block">
+                        4. Version 2 Feature Elements
+                    </label>
+
+                    <!-- Rocket Scale -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-mono-space text-slate-300">
+                            <span>Rocket Size Scale:</span>
+                            <span id="rocketScaleVal" class="text-amber-400 font-bold">1.1</span>
+                        </div>
+                        <input type="range" id="rocketScaleSlider" min="0.4" max="1.8" step="0.1" value="1.1" class="w-full accent-amber-500">
+                    </div>
+
+                    <!-- Cloud Density -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-mono-space text-slate-300">
+                            <span>Nebula Cloud Opacity:</span>
+                            <span id="cloudDensityVal" class="text-amber-400 font-bold">0.6</span>
+                        </div>
+                        <input type="range" id="cloudDensitySlider" min="0.1" max="1.0" step="0.1" value="0.6" class="w-full accent-amber-500">
+                    </div>
+
+                    <!-- Ray Count -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-mono-space text-slate-300">
+                            <span>Base Solar Rays:</span>
+                            <span id="rayCountVal" class="text-amber-400 font-bold">36</span>
+                        </div>
+                        <input type="range" id="rayCountSlider" min="16" max="52" value="36" class="w-full accent-amber-500">
+                    </div>
+
+                    <!-- Sun Radius -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-mono-space text-slate-300">
+                            <span>Sun Dome Radius:</span>
+                            <span id="sunRadiusVal" class="text-amber-400 font-bold">260</span>
+                        </div>
+                        <input type="range" id="sunRadiusSlider" min="180" max="320" value="260" class="w-full accent-amber-500">
+                    </div>
+
+                    <!-- Milky Way S-Curve Wave Density -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-mono-space text-slate-300">
+                            <span>Milky Way Wave Density:</span>
+                            <span id="waveCurvatureVal" class="text-amber-400 font-bold">5</span>
+                        </div>
+                        <input type="range" id="waveCurvatureSlider" min="2" max="9" value="5" class="w-full accent-amber-500">
+                    </div>
+
+                    <!-- Planet Count -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-mono-space text-slate-300">
+                            <span>Top-Right Planets:</span>
+                            <span id="planetCountVal" class="text-amber-400 font-bold">3</span>
+                        </div>
+                        <input type="range" id="planetCountSlider" min="1" max="5" value="3" class="w-full accent-amber-500">
+                    </div>
+
+                    <!-- ISS Scale -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-mono-space text-slate-300">
+                            <span>ISS Space Station Scale:</span>
+                            <span id="issScaleVal" class="text-amber-400 font-bold">0.8</span>
+                        </div>
+                        <input type="range" id="issScaleSlider" min="0.4" max="1.6" step="0.1" value="0.8" class="w-full accent-amber-500">
+                    </div>
+
+                </div>
+
+                <!-- Toggles -->
+                <div class="space-y-2 bg-slate-950/40 p-4 rounded-xl border border-slate-800/80">
+                    <label class="text-xs font-semibold text-slate-200 uppercase tracking-wider font-mono-space block mb-2">
+                        5. Overlays & Frame
+                    </label>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-slate-300 font-mono-space">Cosmic Stardust Overlay</span>
+                        <input type="checkbox" id="chkStardust" checked class="w-4 h-4 accent-amber-500 rounded cursor-pointer">
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+                        <span class="text-xs text-slate-300 font-mono-space">ISS Orbit Vehicle</span>
+                        <input type="checkbox" id="chkISS" checked class="w-4 h-4 accent-amber-500 rounded cursor-pointer">
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+                        <span class="text-xs text-slate-300 font-mono-space">Outer Edge Frame</span>
+                        <input type="checkbox" id="chkBorder" checked class="w-4 h-4 accent-amber-500 rounded cursor-pointer">
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+                        <span class="text-xs font-semibold text-amber-300 font-mono-space flex items-center gap-1.5">
+                            <i class="fa-solid fa-needle"></i> Embroidery Mode (Thick Stitch Lines & Limited Colors)
+                        </span>
+                        <input type="checkbox" id="chkEmbroidery" class="w-4 h-4 accent-amber-500 rounded cursor-pointer">
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+                        <span class="text-xs text-slate-300 font-mono-space">Small-Scale Recognizability Check</span>
+                        <input type="checkbox" id="chkMiniCheck" checked class="w-4 h-4 accent-amber-500 rounded cursor-pointer">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/60 py-3 text-center text-xs font-mono-space text-slate-500">
+        BARUCH CELESTIAL MISSION PATCH GENERATOR — VERSION 2
+    </footer>
+
+    <!-- JavaScript Canvas Logic -->
+    <script>
+        // DOM Elements
+        const canvas = document.getElementById('patchCanvas');
+        const ctx = canvas.getContext('2d');
+        const miniCanvas = document.getElementById('miniPatchCanvas');
+        const miniCtx = miniCanvas.getContext('2d');
+        const miniScaleCard = document.getElementById('miniScaleCard');
+
+        // Demonstration Canvases
+        const demoCanvasLarge = document.getElementById('demoCanvasLarge');
+        const demoCtxLarge = demoCanvasLarge.getContext('2d');
+        const demoCanvasMedium = document.getElementById('demoCanvasMedium');
+        const demoCtxMedium = demoCanvasMedium.getContext('2d');
+        const demoCanvasSmall = document.getElementById('demoCanvasSmall');
+        const demoCtxSmall = demoCanvasSmall.getContext('2d');
+
+        // Inputs
+        const shapeSelect = document.getElementById('shapeSelect');
+        const textInput = document.getElementById('textInput');
+        const fontStyleSelect = document.getElementById('fontStyleSelect');
+        const fontSizeSlider = document.getElementById('fontSizeSlider');
+        const paletteSelect = document.getElementById('paletteSelect');
+        const rocketScaleSlider = document.getElementById('rocketScaleSlider');
+        const issScaleSlider = document.getElementById('issScaleSlider');
+        const cloudDensitySlider = document.getElementById('cloudDensitySlider');
+        const rayCountSlider = document.getElementById('rayCountSlider');
+        const sunRadiusSlider = document.getElementById('sunRadiusSlider');
+        const waveCurvatureSlider = document.getElementById('waveCurvatureSlider');
+        const planetCountSlider = document.getElementById('planetCountSlider');
+        const chkStardust = document.getElementById('chkStardust');
+        const chkISS = document.getElementById('chkISS');
+        const chkBorder = document.getElementById('chkBorder');
+        const chkEmbroidery = document.getElementById('chkEmbroidery');
+        const chkMiniCheck = document.getElementById('chkMiniCheck');
+
+        const btnRandomize = document.getElementById('btnRandomize');
+        const btnToggleAnim = document.getElementById('btnToggleAnim');
+        const animIcon = document.getElementById('animIcon');
+        const animText = document.getElementById('animText');
+        const btnReset = document.getElementById('btnReset');
+        const btnResetConsole = document.getElementById('btnResetConsole');
+        const btnExport = document.getElementById('btnExport');
+
+        const DEFAULT_SEED = 42;
+        let seed = DEFAULT_SEED;
+        let animationFrameId = null;
+        let isAnimating = true;
+        let lastTime = 0;
+        let stardustParticles = [];
+
+        const fontStyles = ['Cinzel', 'Michroma', 'Space Mono', 'Cinzel Decorative', 'FallSerif'];
+        const shapes = ['square', 'circle', 'shield', 'octagon', 'arch'];
+
+        // Color Palettes
+        const palettes = {
+            skills: {
+                bg: '#0A0A0C',
+                gold: '#E2C085',
+                sun: '#FFFFFF',
+                rayColor: '#FFFFFF',
+                waves: ['#38BDF8', '#818CF8', '#0EA5E9', '#0284C7', '#60A5FA'],
+                planetHues: ['#C87D55', '#38BDF8', '#E11D48', '#F59E0B', '#10B981'],
+                constellations: '#B8A5D6',
+                white: '#FFFFFF'
+            },
+            deepSpace: {
+                bg: '#0A0A0C',
+                gold: '#E2C085',
+                sun: '#FFFFFF',
+                rayColor: '#FFFFFF',
+                waves: ['#06B6D4', '#3B82F6', '#6366F1', '#0EA5E9', '#38BDF8'],
+                planetHues: ['#C87D55', '#38BDF8', '#E11D48', '#F59E0B', '#10B981'],
+                constellations: '#C084FC',
+                white: '#FFFFFF'
+            },
+            solarAura: {
+                bg: '#0A0A0C',
+                gold: '#E2C085',
+                sun: '#FFFFFF',
+                rayColor: '#FFFFFF',
+                waves: ['#F43F5E', '#FB7185', '#F59E0B', '#FDA4AF', '#E11D48'],
+                planetHues: ['#C87D55', '#38BDF8', '#E11D48', '#F59E0B', '#10B981'],
+                constellations: '#F472B6',
+                white: '#FFFFFF'
+            },
+            emeraldAbyss: {
+                bg: '#0A0A0C',
+                gold: '#E2C085',
+                sun: '#FFFFFF',
+                rayColor: '#FFFFFF',
+                waves: ['#10B981', '#34D399', '#059669', '#6EE7B7', '#047857'],
+                planetHues: ['#C87D55', '#38BDF8', '#E11D48', '#F59E0B', '#10B981'],
+                constellations: '#A7F3D0',
+                white: '#FFFFFF'
+            },
+            imperialViolet: {
+                bg: '#0A0A0C',
+                gold: '#E2C085',
+                sun: '#FFFFFF',
+                rayColor: '#FFFFFF',
+                waves: ['#A855F7', '#E879F9', '#C084FC', '#818CF8', '#D8B4FE'],
+                planetHues: ['#C87D55', '#38BDF8', '#E11D48', '#F59E0B', '#10B981'],
+                constellations: '#F0ABFC',
+                white: '#FFFFFF'
+            },
+            monochrome: {
+                bg: '#0A0A0C',
+                gold: '#E2C085',
+                sun: '#FFFFFF',
+                rayColor: '#FFFFFF',
+                waves: ['#E5E7EB', '#9CA3AF', '#6B7280', '#D1D5DB', '#4B5563'],
+                planetHues: ['#C87D55', '#38BDF8', '#E11D48', '#F59E0B', '#10B981'],
+                constellations: '#D1D5DB',
+                white: '#FFFFFF'
+            }
+        };
+
+        function pseudoRandom(s) {
+            let x = Math.sin(s++) * 10000;
+            return x - Math.floor(x);
+        }
+
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function getRandomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function getRandomPaletteKey() {
+            const keys = Object.keys(palettes);
+            return getRandomItem(keys);
+        }
+
+        function createSilhouettePath(ctx, w, h, inset = 0) {
+            const shape = shapeSelect.value;
+            const cx = w / 2;
+            const cy = h / 2;
+            // Safe padding margin tailored to maintain generous border clearance within the canvas frame
+            const margin = 65 + inset;
+
+            ctx.beginPath();
+
+            if (shape === 'square') {
+                const cornerRadius = 32 - (inset > 0 ? inset / 2 : 0);
+                const rectX = margin;
+                const rectY = margin;
+                const rectW = w - (margin * 2);
+                const rectH = h - (margin * 2);
+                
+                ctx.moveTo(rectX + cornerRadius, rectY);
+                ctx.lineTo(rectX + rectW - cornerRadius, rectY);
+                ctx.quadraticCurveTo(rectX + rectW, rectY, rectX + rectW, rectY + cornerRadius);
+                ctx.lineTo(rectX + rectW, rectY + rectH - cornerRadius);
+                ctx.quadraticCurveTo(rectX + rectW, rectY + rectH, rectX + rectW - cornerRadius, rectY + rectH);
+                ctx.lineTo(rectX + cornerRadius, rectY + rectH);
+                ctx.quadraticCurveTo(rectX, rectY + rectH, rectX, rectY + rectH - cornerRadius);
+                ctx.lineTo(rectX, rectY + cornerRadius);
+                ctx.quadraticCurveTo(rectX, rectY, rectX + cornerRadius, rectY);
+                ctx.closePath();
+            } else if (shape === 'shield') {
+                const top = margin;
+                const bottom = h - margin;
+                const left = margin;
+                const right = w - margin;
+                
+                ctx.moveTo(left, top);
+                ctx.lineTo(right, top);
+                ctx.lineTo(right, cy);
+                ctx.quadraticCurveTo(right, bottom - 90, cx, bottom);
+                ctx.quadraticCurveTo(left, bottom - 90, left, cy);
+                ctx.closePath();
+            } else if (shape === 'circle') {
+                const radius = Math.min(w, h) / 2 - margin;
+                ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+            } else if (shape === 'octagon') {
+                const radius = Math.min(w, h) / 2 - margin;
+                const sides = 8;
+                for (let i = 0; i < sides; i++) {
+                    const angle = (i * 2 * Math.PI) / sides - Math.PI / 8;
+                    const x = cx + radius * Math.cos(angle);
+                    const y = cy + radius * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+            } else if (shape === 'arch') {
+                // Adjust Arch parameters so the apex radius fits entirely within top/bottom margins
+                const left = margin;
+                const right = w - margin;
+                const radius = (right - left) / 2;
+                const topArcCenter = margin + radius;
+                const bottom = h - margin;
+
+                ctx.moveTo(left, bottom);
+                ctx.lineTo(left, topArcCenter);
+                ctx.arc(cx, topArcCenter, radius, Math.PI, 0, false);
+                ctx.lineTo(right, bottom);
+                ctx.closePath();
+            } else { // Fallback / Crest shape fitting safely within frame
+                const top = margin;
+                const bottom = h - margin;
+                const left = margin;
+                const right = w - margin;
+                ctx.moveTo(cx, top);
+                ctx.quadraticCurveTo(right - 10, cy - 30, right, cy);
+                ctx.quadraticCurveTo(right, bottom - 50, cx, bottom);
+                ctx.quadraticCurveTo(left, bottom - 50, left, cy);
+                ctx.quadraticCurveTo(left + 10, cy - 30, cx, top);
+                ctx.closePath();
+            }
+        }
+
+        // Initialize Stardust Particles with Twinkle Parameters
+        function initStardustParticles(w, h) {
+            stardustParticles = [];
+            let localSeed = seed;
+            const galaxyColors = ['#FFFFFF', '#38BDF8', '#C084FC', '#F43F5E', '#34D399', '#F59E0B', '#E2C085', '#60A5FA'];
+            for (let i = 0; i < 240; i++) {
+                stardustParticles.push({
+                    x: pseudoRandom(localSeed++) * w,
+                    y: pseudoRandom(localSeed++) * h,
+                    size: pseudoRandom(localSeed++) * 3.0 + 0.5,
+                    baseAlpha: pseudoRandom(localSeed++) * 0.7 + 0.15,
+                    twinkleSpeed: 0.02 + pseudoRandom(localSeed++) * 0.06,
+                    twinkleOffset: pseudoRandom(localSeed++) * Math.PI * 2,
+                    color: galaxyColors[Math.floor(pseudoRandom(localSeed++) * galaxyColors.length)],
+                    isTwinkling: i % 3 === 0 // Make roughly 1/3 of the stars actively twinkle
+                });
+            }
+        }
+
+        // Draw Star/Diamond Seed Motif inside Apex of Letter 'A'
+        function drawStarSeed(ctx, cx, cy, color, size) {
+            ctx.save();
+            ctx.fillStyle = color;
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - size);
+            ctx.quadraticCurveTo(cx, cy, cx + size, cy);
+            ctx.quadraticCurveTo(cx, cy, cx, cy + size);
+            ctx.quadraticCurveTo(cx, cy, cx - size, cy);
+            ctx.quadraticCurveTo(cx, cy, cx, cy - size);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // Cosmic Stardust Layer with Animated Twinkling Effect
+        function drawStardust(ctx, w, h, time) {
+            if (!chkStardust.checked) return;
+            
+            stardustParticles.forEach(p => {
+                let alpha = p.baseAlpha;
+                if (p.isTwinkling) {
+                    alpha = p.baseAlpha + Math.sin(time * p.twinkleSpeed + p.twinkleOffset) * 0.35;
+                    alpha = Math.max(0.1, Math.min(1.0, alpha));
+                }
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1.0;
+        }
+
+        function drawNebulaClouds(ctx, w, h, palette) {
+            const density = parseFloat(cloudDensitySlider.value);
+            if (density <= 0) return;
+            ctx.save();
+            ctx.globalAlpha = density * 0.45;
+            
+            const grad1 = ctx.createRadialGradient(w * 0.25, h * 0.35, 20, w * 0.25, h * 0.35, w * 0.5);
+            grad1.addColorStop(0, '#0284c7');
+            grad1.addColorStop(0.5, '#7c3aed');
+            grad1.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad1;
+            ctx.beginPath();
+            ctx.arc(w * 0.25, h * 0.35, w * 0.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            const grad2 = ctx.createRadialGradient(w * 0.75, h * 0.65, 30, w * 0.75, h * 0.65, w * 0.55);
+            grad2.addColorStop(0, '#f43f5e');
+            grad2.addColorStop(0.5, '#4f46e5');
+            grad2.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad2;
+            ctx.beginPath();
+            ctx.arc(w * 0.75, h * 0.65, w * 0.55, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawISS(ctx, w, h, palette) {
+            if (!chkISS.checked) return;
+            ctx.save();
+            const scale = parseFloat(issScaleSlider.value);
+            const cx = w * 0.28;
+            const cy = h * 0.28;
+            ctx.translate(cx, cy);
+            ctx.scale(scale, scale);
+
+            // Illustrated ISS Space Station Styling (matching sun ray aesthetic)
+            ctx.strokeStyle = palette.rayColor || palette.gold;
+            ctx.lineWidth = 2.0;
+
+            // Main Central Truss Backbone
+            ctx.beginPath();
+            ctx.moveTo(-60, 0);
+            ctx.lineTo(60, 0);
+            ctx.stroke();
+
+            // Port Solar Array Wing (Segmented panels)
+            ctx.fillStyle = palette.bg;
+            ctx.fillRect(-78, -20, 26, 40);
+            ctx.strokeRect(-78, -20, 26, 40);
+            ctx.beginPath();
+            ctx.moveTo(-78, 0); ctx.lineTo(-52, 0);
+            ctx.moveTo(-65, -20); ctx.lineTo(-65, 20);
+            ctx.stroke();
+
+            // Starboard Solar Array Wing (Segmented panels)
+            ctx.fillRect(52, -20, 26, 40);
+            ctx.strokeRect(52, -20, 26, 40);
+            ctx.beginPath();
+            ctx.moveTo(52, 0); ctx.lineTo(78, 0);
+            ctx.moveTo(65, -20); ctx.lineTo(65, 20);
+            ctx.stroke();
+
+            // Central Habitation & Laboratory Modules (Cylindrical compartments)
+            ctx.fillStyle = palette.sun;
+            ctx.beginPath();
+            ctx.roundRect(-22, -10, 44, 20, 4);
+            ctx.fill();
+            ctx.stroke();
+
+            // Docking Node Module
+            ctx.beginPath();
+            ctx.roundRect(-8, -16, 16, 32, 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Sun Ray Node Dots at solar panel tips
+            ctx.fillStyle = palette.sun;
+            ctx.beginPath();
+            ctx.arc(-78, 0, 3, 0, Math.PI * 2);
+            ctx.arc(78, 0, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawMilkyWayWaves(ctx, w, h, palette) {
+            const densityLevel = parseInt(waveCurvatureSlider.value);
+            const isEmbroidery = chkEmbroidery.checked;
+            ctx.save();
+
+            let mwSeed = seed + 15;
+            const startX = -50;
+
+            if (!isEmbroidery) {
+                const glowGrad = ctx.createRadialGradient(100, h / 2, 20, 100, h / 2, 500);
+                glowGrad.addColorStop(0, 'rgba(30, 64, 175, 0.45)');
+                glowGrad.addColorStop(0.5, 'rgba(14, 116, 144, 0.2)');
+                glowGrad.addColorStop(1, 'transparent');
+
+                ctx.fillStyle = glowGrad;
+                ctx.beginPath();
+                ctx.arc(100, h / 2, 600, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            const numLines = isEmbroidery ? Math.min(18, 12 + densityLevel) : 20 + densityLevel * 3;
+            // Thicken stroke lines for embroidery stitch simulation
+            ctx.lineWidth = isEmbroidery ? 4.5 : 1.6;
+            const waveColors = isEmbroidery 
+                ? [palette.waves[0], palette.waves[1] || palette.waves[0]] 
+                : palette.waves;
+
+            for (let i = 0; i < numLines; i++) {
+                const offset = (i - numLines / 2) * (isEmbroidery ? 22 : 16);
+                const alpha = Math.max(0.2, 1 - Math.abs(offset) / 260);
+
+                ctx.beginPath();
+                ctx.moveTo(startX + offset, -50);
+                ctx.bezierCurveTo(
+                    startX + 320 + offset, 220,
+                    startX + 280 + offset, 580,
+                    w + 50, h + 50
+                );
+
+                ctx.strokeStyle = waveColors[i % waveColors.length];
+                ctx.globalAlpha = isEmbroidery ? 0.95 : alpha * 0.85;
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        function drawPlanetaryCanopy(ctx, w, h, palette, time = 0) {
+            const count = parseInt(planetCountSlider.value);
+            const isEmbroidery = chkEmbroidery.checked;
+            ctx.save();
+
+            let pSeed = seed + 42;
+            const cornerX = w;
+            const cornerY = 0;
+            const baseRadii = [280, 440, 600, 760, 920];
+            const planetHues = isEmbroidery 
+                ? [palette.sun, palette.gold, palette.waves[0]] 
+                : palette.planetHues;
+
+            for (let i = 0; i < Math.min(count, 5); i++) {
+                const arcRadius = baseRadii[i];
+
+                ctx.beginPath();
+                ctx.arc(cornerX, cornerY, arcRadius, Math.PI * 0.5, Math.PI);
+                ctx.strokeStyle = palette.gold;
+                // Thicken orbital stroke lines for embroidery mode
+                ctx.lineWidth = isEmbroidery ? 4.0 : 1.4;
+                ctx.globalAlpha = isEmbroidery ? 0.9 : 0.55;
+                ctx.setLineDash(isEmbroidery ? [12, 14] : [8, 12]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Animate planetary revolution along orbital arc
+                const baseAngle = Math.PI * 0.75 + (pseudoRandom(pSeed++) - 0.5) * 0.3;
+                const speed = 0.15 + (i * 0.05);
+                const angleOffset = Math.sin(time * speed + i) * 0.22;
+                const angle = baseAngle + angleOffset;
+
+                const px = cornerX + Math.cos(angle) * arcRadius;
+                const py = cornerY + Math.sin(angle) * arcRadius;
+                const planetRadius = 18 + pseudoRandom(pSeed++) * 22;
+
+                ctx.globalAlpha = 1.0;
+                ctx.fillStyle = palette.bg;
+                ctx.beginPath();
+                ctx.arc(px, py, planetRadius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = planetHues[i % planetHues.length];
+                ctx.beginPath();
+                ctx.arc(px, py, planetRadius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = palette.sun;
+                ctx.lineWidth = isEmbroidery ? 4.0 : 2.5;
+                ctx.stroke();
+            }
+
+            ctx.restore();
+        }
+
+        function drawSunAndRays(ctx, w, h, palette) {
+            const rayCount = parseInt(rayCountSlider.value);
+            const baseSunRadius = parseInt(sunRadiusSlider.value);
+            const isEmbroidery = chkEmbroidery.checked;
+            const currentShape = shapeSelect.value;
+
+            // Compute bottom offset based on shape curvature to prevent dome & text cutoff
+            let bottomOffset = 10;
+            if (currentShape === 'shield') bottomOffset = 65;
+            else if (currentShape === 'circle' || currentShape === 'octagon') bottomOffset = 50;
+            else if (currentShape === 'arch') bottomOffset = 25;
+
+            const centerX = w / 2;
+            const centerY = h - bottomOffset;
+            const sunRadius = baseSunRadius;
+
+            ctx.save();
+
+            const angleStep = Math.PI / (rayCount + 1);
+            for (let i = 1; i <= rayCount; i++) {
+                const angle = Math.PI + i * angleStep;
+                const innerR = sunRadius + 10;
+                
+                const mod = i % 3;
+                let lengthType = 'medium';
+                // Calculate max available radial clearance inside the active shape path
+                let maxRayExtension = 220;
+                if (currentShape === 'circle' || currentShape === 'octagon') maxRayExtension = 160;
+                else if (currentShape === 'shield') maxRayExtension = 180;
+                else if (currentShape === 'arch') maxRayExtension = 190;
+
+                let outerR = sunRadius + (maxRayExtension * 0.7);
+                if (mod === 0) {
+                    lengthType = 'short';
+                    outerR = sunRadius + (maxRayExtension * 0.35);
+                } else if (mod === 1) {
+                    lengthType = 'long';
+                    outerR = sunRadius + maxRayExtension;
+                }
+
+                const isDotted = (i % 2 === 0);
+
+                const x1 = centerX + Math.cos(angle) * innerR;
+                const y1 = centerY + Math.sin(angle) * innerR;
+                const x2 = centerX + Math.cos(angle) * outerR;
+                const y2 = centerY + Math.sin(angle) * outerR;
+
+                ctx.strokeStyle = palette.rayColor || palette.gold;
+                // Thicken sun rays for heavy thread stitch representation
+                ctx.lineWidth = isEmbroidery 
+                    ? (lengthType === 'long' ? 5.5 : 4.0) 
+                    : (lengthType === 'long' ? 2.5 : 1.8);
+
+                if (isDotted && !isEmbroidery) {
+                    ctx.setLineDash([3, 5]);
+                } else if (isDotted && isEmbroidery) {
+                    ctx.setLineDash([8, 8]);
+                } else {
+                    ctx.setLineDash([]);
+                }
+
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Stitched Node Dot at ray tip
+                ctx.fillStyle = palette.sun;
+                if (!isEmbroidery) {
+                    ctx.shadowColor = palette.gold;
+                    ctx.shadowBlur = 8;
+                }
+                ctx.beginPath();
+                ctx.arc(x2, y2, isEmbroidery ? (lengthType === 'long' ? 6.5 : 4.5) : (lengthType === 'long' ? 4.0 : 2.5), 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            // Sun Dome Background
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, sunRadius, Math.PI, 0);
+            ctx.fillStyle = palette.bg;
+            ctx.fill();
+
+            // Sun Dome Outer Rim (Heavy Stitch Line)
+            ctx.strokeStyle = palette.sun;
+            ctx.lineWidth = isEmbroidery ? 8 : 5;
+            ctx.stroke();
+
+            // Sun Dome Inner Accent
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, sunRadius - (isEmbroidery ? 20 : 16), Math.PI, 0);
+            ctx.strokeStyle = palette.sun;
+            ctx.lineWidth = isEmbroidery ? 3.5 : 2;
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function drawRocket(ctx, w, h, palette, time = 0) {
+            ctx.save();
+            const scale = parseFloat(rocketScaleSlider.value);
+            const baseSunRadius = parseInt(sunRadiusSlider.value);
+            const currentShape = shapeSelect.value;
+            const centerX = w / 2;
+
+            let bottomOffset = 10;
+            if (currentShape === 'shield') bottomOffset = 65;
+            else if (currentShape === 'circle' || currentShape === 'octagon') bottomOffset = 50;
+            else if (currentShape === 'arch') bottomOffset = 25;
+            
+            // Central baseline Y position atop the sun dome
+            const baselineY = (h - bottomOffset) - baseSunRadius + 12;
+
+            // Loop timing: 5s pause at center + 3s flight & wrap-around loop = 8s total cycle
+            const pauseDuration = 5.0; // Seconds to rest in center
+            const flightDuration = 3.0; // Seconds to fly up, wrap from bottom, and return
+            const totalCycle = pauseDuration + flightDuration;
+
+            const cycleTime = time % totalCycle;
+
+            let rocketY = baselineY;
+            let isFlying = false;
+
+            if (cycleTime > pauseDuration) {
+                isFlying = true;
+                const flightProgress = (cycleTime - pauseDuration) / flightDuration; // 0.0 to 1.0
+
+                // Total vertical distance to travel (from bottom of screen to top of screen)
+                const travelDistance = h + 150;
+                const currentY = baselineY - (flightProgress * travelDistance);
+
+                // Wrap around seamlessly from bottom if off-screen top
+                if (currentY < -80) {
+                    rocketY = currentY + travelDistance;
+                } else {
+                    rocketY = currentY;
+                }
+            } else {
+                rocketY = baselineY;
+            }
+
+            ctx.translate(centerX, rocketY);
+            ctx.scale(scale, scale);
+
+            // Dynamic flame pulsing with thrust cycle (subtle idle flame vs active launch flame)
+            const flamePulse = isFlying 
+                ? 38 + Math.sin(time * 18) * 10 
+                : 14 + Math.sin(time * 6) * 4;
+
+            ctx.fillStyle = '#f97316';
+            ctx.beginPath();
+            ctx.moveTo(-7, 0);
+            ctx.lineTo(0, flamePulse);
+            ctx.lineTo(7, 0);
+            ctx.closePath();
+            ctx.fill();
+
+            // Inner bright core flame
+            ctx.fillStyle = '#fef08a';
+            ctx.beginPath();
+            ctx.moveTo(-4, 0);
+            ctx.lineTo(0, flamePulse * 0.6);
+            ctx.lineTo(4, 0);
+            ctx.closePath();
+            ctx.fill();
+
+            // Rocket Body
+            ctx.fillStyle = '#ffffff';
+            ctx.strokeStyle = palette.sun;
+            ctx.lineWidth = 2.2;
+            ctx.beginPath();
+            ctx.moveTo(0, -46);
+            ctx.quadraticCurveTo(18, -14, 15, 5);
+            ctx.lineTo(-15, 5);
+            ctx.quadraticCurveTo(-18, -14, 0, -46);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Porthole Window
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.arc(0, -15, 5.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = palette.sun;
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function drawCenterText(ctx, w, h, palette) {
+            const rawText = textInput.value.trim() || 'Baruch';
+            const fontFamily = fontStyleSelect.value;
+            const userFontSize = parseInt(fontSizeSlider.value);
+            const baseSunRadius = parseInt(sunRadiusSlider.value);
+            const currentShape = shapeSelect.value;
+
+            let bottomOffset = 10;
+            if (currentShape === 'shield') bottomOffset = 65;
+            else if (currentShape === 'circle' || currentShape === 'octagon') bottomOffset = 50;
+            else if (currentShape === 'arch') bottomOffset = 25;
+            
+            // Text vertical center positioned securely inside the sun dome arch
+            const textY = (h - bottomOffset) - (baseSunRadius * 0.45);
+
+            // Strict maximum text width constraint to keep text well inside sun dome walls
+            const maxTextWidth = baseSunRadius * 1.15;
+
+            ctx.save();
+
+            let fontSize = userFontSize;
+            const uppercaseText = rawText.toUpperCase();
+
+            // Measure and auto-scale font size if text exceeds the available inner dome radius
+            let fontCss = `600 ${fontSize}px "Cinzel", serif`;
+            if (fontFamily === 'Cinzel Decorative') fontCss = `700 ${fontSize}px "Cinzel Decorative", serif`;
+            else if (fontFamily === 'Space Mono') fontCss = `700 ${fontSize}px "Space Mono", monospace`;
+            else if (fontFamily === 'Michroma') fontCss = `${fontSize}px "Michroma", sans-serif`;
+            
+            ctx.font = fontCss;
+            let measuredWidth = ctx.measureText(uppercaseText).width;
+            if (fontFamily === 'FallSerif' && uppercaseText.includes('A')) {
+                measuredWidth += (uppercaseText.length - 1) * (fontSize * 0.18);
+            }
+
+            if (measuredWidth > maxTextWidth) {
+                fontSize = Math.floor(fontSize * (maxTextWidth / measuredWidth));
+                if (fontFamily === 'Cinzel Decorative') fontCss = `700 ${fontSize}px "Cinzel Decorative", serif`;
+                else if (fontFamily === 'Space Mono') fontCss = `700 ${fontSize}px "Space Mono", monospace`;
+                else if (fontFamily === 'Michroma') fontCss = `${fontSize}px "Michroma", sans-serif`;
+                else fontCss = `600 ${fontSize}px "${fontFamily === 'FallSerif' ? 'Cinzel' : fontFamily}", serif`;
+                ctx.font = fontCss;
+            }
+
+            if (fontFamily === 'FallSerif') {
+                ctx.fillStyle = palette.sun;
+                ctx.shadowColor = palette.sun;
+                ctx.shadowBlur = 12;
+
+                if (uppercaseText.includes('A')) {
+                    const tracking = fontSize * 0.18;
+                    const letters = uppercaseText.split('');
+                    
+                    let totalWidth = 0;
+                    letters.forEach((char) => {
+                        totalWidth += ctx.measureText(char).width + tracking;
+                    });
+                    totalWidth -= tracking;
+
+                    let startX = (w - totalWidth) / 2;
+
+                    letters.forEach((char) => {
+                        const charWidth = ctx.measureText(char).width;
+                        const charCenterX = startX + charWidth / 2;
+
+                        if (char === 'A') {
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillStyle = palette.sun;
+                            ctx.fillText('A', charCenterX, textY);
+
+                            // Embedded Star seed inside 'A'
+                            const starSize = fontSize * 0.22;
+                            drawStarSeed(ctx, charCenterX, textY + (fontSize * 0.03), palette.sun, starSize);
+                        } else {
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillStyle = palette.sun;
+                            ctx.fillText(char, charCenterX, textY);
+                        }
+
+                        startX += charWidth + tracking;
+                    });
+                } else {
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillStyle = palette.sun;
+                    ctx.fillText(uppercaseText, w / 2, textY);
+                }
+            } else {
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = palette.sun;
+                ctx.shadowColor = palette.sun;
+                ctx.shadowBlur = 12;
+
+                ctx.fillText(uppercaseText, w / 2, textY);
+            }
+
+            ctx.restore();
+        }
+
+        function renderPatchFrame(time = 0) {
+            const w = canvas.width;
+            const h = canvas.height;
+            const activePalette = palettes[paletteSelect.value] || palettes.skills;
+
+            ctx.fillStyle = '#050507';
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.save();
+            createSilhouettePath(ctx, w, h, 0);
+            ctx.clip();
+
+            ctx.fillStyle = activePalette.bg;
+            ctx.fill();
+
+            // Render layers with animated time parameter for twinkling stars, revolving planets, and rocket motion
+            drawStardust(ctx, w, h, time);
+            drawNebulaClouds(ctx, w, h, activePalette);
+            drawISS(ctx, w, h, activePalette);
+            drawMilkyWayWaves(ctx, w, h, activePalette);
+            drawPlanetaryCanopy(ctx, w, h, activePalette, time);
+            drawSunAndRays(ctx, w, h, activePalette);
+            drawCenterText(ctx, w, h, activePalette);
+            drawRocket(ctx, w, h, activePalette, time);
+
+            if (chkBorder.checked) {
+                ctx.save();
+                // Outer primary extra-thick stitched border
+                createSilhouettePath(ctx, w, h, 0);
+                ctx.strokeStyle = activePalette.waves[0] || activePalette.gold;
+                ctx.lineWidth = shapeSelect.value === 'square' ? 24 : 28;
+                ctx.stroke();
+
+                // Inner accent border offset safely inside silhouette boundary
+                createSilhouettePath(ctx, w, h, 18);
+                ctx.strokeStyle = activePalette.sun;
+                ctx.lineWidth = 4;
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            ctx.restore();
+
+            // Update Small-Scale Check Viewport
+            if (chkMiniCheck.checked) {
+                miniScaleCard.classList.remove('hidden');
+                miniScaleCard.style.display = 'flex';
+                miniCtx.clearRect(0, 0, miniCanvas.width, miniCanvas.height);
+                miniCtx.drawImage(canvas, 0, 0, miniCanvas.width, miniCanvas.height);
+            } else {
+                miniScaleCard.classList.add('hidden');
+                miniScaleCard.style.display = 'none';
+            }
+
+            // Sync Multi-Scale Demonstration Canvases
+            demoCtxLarge.clearRect(0, 0, demoCanvasLarge.width, demoCanvasLarge.height);
+            demoCtxLarge.drawImage(canvas, 0, 0, demoCanvasLarge.width, demoCanvasLarge.height);
+
+            demoCtxMedium.clearRect(0, 0, demoCanvasMedium.width, demoCanvasMedium.height);
+            demoCtxMedium.drawImage(canvas, 0, 0, demoCanvasMedium.width, demoCanvasMedium.height);
+
+            demoCtxSmall.clearRect(0, 0, demoCanvasSmall.width, demoCanvasSmall.height);
+            demoCtxSmall.drawImage(canvas, 0, 0, demoCanvasSmall.width, demoCanvasSmall.height);
+        }
+
+        function startAnimationLoop() {
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            function loop(timestamp) {
+                if (isAnimating) {
+                    lastTime = timestamp * 0.001;
+                    renderPatchFrame(lastTime);
+                }
+                animationFrameId = requestAnimationFrame(loop);
+            }
+            animationFrameId = requestAnimationFrame(loop);
+        }
+
+        function renderPatch() {
+            renderPatchFrame(lastTime || 0);
+        }
+
+        function updateLabels() {
+            document.getElementById('rocketScaleVal').textContent = rocketScaleSlider.value;
+            document.getElementById('cloudDensityVal').textContent = cloudDensitySlider.value;
+            document.getElementById('rayCountVal').textContent = rayCountSlider.value;
+            document.getElementById('sunRadiusVal').textContent = sunRadiusSlider.value;
+            document.getElementById('waveCurvatureVal').textContent = waveCurvatureSlider.value;
+            document.getElementById('planetCountVal').textContent = planetCountSlider.value;
+            document.getElementById('issScaleVal').textContent = issScaleSlider.value;
+        }
+
+        function resetControls() {
+            seed = DEFAULT_SEED;
+            shapeSelect.value = 'square';
+            textInput.value = 'Baruch';
+            fontStyleSelect.value = 'FallSerif';
+            fontSizeSlider.value = '55';
+            paletteSelect.value = 'skills';
+            rocketScaleSlider.value = '1.1';
+            issScaleSlider.value = '0.8';
+            cloudDensitySlider.value = '0.6';
+            rayCountSlider.value = '36';
+            sunRadiusSlider.value = '260';
+            waveCurvatureSlider.value = '5';
+            planetCountSlider.value = '3';
+            chkStardust.checked = true;
+            chkISS.checked = true;
+            chkBorder.checked = true;
+            chkEmbroidery.checked = false;
+            chkMiniCheck.checked = true;
+
+            initStardustParticles(canvas.width, canvas.height);
+            updateLabels();
+            renderPatch();
+        }
+
+        function randomizePatchDesign() {
+            seed = Math.floor(Math.random() * 10000);
+            shapeSelect.value = getRandomItem(shapes);
+            
+            // Randomize space-suitable typography
+            const spaceFonts = ['FallSerif', 'Cinzel', 'Cinzel Decorative', 'Space Mono', 'Michroma'];
+            fontStyleSelect.value = getRandomItem(spaceFonts);
+            
+            paletteSelect.value = getRandomPaletteKey();
+
+            // Set balanced sizes so text & elements stay fit inside the sun dome and outer borders
+            fontSizeSlider.value = randomInt(45, 65);
+            rocketScaleSlider.value = (Math.random() * 0.6 + 0.8).toFixed(1);
+            issScaleSlider.value = (Math.random() * 0.6 + 0.6).toFixed(1);
+            cloudDensitySlider.value = (Math.random() * 0.5 + 0.3).toFixed(1);
+            rayCountSlider.value = randomInt(24, 42);
+            
+            // Scaled sun dome radius depending on silhouette to prevent clipping
+            if (shapeSelect.value === 'shield' || shapeSelect.value === 'circle') {
+                sunRadiusSlider.value = randomInt(210, 250);
+            } else {
+                sunRadiusSlider.value = randomInt(230, 270);
+            }
+            
+            waveCurvatureSlider.value = randomInt(3, 7);
+            planetCountSlider.value = randomInt(2, 4);
+
+            initStardustParticles(canvas.width, canvas.height);
+            updateLabels();
+            renderPatch();
+        }
+
+        // Attach Event Listeners
+        const inputElements = [
+            shapeSelect, textInput, fontStyleSelect, fontSizeSlider,
+            paletteSelect, rocketScaleSlider, issScaleSlider, cloudDensitySlider,
+            rayCountSlider, sunRadiusSlider, waveCurvatureSlider, planetCountSlider,
+            chkStardust, chkISS, chkBorder, chkEmbroidery, chkMiniCheck
+        ];
+
+        inputElements.forEach(elem => {
+            elem.addEventListener('input', () => {
+                updateLabels();
+                renderPatch();
+            });
+        });
+
+        btnRandomize.addEventListener('click', randomizePatchDesign);
+        btnReset.addEventListener('click', resetControls);
+        btnResetConsole.addEventListener('click', resetControls);
+
+        btnToggleAnim.addEventListener('click', () => {
+            isAnimating = !isAnimating;
+            if (isAnimating) {
+                animIcon.className = 'fa-solid fa-pause';
+                animText.textContent = 'Pause';
+            } else {
+                animIcon.className = 'fa-solid fa-play';
+                animText.textContent = 'Play';
+            }
+        });
+
+        btnExport.addEventListener('click', () => {
+            const dataUrl = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `Baruch_Space_Mission_Patch_v2.png`;
+            link.href = dataUrl;
+            link.click();
+        });
+
+        // Initialize application on load
+        window.onload = () => {
+            initStardustParticles(canvas.width, canvas.height);
+            updateLabels();
+            startAnimationLoop();
+        };
+    </script>
+</body>
+</html>
