@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baruch Version 2 Sketch Concept — Space Theme Layout</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+        /* Color Palette: Deep Celestial Space Theme */
+        :root {
+            --bg-color: #030712;        /* Deep Space Void */
+            --card-bg: rgba(15, 23, 42, 0.75); /* Dark Glassmorphism Slate */
+            --text-color: #F8FAFC;      /* Crisp Starlight White */
+            --accent-color: #38BDF8;    /* Glowing Cyan / Stellar Ice */
+            --secondary-accent: #C084FC;/* Galactic Nebula Purple */
+            --border-color: rgba(56, 189, 248, 0.35); /* Glowing Outer Border */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Editorial Celestial Serif Heading */
+        .font-manofa-bold {
+            font-family: 'Cinzel', serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.01em;
+            color: #F8FAFC;
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+        }
+
+        /* Body Text */
+        .font-manofa-light {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 400;
+            line-height: 1.8;
+            color: #CBD5E1;
+        }
+
+        .font-mono-code {
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* Interactive Work List Buttons & Links */
+        .btn-pill {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(192, 132, 252, 0.2));
+            color: #38BDF8;
+            border: 1.5px solid var(--border-color);
+            border-radius: 9999px;
+            backdrop-filter: blur(8px);
+            transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-pill:hover {
+            background: #38BDF8;
+            color: #030712;
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
+        }
+
+        /* Portfolio Modular Card Structure */
+        .portfolio-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(56, 189, 248, 0.1);
+        }
+
+        /* Canvas Particle Layer for Drifting Stardust */
+        #spaceCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-[#38BDF8] selection:text-[#030712] relative">
+
+    <!-- HERO HEADER (Full-width / Edge-to-edge) -->
+    <header class="relative w-full min-h-[42vh] flex flex-col justify-between p-6 md:p-12 lg:p-16 border-b border-[#38BDF8]/30 overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-[#030712]">
+        
+        <!-- Drifting Cosmic Canvas Animation Background -->
+        <canvas id="spaceCanvas"></canvas>
+
+        <div class="relative z-10 w-full flex justify-between items-start">
+            <span class="btn-pill px-4 py-1.5 text-xs font-bold tracking-widest uppercase font-mono-code">
+                [01] SKETCH REFINEMENT SEQUENCE
+            </span>
+            <span class="text-xs font-mono-code font-bold tracking-widest uppercase text-cyan-400/80">
+                BARUCH CELESTIAL V2
+            </span>
+        </div>
+
+        <div class="relative z-10 my-8">
+            <h1 class="font-manofa-bold text-4xl md:text-6xl lg:text-7xl leading-none text-transparent bg-clip-text bg-gradient-to-r from-slate-100 via-sky-200 to-cyan-400">
+                BARUCH SKETCH V2
+            </h1>
+            <p class="font-manofa-bold text-lg md:text-2xl mt-3 tracking-wider text-cyan-300/90 font-mono-code">
+                LAYOUT PROTOTYPING & COMPOSITION REFINEMENT
+            </p>
+        </div>
+
+        <div class="relative z-10 w-full flex items-center justify-between border-t border-[#38BDF8]/20 pt-4">
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block animate-ping"></span>
+                <span class="text-xs font-mono-code font-bold uppercase tracking-wider text-slate-400">HAND-DRAWN DRAFT → CELESTIAL DIGITAL ENGINE</span>
+            </div>
+            <a href="#sketch-v2-sequence" class="btn-pill px-4 py-1.5 text-xs font-bold tracking-wider uppercase font-mono-code">
+                EXPLORE SKETCH
+            </a>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER (Grid Architecture) -->
+    <main id="sketch-v2-sequence" class="container mx-auto p-6 md:p-12 lg:p-16 space-y-12 relative z-10">
+
+        <!-- SEQUENCE CARD: SKETCH & PROMPT BREAKDOWN -->
+        <section class="portfolio-card p-6 md:p-10 space-y-8">
+            
+            <div class="flex flex-wrap justify-between items-center border-b border-[#38BDF8]/30 pb-4 gap-3">
+                <div class="flex items-center gap-3">
+                    <span class="btn-pill px-3 py-1 text-xs font-bold tracking-widest uppercase font-mono-code">
+                        [02] CONCEPT LAYOUT
+                    </span>
+                    <h2 class="font-manofa-bold text-2xl md:text-3xl text-slate-100">
+                        VERSION 2 SKETCH ARCHITECTURE
+                    </h2>
+                </div>
+                <span class="text-xs font-mono-code font-bold text-cyan-400">INPUT FILE: patch v2.jpg</span>
+            </div>
+
+            <!-- PROMPT STATEMENT HIGHLIGHT BOX -->
+            <div class="bg-slate-900/90 border border-cyan-500/40 rounded-2xl p-6 shadow-xl space-y-3 relative overflow-hidden group">
+                <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/20 transition-all"></div>
+                <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-cyan-400 font-mono-code">
+                    <i class="fa-solid fa-wand-magic-sparkles text-sm"></i> DESIGN REFINEMENT GOAL
+                </div>
+                <p class="font-manofa-light text-xl md:text-2xl font-semibold italic border-l-4 border-cyan-400 pl-4 py-1 text-slate-100">
+                    "to refine the composition and add elements."
+                </p>
+            </div>
+
+            <!-- MODULAR 2-COLUMN GRID LAYOUT -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center pt-2">
+                
+                <!-- Left Column: Hand-Drawn Sketch Render -->
+                <div class="lg:col-span-5 flex flex-col items-center">
+                    <div class="relative w-full max-w-[360px] aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl border-2 border-cyan-500/40 group bg-slate-950">
+                        <img src="patch v2.jpg" alt="Version 2 Hand-Drawn Patch Sketch" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 filter contrast-105">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-60"></div>
+                    </div>
+                    <span class="text-xs font-mono-code font-bold mt-4 uppercase tracking-wider text-cyan-300/80">
+                        FIG 1.0 — VERSION 2 HAND-DRAWN CONCEPT SKETCH
+                    </span>
+                </div>
+
+                <!-- Right Column: Annotated Design Elements -->
+                <div class="lg:col-span-7 space-y-6">
+                    <h3 class="font-manofa-bold text-xl border-b border-[#38BDF8]/20 pb-2 text-slate-200">
+                        ANNOTATED DESIGN ELEMENTS
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-manofa-light">
+                        
+                        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 space-y-1 hover:border-cyan-500/50 transition-colors">
+                            <span class="text-xs font-bold uppercase tracking-wider block text-cyan-300 font-mono-code">
+                                <i class="fa-solid fa-font mr-2"></i>Title Base Dome
+                            </span>
+                            <p class="text-sm text-slate-300">
+                                Central baseline dome housing the "Baruch" mission title, forming the structural anchor of the emblem.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 space-y-1 hover:border-cyan-500/50 transition-colors">
+                            <span class="text-xs font-bold uppercase tracking-wider block text-cyan-300 font-mono-code">
+                                <i class="fa-solid fa-water-ladder mr-2"></i>Milky Wave Stream
+                            </span>
+                            <p class="text-sm text-slate-300">
+                                Diagonal S-curve stream sweeping across the left quadrant, symbolizing fluid celestial movement and data waves.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 space-y-1 hover:border-cyan-500/50 transition-colors">
+                            <span class="text-xs font-bold uppercase tracking-wider block text-cyan-300 font-mono-code">
+                                <i class="fa-solid fa-sun mr-2"></i>Solar Rays & Nodes
+                            </span>
+                            <p class="text-sm text-slate-300">
+                                Radiating solar rays with illuminated node tips expanding upward from the dome to drive visual energy.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 space-y-1 hover:border-cyan-500/50 transition-colors">
+                            <span class="text-xs font-bold uppercase tracking-wider block text-cyan-300 font-mono-code">
+                                <i class="fa-solid fa-globe mr-2"></i>Orbital Canopy
+                            </span>
+                            <p class="text-sm text-slate-300">
+                                Nested planetary orbit trajectories situated in the upper-right corner for astronomical scale.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="bg-slate-900/80 border border-cyan-500/30 rounded-xl p-4 text-xs font-mono-code font-bold flex items-center justify-between text-slate-300">
+                        <span><i class="fa-solid fa-compass-drafting mr-2 text-cyan-400"></i>FRAME GEOMETRY: CLASSIC RECTANGULAR / SQUARE SILHOUETTE</span>
+                        <span class="btn-pill px-2.5 py-0.5 text-[10px]">VERIFIED</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-[#38BDF8]/20 py-8 px-6 text-center text-xs font-mono-code font-bold uppercase tracking-widest text-slate-400 relative z-10">
+        BARUCH CELESTIAL SPACE MISSION PATCH — VERSION 2 SKETCH PRESENTATION
+    </footer>
+
+    <!-- FAST-DRIFTING STARDUST ANIMATION SCRIPT -->
+    <script>
+        const canvas = document.getElementById('spaceCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = canvas.parentElement.offsetHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class DriftingStardust {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2.5 + 0.5;
+                this.speedY = Math.random() * 1.5 + 0.5;
+                this.speedX = Math.random() * 0.6 - 0.3;
+                this.alpha = Math.random() * 0.6 + 0.2;
+                const colors = ['#38BDF8', '#C084FC', '#F8FAFC', '#60A5FA'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+            }
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                if (this.y > canvas.height) { this.reset(); this.y = 0; }
+            }
+            draw() {
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        const particles = Array.from({ length: 45 }, () => new DriftingStardust());
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+
+</body>
+</html>
