@@ -229,18 +229,23 @@
       counter-increment: project-counter;
     }
 
-    /* Automatic Number Tag Rendering via CSS Counter */
-    .card-tag::before {
-      content: "[" decimal-leading-zero(project-counter) "]";
+    .card-tag {
       font-family: 'Manofa Bold', 'Playfair Display', Georgia, serif;
       font-size: 1rem;
       font-weight: bold;
       color: #5B0015;
       letter-spacing: 0.1em;
+      margin-bottom: 12px;
     }
 
-    .card-tag {
-      margin-bottom: 12px;
+    /* Primary method: Dynamic CSS Counter */
+    .card-tag::before {
+      content: "[" counter(project-counter, decimal-leading-zero) "]";
+    }
+
+    /* Fallback method if browser disables CSS counters */
+    .card-tag:empty::before {
+      content: attr(data-num);
     }
 
     .card-title {
@@ -322,18 +327,12 @@
         <div class="section-divider"></div>
       </div>
 
-      <!-- ===================================================================
-           WORK GRID: Automatic Numbering Enabled!
-           To add a new project or edit on GitHub, simply copy/paste one of the 
-           <article class="work-card"> blocks below. The numbers [01], [02]... 
-           will format and renumber automatically via CSS Counters!
-           =================================================================== -->
       <div class="work-grid">
         
         <!-- Item 01 -->
         <article class="work-card">
           <div>
-            <div class="card-tag"></div>
+            <div class="card-tag" data-num="[01]"></div>
             <h3 class="card-title">Custom Instructions</h3>
           </div>
           <a href="#" class="btn-pill">View Project</a>
@@ -342,44 +341,44 @@
         <!-- Item 02 -->
         <article class="work-card">
           <div>
-            <div class="card-tag"></div>
+            <div class="card-tag" data-num="[02]"></div>
             <h3 class="card-title">A Style Guide for Your AI</h3>
           </div>
-          <a href="handoff.md" class="btn-pill">View Project</a>
+          <a href="#" class="btn-pill">View Project</a>
         </article>
 
         <!-- Item 03 -->
         <article class="work-card">
           <div>
-            <div class="card-tag"></div>
+            <div class="card-tag" data-num="[03]"></div>
             <h3 class="card-title">Design a ___</h3>
           </div>
-          <a href="design-a.html" class="btn-pill">View Project</a>
+          <a href="#" class="btn-pill">View Project</a>
         </article>
 
         <!-- Item 04 -->
         <article class="work-card">
           <div>
-            <div class="card-tag"></div>
+            <div class="card-tag" data-num="[04]"></div>
             <h3 class="card-title">Commute Story</h3>
           </div>
-          <a href="commute-story.html" class="btn-pill">View Project</a>
+          <a href="#" class="btn-pill">View Project</a>
         </article>
 
         <!-- Item 05 -->
         <article class="work-card">
           <div>
-            <div class="card-tag"></div>
+            <div class="card-tag" data-num="[05]"></div>
             <h3 class="card-title">Become a Crea(i)tive Director</h3>
           </div>
-          <a href="poster.html" class="btn-pill">View Project</a>
+          <a href="#" class="btn-pill">View Project</a>
         </article>
 
         <!-- Item 06 -->
         <article class="work-card">
           <div>
-            <div class="card-tag"></div>
-            <h3 class="card-title">Chair sequence</h3>
+            <div class="card-tag" data-num="[06]"></div>
+            <h3 class="card-title">Chair Sequence</h3>
           </div>
           <a href="#" class="btn-pill">View Project</a>
         </article>
@@ -387,92 +386,102 @@
         <!-- Item 07 -->
         <article class="work-card">
           <div>
-            <div class="card-tag"></div>
+            <div class="card-tag" data-num="[07]"></div>
             <h3 class="card-title">Poster Generator</h3>
           </div>
           <a href="#" class="btn-pill">View Project</a>
         </article>
 
-        <!-- Item 09 -->
+        <!-- Item 08 -->
         <article class="work-card">
           <div>
-            <div class="card-tag"></div>
+            <div class="card-tag" data-num="[08]"></div>
             <h3 class="card-title">Live Stream Generator</h3>
           </div>
           <a href="#" class="btn-pill">View Project</a>
         </article>
 
-        <!-- Item 10 -->
+         <!-- Item 09 -->
         <article class="work-card">
           <div>
-            <div class="card-tag"></div>
+            <div class="card-tag" data-num="[09]"></div>
             <h3 class="card-title">Variable Typography</h3>
           </div>
           <a href="#" class="btn-pill">View Project</a>
         </article>
 
-        <!-- Item 11 -->
+         <!-- Item 10 -->
         <article class="work-card">
           <div>
-            <div class="card-tag"></div>
+            <div class="card-tag" data-num="[10]"></div>
             <h3 class="card-title">Mission Patch</h3>
           </div>
           <a href="#" class="btn-pill">View Project</a>
         </article>
 
-        <!-- Item 12 -->
+         <!-- Item 11 -->
         <article class="work-card">
           <div>
-            <div class="card-tag"></div>
+            <div class="card-tag" data-num="[11]"></div>
             <h3 class="card-title">Mission Patch Generator</h3>
           </div>
           <a href="#" class="btn-pill">View Project</a>
         </article>
 
-        <!-- Item 13 -->
+         <!-- Item 12 -->
         <article class="work-card">
           <div>
-            <div class="card-tag"></div>
+            <div class="card-tag" data-num="[12]"></div>
             <h3 class="card-title">Mission Patch V2</h3>
           </div>
           <a href="#" class="btn-pill">View Project</a>
         </article>
 
-        <!-- Item 14 -->
+         <!-- Item 13 -->
         <article class="work-card">
           <div>
-            <div class="card-tag"></div>
+            <div class="card-tag" data-num="[13]"></div>
             <h3 class="card-title">Mission Patch Generator V2</h3>
           </div>
           <a href="#" class="btn-pill">View Project</a>
         </article>
 
-        <!-- Item 15 -->
+         <!-- Item 14 -->
         <article class="work-card">
           <div>
-            <div class="card-tag"></div>
+            <div class="card-tag" data-num="[14]"></div>
             <h3 class="card-title">Mission Patch V3</h3>
           </div>
           <a href="#" class="btn-pill">View Project</a>
         </article>
 
-        <!-- Item 16 -->
+         <!-- Item 15 -->
         <article class="work-card">
           <div>
-            <div class="card-tag"></div>
+            <div class="card-tag" data-num="[15]"></div>
             <h3 class="card-title">blank</h3>
           </div>
           <a href="#" class="btn-pill">View Project</a>
         </article>
 
-        <!-- Item 17 -->
+         <!-- Item 16 -->
         <article class="work-card">
           <div>
-            <div class="card-tag"></div>
+            <div class="card-tag" data-num="[16]"></div>
             <h3 class="card-title">blank</h3>
           </div>
           <a href="#" class="btn-pill">View Project</a>
         </article>
+
+         <!-- Item 17 -->
+        <article class="work-card">
+          <div>
+            <div class="card-tag" data-num="[17]"></div>
+            <h3 class="card-title">blank</h3>
+          </div>
+          <a href="#" class="btn-pill">View Project</a>
+        </article>
+
       </div>
     </main>
 
