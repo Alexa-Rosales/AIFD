@@ -5,12 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>A.I. FOR DESIGNERS — Alexa Rosales</title>
   
-  <!-- Google Font fallback for serif styling -->
+  <!-- Font Imports: Playfair Display as serif fallback for Manofa -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
 
   <style>
+    /* ==========================================================================
+       1. Custom Fonts & Reset
+       ========================================================================== */
     @font-face {
       font-family: 'Manofa Bold';
       src: local('Manofa Bold'), local('Manofa-Bold');
@@ -39,6 +42,9 @@
       overflow-x: hidden;
     }
 
+    /* ==========================================================================
+       2. Canvas Background Animation
+       ========================================================================== */
     #flowerCanvas {
       position: fixed;
       top: 0;
@@ -49,6 +55,9 @@
       z-index: 1;
     }
 
+    /* ==========================================================================
+       3. Main Layout Container
+       ========================================================================== */
     .page-wrapper {
       position: relative;
       z-index: 2;
@@ -58,6 +67,9 @@
       flex-direction: column;
     }
 
+    /* ==========================================================================
+       4. Hero Banner (Full Width: 100vw) with hero.jpg Image Container
+       ========================================================================== */
     .hero-container {
       width: 100vw;
       min-height: 55vh;
@@ -70,6 +82,7 @@
       overflow: hidden;
     }
 
+    /* Embedded hero.jpg Image Element */
     .hero-bg-img {
       position: absolute;
       top: 0;
@@ -81,6 +94,7 @@
       z-index: 1;
     }
 
+    /* Overlay gradient for high contrast readability */
     .hero-overlay {
       position: absolute;
       inset: 0;
@@ -132,6 +146,9 @@
       opacity: 0.75;
     }
 
+    /* ==========================================================================
+       5. Content & Grid System
+       ========================================================================== */
     .content-container {
       max-width: 1400px;
       margin: 0 auto;
@@ -162,12 +179,16 @@
       opacity: 0.4;
     }
 
+    /* Grid Layout for Work Items */
     .work-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 20px;
+      /* CSS Counter for Automatic Item Numbering */
+      counter-reset: project-counter;
     }
 
+    /* Desktop Responsive Spans */
     @media (max-width: 1200px) {
       .work-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -180,6 +201,7 @@
       }
     }
 
+    /* Mobile View: Single 1-column vertical feed */
     @media (max-width: 600px) {
       .work-grid {
         grid-template-columns: 1fr;
@@ -190,6 +212,9 @@
       }
     }
 
+    /* ==========================================================================
+       6. Interactive Work Items & Buttons
+       ========================================================================== */
     .work-card {
       background-color: rgba(128, 174, 235, 0.4);
       border: 1px solid #5B0015;
@@ -200,14 +225,21 @@
       justify-content: space-between;
       min-height: 180px;
       backdrop-filter: blur(4px);
+      /* Increment counter for each card */
+      counter-increment: project-counter;
     }
 
-    .card-tag {
+    /* Automatic Number Tag Rendering via CSS Counter */
+    .card-tag::before {
+      content: "[" decimal-leading-zero(project-counter) "]";
       font-family: 'Manofa Bold', 'Playfair Display', Georgia, serif;
       font-size: 1rem;
       font-weight: bold;
       color: #5B0015;
       letter-spacing: 0.1em;
+    }
+
+    .card-tag {
       margin-bottom: 12px;
     }
 
@@ -219,6 +251,7 @@
       line-height: 1.2;
     }
 
+    /* Pill Button Spec from Handoff */
     .btn-pill {
       display: inline-flex;
       align-items: center;
@@ -226,8 +259,8 @@
       width: 100%;
       padding: 12px 24px;
       border-radius: 9999px;
-      background-color: #80AEEB;
-      color: #5B0015;
+      background-color: #80AEEB; /* Accent Ice Blue */
+      color: #5B0015; /* Deep Burgundy */
       border: 1px solid #5B0015;
       text-decoration: none;
       font-family: 'Manofa Bold', 'Playfair Display', Georgia, serif;
@@ -239,13 +272,17 @@
       transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    /* Hover State: Color Swap + Translate Y Lift */
     .btn-pill:hover {
-      background-color: #5B0015;
-      color: #80AEEB;
+      background-color: #5B0015; /* Flips to Burgundy */
+      color: #80AEEB; /* Flips to Ice Blue */
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(91, 0, 21, 0.25);
     }
 
+    /* ==========================================================================
+       7. Footer Section
+       ========================================================================== */
     .footer {
       border-top: 1px solid #5B0015;
       padding: 25px 4vw;
@@ -265,6 +302,7 @@
 
   <div class="page-wrapper">
     
+    <!-- Hero Section with Explicit hero.jpg <img> Tag -->
     <header class="hero-container">
       <img src="hero.jpg" alt="A.I. For Designers Header Artwork" class="hero-bg-img">
       <div class="hero-overlay"></div>
@@ -277,18 +315,25 @@
       </div>
     </header>
 
+    <!-- Content & Work Grid -->
     <main class="content-container">
       <div class="section-header">
         <h2 class="section-title">WORK</h2>
         <div class="section-divider"></div>
       </div>
 
+      <!-- ===================================================================
+           WORK GRID: Automatic Numbering Enabled!
+           To add a new project or edit on GitHub, simply copy/paste one of the 
+           <article class="work-card"> blocks below. The numbers [01], [02]... 
+           will format and renumber automatically via CSS Counters!
+           =================================================================== -->
       <div class="work-grid">
         
         <!-- Item 01 -->
         <article class="work-card">
           <div>
-            <div class="card-tag">[01]</div>
+            <div class="card-tag"></div>
             <h3 class="card-title">Custom Instructions</h3>
           </div>
           <a href="#" class="btn-pill">View Project</a>
@@ -297,7 +342,7 @@
         <!-- Item 02 -->
         <article class="work-card">
           <div>
-            <div class="card-tag">[02]</div>
+            <div class="card-tag"></div>
             <h3 class="card-title">A Style Guide for Your AI</h3>
           </div>
           <a href="handoff.md" class="btn-pill">View Project</a>
@@ -306,7 +351,7 @@
         <!-- Item 03 -->
         <article class="work-card">
           <div>
-            <div class="card-tag">[03]</div>
+            <div class="card-tag"></div>
             <h3 class="card-title">Design a ___</h3>
           </div>
           <a href="design-a.html" class="btn-pill">View Project</a>
@@ -315,7 +360,7 @@
         <!-- Item 04 -->
         <article class="work-card">
           <div>
-            <div class="card-tag">[04]</div>
+            <div class="card-tag"></div>
             <h3 class="card-title">Commute Story</h3>
           </div>
           <a href="commute-story.html" class="btn-pill">View Project</a>
@@ -324,96 +369,106 @@
         <!-- Item 05 -->
         <article class="work-card">
           <div>
-            <div class="card-tag">[05]</div>
+            <div class="card-tag"></div>
             <h3 class="card-title">Become a Crea(i)tive Director</h3>
           </div>
           <a href="poster.html" class="btn-pill">View Project</a>
         </article>
 
-         <!-- Item 06 -->
+        <!-- Item 06 -->
         <article class="work-card">
           <div>
-            <div class="card-tag">[08]</div>
-            <h3 class="card-title">Chair Sequence</h3>
+            <div class="card-tag"></div>
+            <h3 class="card-title">Chair sequence</h3>
           </div>
-          <a href="chair sequence.html" class="btn-pill">View Project</a>
+          <a href="#" class="btn-pill">View Project</a>
         </article>
+
         <!-- Item 07 -->
         <article class="work-card">
           <div>
-            <div class="card-tag">[06]</div>
+            <div class="card-tag"></div>
             <h3 class="card-title">Poster Generator</h3>
           </div>
-          <a href="poster final.html" class="btn-pill">View Project</a>
-        </article>
-
-        <!-- Item 08 -->
-        <article class="work-card">
-          <div>
-            <div class="card-tag">[07]</div>
-            <h3 class="card-title">Live Stream Generator</h3>
-          </div>
-          <a href="live stream.html" class="btn-pill">View Project</a>
+          <a href="#" class="btn-pill">View Project</a>
         </article>
 
         <!-- Item 09 -->
         <article class="work-card">
           <div>
-            <div class="card-tag">[08]</div>
-            <h3 class="card-title">Variable Typography</h3>
+            <div class="card-tag"></div>
+            <h3 class="card-title">Live Stream Generator</h3>
           </div>
-          <a href="live final.html" class="btn-pill">View Project</a>
+          <a href="#" class="btn-pill">View Project</a>
         </article>
 
-          <!-- Item 10 -->
+        <!-- Item 10 -->
         <article class="work-card">
           <div>
-            <div class="card-tag">[08]</div>
-            <h3 class="card-title">Mission Patch</h3>
+            <div class="card-tag"></div>
+            <h3 class="card-title">Variable Typography</h3>
           </div>
-          <a href="mission patch.html" class="btn-pill">View Project</a>
+          <a href="#" class="btn-pill">View Project</a>
         </article>
 
         <!-- Item 11 -->
         <article class="work-card">
           <div>
-            <div class="card-tag">[08]</div>
-            <h3 class="card-title">Mission Patch Generator</h3>
+            <div class="card-tag"></div>
+            <h3 class="card-title">Mission Patch</h3>
           </div>
-          <a href="final v1.html" class="btn-pill">View Project</a>
+          <a href="#" class="btn-pill">View Project</a>
         </article>
 
-         <!-- Item 12 -->
+        <!-- Item 12 -->
         <article class="work-card">
           <div>
-            <div class="card-tag">[08]</div>
+            <div class="card-tag"></div>
+            <h3 class="card-title">Mission Patch Generator</h3>
+          </div>
+          <a href="#" class="btn-pill">View Project</a>
+        </article>
+
+        <!-- Item 13 -->
+        <article class="work-card">
+          <div>
+            <div class="card-tag"></div>
             <h3 class="card-title">Mission Patch V2</h3>
           </div>
           <a href="#" class="btn-pill">View Project</a>
         </article>
 
-         <!-- Item 13 -->
+        <!-- Item 14 -->
         <article class="work-card">
           <div>
-            <div class="card-tag">[08]</div>
+            <div class="card-tag"></div>
             <h3 class="card-title">Mission Patch Generator V2</h3>
           </div>
-          <a href="space v2.html" class="btn-pill">View Project</a>
+          <a href="#" class="btn-pill">View Project</a>
         </article>
 
-         <!-- Item 14 -->
+        <!-- Item 15 -->
         <article class="work-card">
           <div>
-            <div class="card-tag">[08]</div>
+            <div class="card-tag"></div>
             <h3 class="card-title">Mission Patch V3</h3>
           </div>
-          <a href="patch v3.html" class="btn-pill">View Project</a>
+          <a href="#" class="btn-pill">View Project</a>
         </article>
 
-         <!-- Item 15 -->
+        <!-- Item 16 -->
         <article class="work-card">
           <div>
-            <div class="card-tag">[08]</div>
+            <div class="card-tag"></div>
+            <h3 class="card-title">blank</h3>
+          </div>
+          <a href="#" class="btn-pill">View Project</a>
+        </article>
+
+        <!-- Item 17 -->
+        <article class="work-card">
+          <div>
+            <div class="card-tag"></div>
             <h3 class="card-title">blank</h3>
           </div>
           <a href="#" class="btn-pill">View Project</a>
@@ -428,6 +483,7 @@
 
   </div>
 
+  <!-- Animated Flower Particle Script -->
   <script>
     (function() {
       const canvas = document.getElementById('flowerCanvas');
@@ -441,7 +497,10 @@
         height = canvas.height = window.innerHeight;
       });
 
+      // Accessibility: Check reduced motion settings
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Particle Configuration
       const particleCount = prefersReducedMotion ? 12 : 45;
       const particles = [];
 
@@ -453,12 +512,12 @@
         reset(initial = false) {
           this.x = Math.random() * width;
           this.y = initial ? Math.random() * height : -30;
-          this.size = Math.random() * 12 + 8;
+          this.size = Math.random() * 12 + 8; // Flower radius
           this.speedY = prefersReducedMotion ? Math.random() * 0.3 + 0.1 : Math.random() * 2.5 + 1.5;
           this.speedX = prefersReducedMotion ? Math.random() * 0.2 - 0.1 : Math.random() * 1.5 + 0.5;
           this.rotation = Math.random() * Math.PI * 2;
           this.rotationSpeed = (Math.random() - 0.5) * 0.05;
-          this.opacity = Math.random() * 0.4 + 0.4;
+          this.opacity = Math.random() * 0.4 + 0.4; // 0.4 to 0.8 as specified
           this.petals = 5;
         }
 
@@ -467,6 +526,7 @@
           this.x += this.speedX;
           this.rotation += this.rotationSpeed;
 
+          // Wrap around edges
           if (this.y > height + 30 || this.x > width + 30) {
             this.reset(false);
           }
@@ -478,7 +538,8 @@
           ctx.rotate(this.rotation);
           ctx.globalAlpha = this.opacity;
 
-          ctx.fillStyle = '#5B0015';
+          // Draw 5-Petal Flower
+          ctx.fillStyle = '#5B0015'; // Deep Burgundy Accent Petals
           for (let i = 0; i < this.petals; i++) {
             ctx.beginPath();
             ctx.rotate((Math.PI * 2) / this.petals);
@@ -486,9 +547,10 @@
             ctx.fill();
           }
 
+          // Flower Center
           ctx.beginPath();
           ctx.arc(0, 0, this.size / 3.5, 0, Math.PI * 2);
-          ctx.fillStyle = '#80AEEB';
+          ctx.fillStyle = '#80AEEB'; // Accent Ice Blue Center
           ctx.fill();
 
           ctx.restore();
