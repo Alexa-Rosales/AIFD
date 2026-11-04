@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creative Director Pt. 1: Style Guide | Rare Blossom</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              coral: '#EBA08E',      /* Core Tube Background */
+              petal: '#F5C5B8',      /* Creamy Petal Pink Accent */
+              terracotta: '#BA5F4B', /* Warm Terracotta */
+              auburn: '#943A28',     /* Deep Auburn Small Print */
+              gold: '#D4AF37',       /* Satin Gold Metallic */
+              cream: '#FAF4F2'       /* Soft Cream Canvas */
+            }
+          },
+          fontFamily: {
+            script: ['"Alex Brush"', 'cursive'],
+            serif: ['"Playfair Display"', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .glass-nav {
+      background: rgba(250, 244, 242, 0.92);
+      backdrop-filter: blur(14px);
+    }
+    .img-zoom {
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .img-zoom:hover {
+      transform: scale(1.04);
+    }
+    /* True Metallic Gold Shimmer Gradient */
+    .gold-metallic-text {
+      background: linear-gradient(135deg, #FFF1B0 0%, #E2BA48 30%, #D4AF37 55%, #9A7B1C 85%, #FFEC9F 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0px 2px 4px rgba(148, 58, 40, 0.25));
+    }
+  </style>
+</head>
+<body class="bg-brand-cream text-brand-auburn font-sans antialiased selection:bg-brand-coral selection:text-white">
+
+  <!-- Header / Navigation -->
+  <header class="fixed top-0 left-0 right-0 z-50 glass-nav border-b border-brand-coral/25">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <span class="font-serif italic text-2xl font-bold tracking-tight text-brand-terracotta">Rare</span>
+        <span class="text-xs uppercase tracking-widest text-brand-auburn font-semibold border-l border-brand-coral/40 pl-3">Style Guide Pt. 1</span>
+      </div>
+      
+      <nav class="hidden md:flex items-center space-x-8 text-xs uppercase tracking-widest font-semibold text-brand-auburn/80">
+        <a href="#brief" class="hover:text-brand-terracotta transition-colors">01. Brief</a>
+        <a href="#palette" class="hover:text-brand-terracotta transition-colors">02. Palette</a>
+        <a href="#typography" class="hover:text-brand-terracotta transition-colors">03. Typography</a>
+        <a href="#logomark" class="hover:text-brand-terracotta transition-colors">04. Logomark</a>
+        <a href="#moodboard" class="hover:text-brand-terracotta transition-colors">05. Moodboard</a>
+      </nav>
+      
+      <div class="text-right">
+        <span class="text-[10px] uppercase tracking-widest block text-brand-auburn/60">Campaign Rollout</span>
+        <span class="text-xs font-serif italic font-semibold text-brand-terracotta">Rare Blossom</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="pt-28 pb-20">
+    
+    <!-- Hero Header -->
+    <section class="max-w-7xl mx-auto px-6 py-12 border-b border-brand-coral/25">
+      <div class="max-w-3xl">
+        <span class="text-xs font-semibold uppercase tracking-[0.25em] text-brand-auburn">Brand Overhaul & Product Launch</span>
+        <h1 class="text-4xl md:text-6xl font-serif font-normal tracking-tight text-brand-terracotta mt-3 leading-tight">
+          Rare Eau de Parfum <br/>
+          <span class="italic font-light text-brand-coral">Rare Blossom</span>
+        </h1>
+        <p class="mt-6 text-brand-auburn/80 font-light leading-relaxed text-base md:text-lg">
+          A full-scale brand overhaul turning Rare Beauty's signature fragrance layering balm into a standalone luxury Eau de Parfum experience.
+        </p>
+      </div>
+    </section>
+
+    <!-- SECTION 01: CAMPAIGN BRIEF -->
+    <section id="brief" class="max-w-7xl mx-auto px-6 py-20 border-b border-brand-coral/25">
+      <div class="grid md:grid-cols-12 gap-12">
+        <div class="md:col-span-4">
+          <span class="text-xs font-semibold uppercase tracking-[0.2em] text-brand-auburn block">01 / The Brief</span>
+          <h2 class="text-3xl font-serif text-brand-terracotta mt-2">Rare Blossom</h2>
+          <p class="text-xs uppercase tracking-widest text-brand-auburn/50 mt-1">Brand Overhaul Campaign</p>
+        </div>
+        
+        <div class="md:col-span-8 space-y-6 text-brand-auburn/80 leading-relaxed font-light">
+          <p>
+            <strong class="font-medium text-brand-terracotta">Product Focus:</strong> Transforming the velvety scent notes of Rare Beauty's cult-favorite <em>Floral Peony Blossom</em> Fragrance Layering Balm into a premier, standalone <strong>Rare Eau de Parfum</strong>. The product elevates scent-layering into an all-day, high-concentration signature fragrance experience.
+          </p>
+          <p>
+            <strong class="font-medium text-brand-terracotta">Creative Core:</strong> Grounded in warm, romantic intimacy and natural botanical elegance. The visual direction balances soft coral and petal pink warmth with luxurious gold metallic accents and earthy terracotta depth, evoking an ethereal, sweet, and sultry floral moment.
+          </p>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-6 pt-6 border-t border-brand-coral/20 text-sm">
+            <div>
+              <span class="block text-xs uppercase tracking-wider text-brand-auburn/50">Core Product</span>
+              <span class="font-medium text-brand-terracotta">Eau de Parfum & Balm</span>
+            </div>
+            <div>
+              <span class="block text-xs uppercase tracking-wider text-brand-auburn/50">Fragrance Family</span>
+              <span class="font-medium text-brand-terracotta">Floral Peony & Amber</span>
+            </div>
+            <div>
+              <span class="block text-xs uppercase tracking-wider text-brand-auburn/50">Campaign Tone</span>
+              <span class="font-medium text-brand-terracotta">Sweet + Sultry Romantic</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 02: COLOR PALETTE -->
+    <section id="palette" class="max-w-7xl mx-auto px-6 py-20 border-b border-brand-coral/25">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-[0.2em] text-brand-auburn block">02 / Color System</span>
+          <h2 class="text-3xl font-serif text-brand-terracotta mt-2">Packaging Color Palette</h2>
+        </div>
+        <p class="text-xs text-brand-auburn/60 max-w-sm mt-4 md:mt-0">Derived from the official Floral Peony Blossom packaging. Click to copy HEX codes.</p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <!-- Palette Item 1: #EBA08E -->
+        <div onclick="copyHex('#EBA08E', 'Soft Coral / Muted Peach')" class="cursor-pointer group">
+          <div class="h-44 rounded-xl bg-[#EBA08E] shadow-sm group-hover:shadow-md transition-all flex items-end p-4">
+            <span class="text-white font-mono text-xs font-semibold bg-black/20 backdrop-blur-sm px-2 py-1 rounded">#EBA08E</span>
+          </div>
+          <h4 class="mt-3 font-semibold text-sm text-brand-terracotta">Soft Coral</h4>
+          <p class="text-xs text-brand-auburn/60">Core Tube Background</p>
+        </div>
+
+        <!-- Palette Item 2: #F5C5B8 -->
+        <div onclick="copyHex('#F5C5B8', 'Creamy Petal Pink')" class="cursor-pointer group">
+          <div class="h-44 rounded-xl bg-[#F5C5B8] shadow-sm group-hover:shadow-md transition-all flex items-end p-4">
+            <span class="text-brand-auburn font-mono text-xs font-semibold bg-white/60 backdrop-blur-sm px-2 py-1 rounded">#F5C5B8</span>
+          </div>
+          <h4 class="mt-3 font-semibold text-sm text-brand-terracotta">Creamy Petal Pink</h4>
+          <p class="text-xs text-brand-auburn/60">Secondary Highlight</p>
+        </div>
+
+        <!-- Palette Item 3: #BA5F4B -->
+        <div onclick="copyHex('#BA5F4B', 'Warm Terracotta')" class="cursor-pointer group">
+          <div class="h-44 rounded-xl bg-[#BA5F4B] shadow-sm group-hover:shadow-md transition-all flex items-end p-4">
+            <span class="text-white font-mono text-xs font-semibold bg-black/20 backdrop-blur-sm px-2 py-1 rounded">#BA5F4B</span>
+          </div>
+          <h4 class="mt-3 font-semibold text-sm text-brand-terracotta">Warm Terracotta</h4>
+          <p class="text-xs text-brand-auburn/60">Primary Wordmark Tone</p>
+        </div>
+
+        <!-- Palette Item 4: #943A28 -->
+        <div onclick="copyHex('#943A28', 'Deep Auburn')" class="cursor-pointer group">
+          <div class="h-44 rounded-xl bg-[#943A28] shadow-sm group-hover:shadow-md transition-all flex items-end p-4">
+            <span class="text-white font-mono text-xs font-semibold bg-black/20 backdrop-blur-sm px-2 py-1 rounded">#943A28</span>
+          </div>
+          <h4 class="mt-3 font-semibold text-sm text-brand-terracotta">Deep Auburn</h4>
+          <p class="text-xs text-brand-auburn/60">Small Print & Ingredients</p>
+        </div>
+
+        <!-- Palette Item 5: #D4AF37 -->
+        <div onclick="copyHex('#D4AF37', 'Satin Gold')" class="cursor-pointer group">
+          <div class="h-44 rounded-xl bg-[#D4AF37] shadow-sm group-hover:shadow-md transition-all flex items-end p-4">
+            <span class="text-white font-mono text-xs font-semibold bg-black/20 backdrop-blur-sm px-2 py-1 rounded">#D4AF37</span>
+          </div>
+          <h4 class="mt-3 font-semibold text-sm text-brand-terracotta">Satin Gold</h4>
+          <p class="text-xs text-brand-auburn/60">Metallic Gold Logomark</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 03: TYPOGRAPHY -->
+    <section id="typography" class="max-w-7xl mx-auto px-6 py-20 border-b border-brand-coral/25">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-[0.2em] text-brand-auburn block">03 / Typography</span>
+          <h2 class="text-3xl font-serif text-brand-terracotta mt-2">Brand Campaign Fonts</h2>
+        </div>
+        
+        <div class="mt-4 md:mt-0 flex items-center space-x-4">
+          <label class="text-xs text-brand-auburn/60 uppercase font-semibold">Test Size:</label>
+          <input type="range" id="fontSizeSlider" min="16" max="72" value="36" class="accent-brand-terracotta cursor-pointer" oninput="updateFontPreview(this.value)">
+          <span id="fontSizeDisplay" class="text-xs font-mono font-semibold text-brand-terracotta w-12">36px</span>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-12">
+        <!-- Display Serif Specimen -->
+        <div class="bg-white p-8 rounded-2xl border border-brand-coral/30 shadow-sm">
+          <div class="flex items-center justify-between border-b border-gray-100 pb-4 mb-6">
+            <div>
+              <h3 class="font-semibold text-brand-terracotta">Display Editorial Serif</h3>
+              <p class="text-xs text-brand-auburn/50">Playfair Display / Serif</p>
+            </div>
+            <span class="text-xs font-mono text-brand-auburn bg-brand-petal/50 px-2.5 py-1 rounded-full">Campaign Headlines</span>
+          </div>
+          
+          <div id="serifPreview" class="font-serif text-brand-terracotta transition-all duration-150 leading-tight" style="font-size: 36px;">
+            Floral Peony Blossom
+          </div>
+          <p class="mt-6 text-xs text-brand-auburn/50 font-serif italic">
+            ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>
+            abcdefghijklmnopqrstuvwxyz 0123456789
+          </p>
+        </div>
+
+        <!-- Body Sans Specimen -->
+        <div class="bg-white p-8 rounded-2xl border border-brand-coral/30 shadow-sm">
+          <div class="flex items-center justify-between border-b border-gray-100 pb-4 mb-6">
+            <div>
+              <h3 class="font-semibold text-brand-terracotta">Brand Secondary Sans</h3>
+              <p class="text-xs text-brand-auburn/50">Plus Jakarta Sans</p>
+            </div>
+            <span class="text-xs font-mono text-brand-auburn bg-brand-petal/50 px-2.5 py-1 rounded-full">Small Print & Packaging Details</span>
+          </div>
+          
+          <div id="sansPreview" class="font-sans font-light text-brand-auburn/80 transition-all duration-150 leading-snug" style="font-size: 24px;">
+            Fragrance Layering Balm · Safe for Sensitive Skin
+          </div>
+          <p class="mt-6 text-xs text-brand-auburn/50 font-mono">
+            ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>
+            abcdefghijklmnopqrstuvwxyz 0123456789
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 04: LOGOMARK (GOLD LOGO & TEXT ON SOFT CORAL TUBE BACKGROUND) -->
+    <section id="logomark" class="max-w-7xl mx-auto px-6 py-20 border-b border-brand-coral/25">
+      <div class="max-w-3xl mb-12">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-brand-auburn block">04 / Visual Identity</span>
+        <h2 class="text-3xl font-serif text-brand-terracotta mt-2">Logomark Specifications</h2>
+        <p class="text-brand-auburn/70 font-light text-sm mt-2">Signature cursive logotype and "FLORAL PEONY BLOSSOM" descriptor rendered strictly in Metallic Satin Gold (#D4AF37) over the Soft Coral (#EBA08E) background.</p>
+      </div>
+
+      <div class="max-w-3xl mx-auto">
+        <!-- Logomark Display Box - Soft Coral (#EBA08E) Background with BOTH "Rare" and "FLORAL PEONY BLOSSOM" in Satin Gold (#D4AF37) -->
+        <div class="bg-[#EBA08E] rounded-3xl border border-[#BA5F4B]/30 p-16 md:p-20 flex flex-col items-center justify-center text-center shadow-xl relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-black/5 pointer-events-none"></div>
+          
+          <div class="my-6">
+            <!-- Wordmark "Rare" in Satin Gold -->
+            <span class="font-serif italic text-7xl md:text-8xl gold-metallic-text tracking-tight block font-normal">Rare</span>
+            
+            <!-- Secondary Text "FLORAL PEONY BLOSSOM" in Satin Gold -->
+            <span class="text-xs md:text-sm uppercase tracking-[0.35em] font-sans gold-metallic-text font-bold mt-6 block">FLORAL PEONY BLOSSOM</span>
+          </div>
+          
+          <div class="mt-10 border-t border-[#BA5F4B]/30 pt-6 w-full max-w-sm">
+            <span class="text-[11px] uppercase tracking-[0.2em] text-[#943A28] font-bold block">GOLD LOGOMARK IDENTITY · RARE BLOSSOM</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 05: FASHION ART MOODBOARD (SEAMLESS GRID WITH EXACT R1-R20 FILENAMES) -->
+    <section id="moodboard" class="max-w-7xl mx-auto px-6 py-20">
+      <div class="max-w-3xl mb-10">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-brand-auburn block">05 / Visual References</span>
+        <h2 class="text-3xl font-serif text-brand-terracotta mt-2">Floral Peony Blossom Moodboard</h2>
+        <p class="text-brand-auburn/70 font-light text-sm mt-2">Seamless edge-to-edge collage featuring all 20 campaign images without any picture frames, borders, or text overlays.</p>
+      </div>
+
+      <!-- 20-Image Seamless Grid Collage (r1.jpg to r20.jpg) -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-0 overflow-hidden rounded-xl shadow-md border border-brand-coral/30">
+        <div class="aspect-[3/4] overflow-hidden"><img src="r1.jpg" alt="Moodboard Asset r1" class="w-full h-full object-cover img-zoom" onerror="this.onerror=null; this.src='r1.jpeg'"></div>
+        <div class="aspect-[3/4] overflow-hidden"><img src="r2.jpg" alt="Moodboard Asset r2" class="w-full h-full object-cover img-zoom" onerror="this.onerror=null; this.src='r2.jpeg'"></div>
+        <div class="aspect-[3/4] overflow-hidden"><img src="r3.jpg" alt="Moodboard Asset r3" class="w-full h-full object-cover img-zoom" onerror="this.onerror=null; this.src='r3.jpeg'"></div>
+        <div class="aspect-[3/4] overflow-hidden"><img src="r4.jpg" alt="Moodboard Asset r4" class="w-full h-full object-cover img-zoom" onerror="this.onerror=null; this.src='r4.jpeg'"></div>
+        <div class="aspect-[3/4] overflow-hidden"><img src="r5.jpg" alt="Moodboard Asset r5" class="w-full h-full object-cover img-zoom" onerror="this.onerror=null; this.src='r5.jpeg'"></div>
+        <div class="aspect-[3/4] overflow-hidden"><img src="r6.jpg" alt="Moodboard Asset r6" class="w-full h-full object-cover img-zoom" onerror="this.onerror=null; this.src='r6.jpeg'"></div>
+        <div class="aspect-[3/4] overflow-hidden"><img src="r7.jpg" alt="Moodboard Asset r7" class="w-full h-full object-cover img-zoom" onerror="this.onerror=null; this.src='r7.jpeg'"></div>
+        <div class="aspect-[3/4] overflow-hidden"><img src="r8.jpg" alt="Moodboard Asset r8" class="w-full h-full object-cover img-zoom" onerror="this.onerror=null; this.src='r8.jpeg'"></div>
+        <div class="aspect-[3/4] overflow-hidden"><img src="r9.jpg" alt="Moodboard Asset r9" class="w-full h-full object-cover img-zoom" onerror="this.onerror=null; this.src='r9.jpeg'"></div>
+        <div class="aspect-[3/4] overflow-hidden"><img src="r10.jpg" alt="Moodboard Asset r10" class="w-full h-full object-cover img-zoom" onerror="this.onerror=null; this.src='r10.jpeg'"></div>
+        <div class="aspect-[3/4] overflow-hidden"><img src="r11.jpg" alt="Moodboard Asset r11" class="w-full h-full object-cover img-zoom" onerror="this.onerror=null; this.src='r11.jpeg'"></div>
+        <div class="aspect-[3/4] overflow-hidden"><img src="r12.jpg" alt="Moodboard Asset r12" class="w-full h-full object-cover img-zoom" onerror="this.onerror=null; this.src='r12.jpeg'"></div>
+        <div class="aspect-[3/4] overflow-hidden"><img src="r13.jpg" alt="Moodboard Asset r13" class="w-full h-full object-cover img-zoom" onerror="this.onerror=null; this.src='r13.jpeg'"></div>
+        <div class="aspect-[3/4] overflow-hidden"><img src="r14.jpg" alt="Moodboard Asset r14" class="w-full h-full object-cover img-zoom" onerror="this.onerror=null; this.src='r14.jpeg'"></div>
+        <div class="aspect-[3/4] overflow-hidden"><img src="r15.jpg" alt="Moodboard Asset r15" class="w-full h-full object-cover img-zoom" onerror="this.onerror=null; this.src='r15.jpeg'"></div>
+        <div class="aspect-[3/4] overflow-hidden"><img src="r16.jpg" alt="Moodboard Asset r16" class="w-full h-full object-cover img-zoom" onerror="this.onerror=null; this.src='r16.jpeg'"></div>
+        <div class="aspect-[3/4] overflow-hidden"><img src="r17.jpg" alt="Moodboard Asset r17" class="w-full h-full object-cover img-zoom" onerror="this.onerror=null; this.src='r17.jpeg'"></div>
+        <div class="aspect-[3/4] overflow-hidden"><img src="r18.jpg" alt="Moodboard Asset r18" class="w-full h-full object-cover img-zoom" onerror="this.onerror=null; this.src='r18.jpeg'"></div>
+        <div class="aspect-[3/4] overflow-hidden"><img src="r19.jpg" alt="Moodboard Asset r19" class="w-full h-full object-cover img-zoom" onerror="this.onerror=null; this.src='r19.jpeg'"></div>
+        <div class="aspect-[3/4] overflow-hidden"><img src="r20.jpg" alt="Moodboard Asset r20" class="w-full h-full object-cover img-zoom" onerror="this.onerror=null; this.src='r20.jpeg'"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-brand-coral/25 py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-xs text-brand-auburn/60">
+      <div class="flex items-center space-x-2">
+        <span class="font-serif italic text-lg font-bold text-brand-terracotta">Rare Beauty</span>
+        <span>— Brand Overhaul Project</span>
+      </div>
+      <p class="mt-4 md:mt-0 font-light">Directed by AI Creative Director · Rare Blossom Campaign</p>
+    </div>
+  </footer>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-brand-auburn text-white px-5 py-3 rounded-xl shadow-xl text-xs font-semibold tracking-wide opacity-0 pointer-events-none transition-all duration-300 transform translate-y-2">
+    Color code copied!
+  </div>
+
+  <script>
+    function updateFontPreview(size) {
+      document.getElementById('fontSizeDisplay').innerText = size + 'px';
+      document.getElementById('serifPreview').style.fontSize = size + 'px';
+      document.getElementById('sansPreview').style.fontSize = Math.max(14, size * 0.65) + 'px';
+    }
+
+    function copyHex(hex, name) {
+      navigator.clipboard.writeText(hex);
+      const toast = document.getElementById('toast');
+      toast.innerText = `Copied ${name} (${hex}) to clipboard`;
+      toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
+      }, 2500);
+    }
+  </script>
+</body>
+</html>
