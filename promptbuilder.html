@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rare Blossom — AI Image Prompt Builder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FAF4F2; color: #943A28; }
+    h1, h2, h3 { font-family: 'Playfair Display', serif; }
+  </style>
+</head>
+<body class="p-6 md:p-12">
+  <div class="max-w-4xl mx-auto bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-[#EBA08E]/30">
+    
+    <!-- Header -->
+    <div class="border-b border-[#EBA08E]/30 pb-6 mb-8">
+      <span class="text-xs font-semibold tracking-widest text-[#BA5F4B] uppercase">Campaign Creative Tool</span>
+      <h1 class="text-3xl md:text-4xl text-[#BA5F4B] mt-1">Rare Blossom Prompt Builder</h1>
+      <p class="text-sm text-[#943A28]/70 mt-2">Generate perfectly spec'd AI image prompts aligned with the Rare Blossom brand-skills.md framework.</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+      
+      <!-- Shot Type Selection -->
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-[#BA5F4B] mb-2">Shot Type / Category</label>
+        <select id="shotType" class="w-full bg-[#FAF4F2] border border-[#EBA08E] rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#BA5F4B]">
+          <option value="hero_product">Hero Product Shot (Travertine & Silk)</option>
+          <option value="lifestyle_hand">Lifestyle Human Touch (Intimate Application)</option>
+          <option value="macro_detail">Macro Detail Shot (Texture & Cap Details)</option>
+          <option value="botanical_setting">Lush Botanical Setting (Garden & Peonies)</option>
+        </select>
+      </div>
+
+      <!-- Camera Angle Selection -->
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-[#BA5F4B] mb-2">Camera Angle & Framing</label>
+        <select id="cameraAngle" class="w-full bg-[#FAF4F2] border border-[#EBA08E] rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#BA5F4B]">
+          <option value="eye_level">Eye-Level Centered Focus</option>
+          <option value="slightly_above">45-Degree High Angle</option>
+          <option value="macro_closeup">Extreme Close-Up Macro</option>
+          <option value="flatlay">Top-Down Flatlay Composition</option>
+        </select>
+      </div>
+
+      <!-- Aspect Ratio / Campaign Placement Dropdown -->
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-[#BA5F4B] mb-2">Placement & Aspect Ratio</label>
+        <select id="aspectRatio" class="w-full bg-[#FAF4F2] border border-[#EBA08E] rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#BA5F4B]">
+          <option value="--ar 16:9">Highway Billboard (16:9)</option>
+          <option value="--ar 4:5">Instagram Feed Post (4:5)</option>
+          <option value="--ar 9:16">Instagram Reel / Story (9:16)</option>
+          <option value="--ar 1:1">Square Digital Ad (1:1)</option>
+          <option value="--ar 2:3">Magazine Full Page Print (2:3)</option>
+          <option value="--ar 3:1">NYC Subway Horizon Banner (3:1)</option>
+        </select>
+      </div>
+
+      <!-- Lighting & Mood Selection -->
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-[#BA5F4B] mb-2">Lighting & Atmosphere</label>
+        <select id="lighting" class="w-full bg-[#FAF4F2] border border-[#EBA08E] rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#BA5F4B]">
+          <option value="golden_hour">Warm Golden Hour Dappled Sun</option>
+          <option value="soft_diffused">Soft Diffused High-Key Morning Light</option>
+          <option value="sundrenched">Sun-Drenched Warm Organic Shadows</option>
+        </select>
+      </div>
+
+      <!-- Campaign Props & Textures Section -->
+      <div class="md:col-span-2">
+        <label class="block text-xs font-bold uppercase tracking-wider text-[#BA5F4B] mb-2">Campaign Props & Textures</label>
+        <select id="propsTextures" class="w-full bg-[#FAF4F2] border border-[#EBA08E] rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#BA5F4B]">
+          <option value="peonies_silk">Fresh Pink Peonies & Soft Draped Rose-Coral Silk</option>
+          <option value="travertine_freesia">Textured Cream Travertine Slab & White Freesia Blossoms</option>
+          <option value="musk_dew">Velvety Musk Blossom Petals with Morning Dew Drops</option>
+          <option value="gold_marble">Brushed Satin Gold Accents & Raw Terracotta Marble</option>
+        </select>
+      </div>
+
+    </div>
+
+    <!-- Generated Output Area -->
+    <div class="bg-[#FAF4F2] border border-[#EBA08E]/40 rounded-2xl p-6 relative space-y-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold uppercase tracking-wider text-[#BA5F4B]">Generated Midjourney / Flux Prompt</span>
+        <button onclick="copyPrompt()" class="text-xs font-semibold bg-[#BA5F4B] text-white px-3 py-1.5 rounded-lg hover:bg-[#943A28] transition-colors">Copy Prompt</button>
+      </div>
+      <p id="promptOutput" class="text-xs md:text-sm text-[#943A28] font-mono leading-relaxed break-words"></p>
+      
+      <!-- Regenerate Prompt Button at the Bottom -->
+      <div class="pt-2 border-t border-[#EBA08E]/30 flex justify-end">
+        <button type="button" onclick="regeneratePrompt()" class="bg-[#BA5F4B] hover:bg-[#943A28] text-white font-semibold text-xs px-5 py-3 rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          Regenerate Prompt
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const shotConfigs = {
+      hero_product: "Commercial luxury fragrance product shot of Rare Blossom Eau de Parfum jar resting gracefully",
+      lifestyle_hand: "Intimate lifestyle beauty shot, elegant hand with soft coral manicured nails gently touching the satin gold dome cap of Rare Blossom Eau de Parfum",
+      macro_detail: "Extreme macro detail shot highlighting the frosted soft coral matte glass texture and brushed satin gold cap of Rare Blossom Eau de Parfum",
+      botanical_setting: "Atmospheric beauty landscape shot featuring the Rare Blossom fragrance bottle"
+    };
+
+    const angleConfigs = {
+      eye_level: "eye-level shot, shallow depth of field, 85mm f/1.4 lens",
+      slightly_above: "45-degree elevated angle, elegant composition, soft background blur",
+      macro_closeup: "extreme close-up macro focus, 100mm f/2.8 macro lens, crisp product details",
+      flatlay: "top-down aesthetic flatlay composition, balanced artistic arrangement"
+    };
+
+    const lightingConfigs = {
+      golden_hour: "warm golden hour sunlight, dappled foliage shadows, glowing highlights",
+      soft_diffused: "soft diffused natural morning light, luminous clean skin tone aesthetics",
+      sundrenched: "bright sun-drenched atmosphere, warm organic textures and subtle reflections"
+    };
+
+    const propsConfigs = {
+      peonies_silk: "surrounded by fresh blooming pink peonies and soft draped rose-coral silk fabric",
+      travertine_freesia: "resting on a textured cream travertine stone slab alongside delicate white freesia blossoms",
+      musk_dew: "styled with velvety musk blossom petals glistening with fresh morning dew drops",
+      gold_marble: "enhanced with brushed satin gold hardware glints and raw terracotta marble surfaces"
+    };
+
+    const brandCore = "color palette of soft coral (#EBA08E), petal pink, warm terracotta, and satin gold accents, luxury aesthetic, highly detailed, photorealistic, 8k resolution --no dark moody lighting, blue tones, cold studio lights, harsh shadows, plastic texture";
+
+    function generatePrompt() {
+      const shot = shotConfigs[document.getElementById('shotType').value];
+      const angle = angleConfigs[document.getElementById('cameraAngle').value];
+      const light = lightingConfigs[document.getElementById('lighting').value];
+      const props = propsConfigs[document.getElementById('propsTextures').value];
+      const ratio = document.getElementById('aspectRatio').value;
+
+      const fullPrompt = `${shot}, ${props}, ${angle}, ${light}, ${brandCore} ${ratio}`;
+      document.getElementById('promptOutput').innerText = fullPrompt;
+    }
+
+    function regeneratePrompt() {
+      const shotSelect = document.getElementById('shotType');
+      const angleSelect = document.getElementById('cameraAngle');
+      const lightingSelect = document.getElementById('lighting');
+      const propsSelect = document.getElementById('propsTextures');
+      const ratioSelect = document.getElementById('aspectRatio');
+
+      shotSelect.selectedIndex = Math.floor(Math.random() * shotSelect.options.length);
+      angleSelect.selectedIndex = Math.floor(Math.random() * angleSelect.options.length);
+      lightingSelect.selectedIndex = Math.floor(Math.random() * lightingSelect.options.length);
+      propsSelect.selectedIndex = Math.floor(Math.random() * propsSelect.options.length);
+      ratioSelect.selectedIndex = Math.floor(Math.random() * ratioSelect.options.length);
+
+      generatePrompt();
+    }
+
+    function copyPrompt() {
+      const text = document.getElementById('promptOutput').innerText;
+      navigator.clipboard.writeText(text);
+      alert('Prompt copied to clipboard!');
+    }
+
+    document.querySelectorAll('select').forEach(el => el.addEventListener('change', generatePrompt));
+    generatePrompt();
+  </script>
+</body>
+</html>
