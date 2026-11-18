@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rare Beauty — Rare Blossom Eau de Parfum | OOH &amp; Print Campaign</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Playfair Display, Cormorant Garamond & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cream: '#FAF6F1',
+            ivory: '#F3ECE4',
+            blush: '#F5C5B8',
+            terracotta: '#BA5F4B',
+            auburn: '#943A28',
+            satinGold: '#D4AF37',
+            espresso: '#281814',
+            taupe: '#7D6A63'
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', '"Cormorant Garamond"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-cream text-espresso font-sans antialiased selection:bg-auburn selection:text-cream">
+
+  <!-- Minimalist Top Bar with Interactive Local Image Loader -->
+  <header class="border-b border-espresso/10 bg-cream/95 backdrop-blur-md sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-6 sm:px-10 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <span class="w-2.5 h-2.5 rounded-full bg-terracotta ring-2 ring-satinGold/40"></span>
+        <span class="text-xs tracking-[0.22em] uppercase font-medium text-espresso/85">Campaign Portfolio</span>
+      </div>
+
+      <!-- Interactive Local File Picker Bar for Instant Browser Sandbox Preview -->
+      <div class="flex items-center gap-3">
+        <span id="uploadStatus" class="hidden sm:inline-block text-[11px] text-taupe">
+          Viewing local paths (<code class="text-auburn font-mono">ad 1.jpeg</code> – <code class="text-auburn font-mono">ad 5.jpeg</code>)
+        </span>
+        <label 
+          for="localImagePicker" 
+          class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium bg-auburn text-cream hover:bg-terracotta transition-colors shadow-sm"
+          title="Select ad 1.jpeg, ad 2.jpeg, ad 3.jpeg, ad 4.jpeg, and ad 5.jpeg from your computer to preview immediately"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-blush" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+          </svg>
+          <span>Load Local Images</span>
+        </label>
+        <input 
+          id="localImagePicker" 
+          type="file" 
+          accept="image/*" 
+          multiple 
+          class="hidden" 
+          onchange="handleLocalFiles(this.files)"
+        />
+      </div>
+    </div>
+  </header>
+
+  <!-- Editorial Campaign Hero Header -->
+  <section class="max-w-6xl mx-auto px-6 sm:px-10 pt-12 pb-10 sm:pt-16 sm:pb-14">
+    <div class="max-w-3xl">
+      <p class="text-xs tracking-[0.25em] uppercase text-terracotta font-semibold mb-3">
+        Rare Beauty &bull; Fragrance Launch
+      </p>
+      <h1 class="font-serif text-4xl sm:text-6xl font-normal tracking-tight text-espresso leading-[1.08]">
+        Rare Blossom <span class="italic font-normal text-auburn">Eau de Parfum</span>
+      </h1>
+      <p class="mt-5 text-sm sm:text-base text-taupe leading-relaxed max-w-2xl font-light">
+        An integrated print and out-of-home visual identity celebrating warm florals—peony, freesia, and musk blossom—across large-format transit, flagship retail, and iconic urban placements.
+      </p>
+    </div>
+
+    <!-- Subtle Campaign Metadata Bar -->
+    <div class="mt-10 pt-6 border-t border-espresso/10 grid grid-cols-2 sm:grid-cols-4 gap-6 text-xs">
+      <div>
+        <span class="block uppercase tracking-[0.18em] text-taupe/80 mb-1">Client</span>
+        <span class="font-medium text-espresso">Rare Beauty</span>
+      </div>
+      <div>
+        <span class="block uppercase tracking-[0.18em] text-taupe/80 mb-1">Fragrance Notes</span>
+        <span class="font-medium text-espresso">Peony &bull; Freesia &bull; Musk</span>
+      </div>
+      <div>
+        <span class="block uppercase tracking-[0.18em] text-taupe/80 mb-1">Deliverables</span>
+        <span class="font-medium text-espresso">5 OOH &amp; Retail Placements</span>
+      </div>
+      <div>
+        <span class="block uppercase tracking-[0.18em] text-taupe/80 mb-1">Preview Tip</span>
+        <span class="font-medium text-auburn">Click &ldquo;Load Local Images&rdquo; above</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Editorial Portfolio Grid -->
+  <main class="max-w-6xl mx-auto px-6 sm:px-10 pb-24 space-y-12 sm:space-y-16">
+
+    <!-- 01: Wide Hero Card — Highway Billboard (ad 1.jpeg) -->
+    <article class="group">
+      <div 
+        role="button" 
+        tabindex="0"
+        onclick="openLightbox('img-ad-1', '01 / Highway Billboard', 'Out-of-Home · 14ft × 48ft — Downtown Corridor', 'Large-format landscape highway spectacular highlighting the sunlit bottle reflection and delicate floral botanicals.')"
+        onkeydown="if(event.key==='Enter') this.click()"
+        class="relative overflow-hidden rounded-2xl bg-ivory border border-espresso/10 shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer"
+      >
+        <div class="aspect-[16/9] w-full overflow-hidden">
+          <img 
+            id="img-ad-1"
+            data-filename="ad 1.jpeg"
+            src="ad 1.jpeg" 
+            alt="Rare Beauty Rare Blossom Highway Billboard (ad 1.jpeg)" 
+            onerror="applyFallback(this, '1600x900', 'ad 1.jpeg — Highway Billboard')"
+            class="w-full h-full object-cover transform group-hover:scale-[1.02] transition-transform duration-700 ease-out"
+          />
+        </div>
+        <!-- Subtle Expand Hint Badge -->
+        <div class="absolute top-4 right-4 bg-cream/90 backdrop-blur-sm text-espresso px-3.5 py-1.5 rounded-full text-xs font-medium tracking-wide opacity-95 group-hover:bg-auburn group-hover:text-cream transition-all duration-300 shadow-sm flex items-center gap-1.5">
+          <span>Enlarge</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+          </svg>
+        </div>
+      </div>
+      <!-- Caption & Format Tag -->
+      <div class="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+        <div>
+          <span class="text-xs font-mono text-terracotta mr-2">01</span>
+          <span class="font-serif text-xl sm:text-2xl text-espresso">Highway Billboard</span>
+          <span class="text-xs text-taupe sm:ml-2 block sm:inline">Out-of-Home &middot; 14ft &times; 48ft</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="inline-block px-3 py-1 rounded-full text-[11px] uppercase tracking-[0.16em] font-medium bg-blush/35 text-auburn border border-terracotta/25">
+            Out-of-Home &middot; 14ft &times; 48ft
+          </span>
+          <span class="text-xs font-mono text-taupe">ad 1.jpeg</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- 02, 03, 04: Three Vertical Portrait Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
+
+      <!-- 02: Subway Poster (ad 2.jpeg) -->
+      <article class="group flex flex-col">
+        <div 
+          role="button" 
+          tabindex="0"
+          onclick="openLightbox('img-ad-2', '02 / Subway Poster', 'Transit · MTA Two-Sheet — Platform Lightbox', 'Four-quadrant editorial grid pairing campaign portrait photography with close-up floral still-life compositions.')"
+          onkeydown="if(event.key==='Enter') this.click()"
+          class="relative overflow-hidden rounded-2xl bg-ivory border border-espresso/10 shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer"
+        >
+          <div class="aspect-[4/5] w-full overflow-hidden">
+            <img 
+              id="img-ad-2"
+              data-filename="ad 2.jpeg"
+              src="ad 2.jpeg" 
+              alt="Rare Beauty Subway Platform Poster (ad 2.jpeg)" 
+              onerror="applyFallback(this, '800x1000', 'ad 2.jpeg — Subway Poster')"
+              class="w-full h-full object-cover transform group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+            />
+          </div>
+          <div class="absolute top-3.5 right-3.5 bg-cream/90 backdrop-blur-sm text-espresso p-2 rounded-full opacity-95 group-hover:bg-auburn group-hover:text-cream transition-all duration-300 shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+            </svg>
+          </div>
+        </div>
+        <div class="mt-4 px-1 flex-1 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-1.5">
+              <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] uppercase tracking-[0.16em] font-medium bg-blush/35 text-auburn border border-terracotta/25">
+                Transit &middot; MTA Two-Sheet
+              </span>
+              <span class="text-xs font-mono text-taupe">ad 2.jpeg</span>
+            </div>
+            <h2 class="font-serif text-xl text-espresso">Subway Poster</h2>
+            <p class="text-xs text-taupe mt-1">Split editorial portrait &amp; botanical still life</p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 03: Sephora Retail Display (ad 3.jpeg) -->
+      <article class="group flex flex-col">
+        <div 
+          role="button" 
+          tabindex="0"
+          onclick="openLightbox('img-ad-3', '03 / Sephora Retail Display', 'In-Store · Gondola Lightbox — Flagship Entrance', 'Point-of-sale retail kiosk showcasing the fine fragrance mist against Rare Beauty\'s signature warm terracotta backdrop.')"
+          onkeydown="if(event.key==='Enter') this.click()"
+          class="relative overflow-hidden rounded-2xl bg-ivory border border-espresso/10 shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer"
+        >
+          <div class="aspect-[4/5] w-full overflow-hidden">
+            <img 
+              id="img-ad-3"
+              data-filename="ad 3.jpeg"
+              src="ad 3.jpeg" 
+              alt="Rare Beauty Sephora In-Store Retail Display (ad 3.jpeg)" 
+              onerror="applyFallback(this, '800x1000', 'ad 3.jpeg — Sephora Retail Display')"
+              class="w-full h-full object-cover transform group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+            />
+          </div>
+          <div class="absolute top-3.5 right-3.5 bg-cream/90 backdrop-blur-sm text-espresso p-2 rounded-full opacity-95 group-hover:bg-auburn group-hover:text-cream transition-all duration-300 shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+            </svg>
+          </div>
+        </div>
+        <div class="mt-4 px-1 flex-1 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-1.5">
+              <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] uppercase tracking-[0.16em] font-medium bg-blush/35 text-auburn border border-terracotta/25">
+                In-Store &middot; Gondola Lightbox
+              </span>
+              <span class="text-xs font-mono text-taupe">ad 3.jpeg</span>
+            </div>
+            <h2 class="font-serif text-xl text-espresso">Sephora Retail Display</h2>
+            <p class="text-xs text-taupe mt-1">High-impact point-of-sale fragrance launch</p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 04: Times Square Digital Billboard (ad 5.jpeg) -->
+      <article class="group flex flex-col">
+        <div 
+          role="button" 
+          tabindex="0"
+          onclick="openLightbox('img-ad-5', '04 / Times Square Digital', 'Spectacular · LED Tower — Broadway Corner', 'Monumental vertical digital screen anchoring the New York flagship launch with warm terracotta and satin gold accents.')"
+          onkeydown="if(event.key==='Enter') this.click()"
+          class="relative overflow-hidden rounded-2xl bg-ivory border border-espresso/10 shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer"
+        >
+          <div class="aspect-[4/5] w-full overflow-hidden">
+            <img 
+              id="img-ad-5"
+              data-filename="ad 5.jpeg"
+              src="ad 5.jpeg" 
+              alt="Rare Beauty Times Square Digital Billboard (ad 5.jpeg)" 
+              onerror="applyFallback(this, '800x1000', 'ad 5.jpeg — Times Square Digital')"
+              class="w-full h-full object-cover transform group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+            />
+          </div>
+          <div class="absolute top-3.5 right-3.5 bg-cream/90 backdrop-blur-sm text-espresso p-2 rounded-full opacity-95 group-hover:bg-auburn group-hover:text-cream transition-all duration-300 shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+            </svg>
+          </div>
+        </div>
+        <div class="mt-4 px-1 flex-1 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-1.5">
+              <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] uppercase tracking-[0.16em] font-medium bg-blush/35 text-auburn border border-terracotta/25">
+                Spectacular &middot; LED Tower
+              </span>
+              <span class="text-xs font-mono text-taupe">ad 5.jpeg</span>
+            </div>
+            <h2 class="font-serif text-xl text-espresso">Times Square Digital</h2>
+            <p class="text-xs text-taupe mt-1">Flagship nighttime urban placement</p>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- 05: Wide Hero Card — NYC Bus Wrap (ad 4.jpeg) -->
+    <article class="group">
+      <div 
+        role="button" 
+        tabindex="0"
+        onclick="openLightbox('img-ad-4', '05 / NYC Bus Wrap', 'Transit · Bus Side — MTA M42 Crosstown', 'Panoramic street-level transit banner uniting editorial portrait storytelling, call-to-action typography, and hero bottle photography.')"
+        onkeydown="if(event.key==='Enter') this.click()"
+        class="relative overflow-hidden rounded-2xl bg-ivory border border-espresso/10 shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer"
+      >
+        <div class="aspect-[16/9] sm:aspect-[21/10] w-full overflow-hidden">
+          <img 
+            id="img-ad-4"
+            data-filename="ad 4.jpeg"
+            src="ad 4.jpeg" 
+            alt="Rare Beauty NYC Transit Bus Wrap (ad 4.jpeg)" 
+            onerror="applyFallback(this, '1600x800', 'ad 4.jpeg — NYC Bus Wrap')"
+            class="w-full h-full object-cover transform group-hover:scale-[1.02] transition-transform duration-700 ease-out"
+          />
+        </div>
+        <div class="absolute top-4 right-4 bg-cream/90 backdrop-blur-sm text-espresso px-3.5 py-1.5 rounded-full text-xs font-medium tracking-wide opacity-95 group-hover:bg-auburn group-hover:text-cream transition-all duration-300 shadow-sm flex items-center gap-1.5">
+          <span>Enlarge</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+          </svg>
+        </div>
+      </div>
+      <!-- Caption & Format Tag -->
+      <div class="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+        <div>
+          <span class="text-xs font-mono text-terracotta mr-2">05</span>
+          <span class="font-serif text-xl sm:text-2xl text-espresso">NYC Bus Wrap</span>
+          <span class="text-xs text-taupe sm:ml-2 block sm:inline">Transit &middot; Bus Side</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="inline-block px-3 py-1 rounded-full text-[11px] uppercase tracking-[0.16em] font-medium bg-blush/35 text-auburn border border-terracotta/25">
+            Transit &middot; Bus Side
+          </span>
+          <span class="text-xs font-mono text-taupe">ad 4.jpeg</span>
+        </div>
+      </div>
+    </article>
+
+  </main>
+
+  <!-- Minimalist Footer -->
+  <footer class="border-t border-espresso/10 bg-ivory/60">
+    <div class="max-w-6xl mx-auto px-6 sm:px-10 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-taupe">
+      <div class="font-serif text-base text-espresso">
+        Rare Beauty &mdash; <span class="italic text-auburn">Rare Blossom</span>
+      </div>
+      <div class="tracking-wider uppercase text-[11px]">
+        Print &amp; Out-Of-Home Art Direction Portfolio
+      </div>
+    </div>
+  </footer>
+
+  <!-- Click-to-Enlarge Lightbox Modal -->
+  <div 
+    id="lightboxModal" 
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-espresso/90 backdrop-blur-md p-4 sm:p-8 transition-opacity duration-300"
+    onclick="closeLightboxOnBackdrop(event)"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="lightboxTitle"
+  >
+    <div class="relative max-w-5xl w-full bg-cream rounded-2xl overflow-hidden shadow-2xl border border-satinGold/40 flex flex-col max-h-[92vh]">
+      
+      <!-- Modal Top Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-espresso/10 bg-ivory/70">
+        <div class="flex items-center gap-3">
+          <span id="lightboxTag" class="inline-block px-3 py-0.5 rounded-full text-[10px] uppercase tracking-[0.18em] font-semibold bg-auburn text-cream">
+            Format Tag
+          </span>
+          <span class="text-xs text-taupe hidden sm:inline">Rare Blossom Eau de Parfum</span>
+        </div>
+        <button 
+          type="button"
+          onclick="closeLightbox()"
+          aria-label="Close modal"
+          class="p-2 rounded-full text-espresso/70 hover:text-espresso hover:bg-espresso/10 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Enlarged Mockup Image Container -->
+      <div class="flex-1 overflow-auto bg-espresso/5 flex items-center justify-center p-4 sm:p-6">
+        <img 
+          id="lightboxImg" 
+          src="" 
+          alt="Enlarged Campaign Mockup" 
+          class="max-h-[66vh] w-auto max-w-full object-contain rounded-xl shadow-md"
+        />
+      </div>
+
+      <!-- Modal Bottom Description -->
+      <div class="px-6 py-4 bg-cream border-t border-espresso/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <h3 id="lightboxTitle" class="font-serif text-xl sm:text-2xl text-espresso">Placement Title</h3>
+          <p id="lightboxDesc" class="text-xs sm:text-sm text-taupe mt-0.5">Placement details</p>
+        </div>
+        <button 
+          type="button"
+          onclick="closeLightbox()"
+          class="self-start sm:self-center px-4 py-2 rounded-full text-xs uppercase tracking-widest font-medium border border-espresso/20 text-espresso hover:bg-espresso hover:text-cream transition-colors"
+        >
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Lightbox & Local File Preview Script -->
+  <script>
+    const modal = document.getElementById('lightboxModal');
+    const modalImg = document.getElementById('lightboxImg');
+    const modalTag = document.getElementById('lightboxTag');
+    const modalTitle = document.getElementById('lightboxTitle');
+    const modalDesc = document.getElementById('lightboxDesc');
+    const uploadStatus = document.getElementById('uploadStatus');
+
+    /**
+     * Graceful fallback placeholder displaying the exact expected local filename
+     * and an interactive overlay prompt to load local images in isolated sandboxes.
+     */
+    function applyFallback(imgEl, dimensions, labelText) {
+      imgEl.onerror = null;
+      imgEl.src = `https://placehold.co/${dimensions}/943A28/FAF6F1?text=${encodeURIComponent(labelText + ' (Click Load Local Images)')}`;
+
+      const container = imgEl.parentElement;
+      if (container && !container.querySelector('.sandbox-load-trigger')) {
+        container.classList.add('relative');
+        const badge = document.createElement('button');
+        badge.type = 'button';
+        badge.className = 'sandbox-load-trigger absolute bottom-3 left-3 z-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium bg-cream/95 text-auburn border border-satinGold/50 shadow-sm hover:bg-auburn hover:text-cream transition-colors';
+        badge.innerHTML = '<span>Load ' + (imgEl.dataset.filename || 'Image') + '</span>';
+        badge.onclick = function (e) {
+          e.stopPropagation();
+          const picker = document.getElementById('localImagePicker');
+          if (picker) picker.click();
+        };
+        container.appendChild(badge);
+      }
+    }
+
+    /**
+     * Allows the user to select their local files ('ad 1.jpeg' through 'ad 5.jpeg')
+     * and maps them automatically by exact filename or ad number (1–5) into the layout.
+     */
+    function handleLocalFiles(fileList) {
+      if (!fileList || fileList.length === 0) return;
+
+      const files = Array.from(fileList);
+      const imgElements = [
+        document.getElementById('img-ad-1'),
+        document.getElementById('img-ad-2'),
+        document.getElementById('img-ad-3'),
+        document.getElementById('img-ad-4'),
+        document.getElementById('img-ad-5')
+      ];
+
+      let matchedCount = 0;
+
+      // 1. Match by exact filename or ad number (1–5) regardless of .jpeg, .jpg, or .png extension
+      files.forEach((file) => {
+        const lowerName = file.name.toLowerCase().trim();
+        const compactName = lowerName.replace(/\s+/g, '');
+
+        // Check exact match against data-filename first
+        let targetImg = imgElements.find(
+          (el) => el && el.dataset.filename && el.dataset.filename.toLowerCase() === lowerName
+        );
+
+        // Fallback to ad number (1–5) regex across .jpeg, .jpg, or .png
+        if (!targetImg) {
+          const match = compactName.match(/ad[_-]?([1-5])(?:_\d+)?\.(?:jpeg|jpg|png|webp)$/);
+          if (match) {
+            const idx = parseInt(match[1], 10) - 1;
+            targetImg = imgElements[idx];
+          }
+        }
+
+        if (targetImg) {
+          targetImg.src = URL.createObjectURL(file);
+          const trigger = targetImg.parentElement?.querySelector('.sandbox-load-trigger');
+          if (trigger) trigger.remove();
+          matchedCount++;
+        }
+      });
+
+      // 2. If files had completely custom names, fill remaining slots sequentially
+      if (matchedCount === 0) {
+        files.slice(0, 5).forEach((file, index) => {
+          if (imgElements[index]) {
+            imgElements[index].src = URL.createObjectURL(file);
+            const trigger = imgElements[index].parentElement?.querySelector('.sandbox-load-trigger');
+            if (trigger) trigger.remove();
+            matchedCount++;
+          }
+        });
+      }
+
+      if (uploadStatus && matchedCount > 0) {
+        uploadStatus.innerHTML = `<span class="text-auburn font-medium">Loaded ${matchedCount} local image${matchedCount > 1 ? 's' : ''}</span>`;
+      }
+    }
+
+    /**
+     * Opens the lightbox modal using the current resolved image source of the clicked card.
+     */
+    function openLightbox(imgElementId, tag, title, description) {
+      const sourceImg = document.getElementById(imgElementId);
+      modalImg.src = sourceImg ? sourceImg.src : '';
+      modalTag.textContent = tag;
+      modalTitle.textContent = title;
+      modalDesc.textContent = description;
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+
+    /**
+     * Closes the lightbox modal and restores page scrolling.
+     */
+    function closeLightbox() {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+
+    /**
+     * Closes the modal when clicking outside the inner card.
+     */
+    function closeLightboxOnBackdrop(event) {
+      if (event.target === modal) {
+        closeLightbox();
+      }
+    }
+
+    // Close lightbox on Escape key press
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
+        closeLightbox();
+      }
+    });
+  </script>
+</body>
+</html>
