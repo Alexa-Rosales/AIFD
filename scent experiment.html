@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rare Beauty — Rare Scents Interactive Scratch Studio</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts evoking Ogg (Playfair Display / Cormorant Garamond), Neue Haas Unica (DM Sans), and Rare Script (Caveat) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            rare: {
+              bg: '#FDF9F7',
+              blush: '#F6ECE9',
+              cream: '#EFE0DA',
+              berry: '#6E1E3A',
+              mauve: '#9E3356',
+              petal: '#E89AB0',
+              peony: '#A64D79',
+              gold: '#D6B88D',
+              ink: '#1A0D12',
+              muted: '#6D5A60',
+              taupe: '#B59E9A',
+              border: '#E8D8D3'
+            }
+          },
+          fontFamily: {
+            editorial: ['"Playfair Display"', '"Cormorant Garamond"', 'Georgia', 'serif'],
+            sans: ['"DM Sans"', 'sans-serif'],
+            handwritten: ['"Caveat"', 'cursive']
+          },
+          boxShadow: {
+            editorial: '0 20px 50px -15px rgba(110, 30, 58, 0.10)',
+            card: '0 8px 24px -6px rgba(110, 30, 58, 0.06)'
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      background-color: #FDF9F7;
+      color: #1A0D12;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* Custom Range Sliders */
+    input[type="range"].rare-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      background: #E8D8D3;
+      border-radius: 999px;
+      outline: none;
+    }
+    input[type="range"].rare-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #6E1E3A;
+      cursor: pointer;
+      border: 2px solid #FDF9F7;
+      box-shadow: 0 2px 6px rgba(110, 30, 58, 0.35);
+    }
+    input[type="range"].slider-beginnings::-webkit-slider-thumb {
+      background: #D4956A;
+    }
+    input[type="range"].slider-blossom::-webkit-slider-thumb {
+      background: #E89AB0;
+    }
+
+    /* Floating sensory note particles */
+    @keyframes floatUpFade {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, 6px) scale(0.9);
+      }
+      20% {
+        opacity: 1;
+        transform: translate(-50%, -8px) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -46px) scale(0.96);
+      }
+    }
+    .note-particle {
+      position: absolute;
+      pointer-events: none;
+      white-space: nowrap;
+      animation: floatUpFade 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* Custom cursor on scratch pad */
+    .scratch-cursor {
+      cursor: crosshair;
+    }
+
+    /* Ensure scratch canvases always fill their container cleanly */
+    .scratch-layer-canvas {
+      display: block;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Smooth tab pill indicator */
+    .tab-active {
+      background-color: #6E1E3A;
+      color: #FDF9F7;
+      border-color: #6E1E3A;
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-rare-berry selection:text-white">
+
+  <!-- Top Campaign Utility Bar -->
+  <div class="bg-rare-berry text-rare-bg text-[11px] tracking-[0.18em] uppercase py-2 px-4 text-center font-medium">
+    Rare Scents Campaign • Experimental Digital Fragrance Atelier • Scratch &amp; Layer Your Signature Accord
+  </div>
+
+  <!-- Editorial Navigation Header -->
+  <header class="sticky top-0 z-40 bg-rare-bg/90 backdrop-blur-md border-b border-rare-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-4">
+      <!-- Brand Wordmark -->
+      <div class="flex items-center gap-3">
+        <a href="#studio" onclick="switchView('studio')" class="flex items-baseline gap-2.5 group">
+          <span class="font-editorial text-2xl sm:text-3xl font-semibold tracking-tight text-rare-ink">Rare Beauty</span>
+          <span class="hidden sm:inline-block text-rare-taupe font-light">/</span>
+          <span class="text-[11px] uppercase tracking-[0.2em] text-rare-berry font-semibold">Scent Lab</span>
+        </a>
+      </div>
+
+      <!-- Mode Switcher: Studio Tool vs. Campaign Website Deliverable -->
+      <nav class="flex items-center bg-rare-blush p-1 rounded-full border border-rare-border">
+        <button id="nav-studio-btn" onclick="switchView('studio')" class="px-3.5 sm:px-5 py-1.5 rounded-full text-xs font-medium tracking-wide transition-all tab-active">
+          Scratch Studio
+        </button>
+        <button id="nav-campaign-btn" onclick="switchView('campaign')" class="px-3.5 sm:px-5 py-1.5 rounded-full text-xs font-medium tracking-wide text-rare-ink hover:text-rare-berry transition-all flex items-center gap-1.5">
+          <span>Campaign Deliverable</span>
+          <span class="hidden md:inline-block text-[10px] px-1.5 py-0.5 rounded-full bg-rare-berry/10 text-rare-berry font-semibold">Web</span>
+        </button>
+      </nav>
+
+      <!-- Sound & Quick Actions -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button id="sound-toggle-btn" onclick="toggleSound()" title="Toggle Sensory Shimmer Audio" class="p-2.5 rounded-full border border-rare-border bg-white hover:bg-rare-blush text-rare-ink transition-colors flex items-center gap-1.5 text-xs">
+          <svg id="sound-icon-on" class="w-4 h-4 text-rare-berry" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14" />
+          </svg>
+          <svg id="sound-icon-off" class="w-4 h-4 text-rare-muted hidden" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6" />
+          </svg>
+          <span class="hidden lg:inline text-[11px] uppercase tracking-wider font-medium" id="sound-label">Audio On</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Toast Notification Banner (Replaces alert) -->
+  <div id="toast-banner" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="bg-rare-ink text-rare-bg px-5 py-3 rounded-2xl shadow-editorial border border-rare-berry/30 flex items-center gap-3 text-xs tracking-wide">
+      <span class="w-2 h-2 rounded-full bg-rare-petal animate-pulse"></span>
+      <span id="toast-message">Action completed</span>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 1: INTERACTIVE SCENT SCRATCH STUDIO (CORE EXPERIMENTAL TOOL)      -->
+  <!-- ===================================================================== -->
+  <main id="view-studio" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+
+    <!-- Editorial Hero Header -->
+    <div class="max-w-3xl mx-auto text-center mb-8 sm:mb-12">
+      <div class="flex items-center justify-center gap-3 mb-2">
+        <span class="text-[11px] uppercase tracking-[0.22em] text-rare-berry font-semibold">Interactive Fragrance Discovery</span>
+        <span class="h-[1px] w-10 bg-rare-berry/40"></span>
+        <span class="font-handwritten text-xl text-rare-mauve">scratch to reveal</span>
+      </div>
+      <h1 class="font-editorial text-4xl sm:text-5xl lg:text-6xl font-normal tracking-tight text-rare-ink leading-[1.08]">
+        A scent story written <span class="italic text-rare-berry">on your skin.</span>
+      </h1>
+      <p class="mt-3 sm:mt-4 text-sm sm:text-base text-rare-muted leading-relaxed max-w-2xl mx-auto">
+        Select a fragrance applicator and scratch across the metallic rose-berry foil strip to release botanical accords. Layer <strong class="font-medium text-rare-ink">Rare Eau de Parfum</strong>, <strong class="font-medium text-rare-ink">Rare Beginnings Eau de Parfum</strong>, and <strong class="font-medium text-rare-ink">Rare Blossom</strong> directly on your scent card.
+      </p>
+    </div>
+
+    <!-- Centered Single-Column Scent Scratch Workspace -->
+    <div class="max-w-4xl mx-auto">
+
+      <!-- Tactile Scratch-and-Discover Canvas & Layer Controls -->
+      <section class="space-y-6">
+
+        <!-- Step 1: Select Fragrance Applicator -->
+        <div class="bg-white rounded-3xl p-5 sm:p-6 border border-rare-border shadow-card">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <span class="text-[10px] uppercase tracking-[0.2em] text-rare-muted font-semibold block">Step 01 • Choose Applicator</span>
+              <h2 class="font-editorial text-2xl text-rare-ink">Select a Scent to Scratch</h2>
+            </div>
+            <span class="font-handwritten text-xl text-rare-berry">tap a bottle</span>
+          </div>
+
+          <!-- 3 Applicator Cards (Strictly Rare Original, Rare Beginnings, and Rare Blossom) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3" id="applicator-grid">
+            <!-- Original EDP -->
+            <button onclick="selectApplicator('original')" data-app="original" class="applicator-btn active-applicator text-left p-3.5 rounded-2xl border-2 border-rare-berry bg-rare-blush/70 transition-all flex flex-col justify-between min-h-[104px]">
+              <div class="flex items-center justify-between w-full">
+                <span class="w-4 h-4 rounded-full bg-[#6E1E3A] ring-2 ring-offset-2 ring-[#6E1E3A]/30"></span>
+                <span class="text-[10px] uppercase tracking-widest text-rare-berry font-semibold">EDP</span>
+              </div>
+              <div class="mt-3">
+                <div class="font-editorial text-lg font-semibold leading-tight text-rare-ink">Rare Original</div>
+                <div class="text-[11px] text-rare-muted mt-0.5">Caramel • Pistachio • Vanilla</div>
+              </div>
+            </button>
+
+            <!-- Beginnings EDP -->
+            <button onclick="selectApplicator('beginnings')" data-app="beginnings" class="applicator-btn text-left p-3.5 rounded-2xl border border-rare-border bg-white hover:bg-rare-blush/40 transition-all flex flex-col justify-between min-h-[104px]">
+              <div class="flex items-center justify-between w-full">
+                <span class="w-4 h-4 rounded-full bg-[#D4956A]"></span>
+                <span class="text-[10px] uppercase tracking-widest text-rare-muted font-semibold">EDP</span>
+              </div>
+              <div class="mt-3">
+                <div class="font-editorial text-lg font-semibold leading-tight text-rare-ink">Rare Beginnings</div>
+                <div class="text-[11px] text-rare-muted mt-0.5">Pear Nectar • Gardenia • Lotus</div>
+              </div>
+            </button>
+
+            <!-- Rare Blossom -->
+            <button onclick="selectApplicator('blossom')" data-app="blossom" class="applicator-btn text-left p-3.5 rounded-2xl border border-rare-border bg-white hover:bg-rare-blush/40 transition-all flex flex-col justify-between min-h-[104px]">
+              <div class="flex items-center justify-between w-full">
+                <span class="w-4 h-4 rounded-full bg-[#E89AB0]"></span>
+                <span class="text-[10px] uppercase tracking-widest text-rare-muted font-semibold">Blossom</span>
+              </div>
+              <div class="mt-3">
+                <div class="font-editorial text-lg font-semibold leading-tight text-rare-ink">Rare Blossom</div>
+                <div class="text-[11px] text-rare-muted mt-0.5">Peony • Freesia • Musk Blossom</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Interactive Metallic Foil Scratch Strip -->
+        <div class="bg-white rounded-3xl p-5 sm:p-6 border border-rare-border shadow-editorial relative overflow-hidden">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div>
+              <span class="text-[10px] uppercase tracking-[0.2em] text-rare-muted font-semibold block">Step 02 • Tactile Scent Strip</span>
+              <h2 class="font-editorial text-2xl text-rare-ink">Scratch to Release Botanical Accords</h2>
+            </div>
+            <div class="flex items-center gap-2 bg-rare-blush px-3 py-1.5 rounded-full border border-rare-border">
+              <span class="text-[11px] uppercase tracking-wider text-rare-muted">Revealed:</span>
+              <span id="scratch-percent-display" class="text-xs font-semibold text-rare-berry">0%</span>
+            </div>
+          </div>
+
+          <!-- Responsive Scratch Canvas Wrapper -->
+          <div id="scratch-stage" class="relative w-full h-[300px] sm:h-[340px] rounded-2xl overflow-hidden border border-rare-border select-none touch-none shadow-inner bg-rare-cream">
+            <!-- Bottom Layer: Dynamic Watercolor Cosmetic Swatch Canvas -->
+            <canvas id="swatchCanvas" class="scratch-layer-canvas z-0"></canvas>
+
+            <!-- Top Layer: Scratchable Metallic Rose-Berry & Gold Foil Canvas -->
+            <canvas id="foilCanvas" class="scratch-layer-canvas scratch-cursor z-10"></canvas>
+
+            <!-- Floating Particle Container -->
+            <div id="particle-container" class="absolute inset-0 pointer-events-none z-20 overflow-hidden"></div>
+
+            <!-- Subtle Bottom Watermark inside Scratch Card -->
+            <div class="absolute bottom-3 left-4 right-4 z-20 pointer-events-none flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-white/90 drop-shadow">
+              <span>Rare Scents Foil Tester No. 04</span>
+              <span class="font-handwritten text-base capitalize tracking-normal text-white">rub gently to awaken notes</span>
+            </div>
+          </div>
+
+          <!-- Quick Action Bar Below Scratch Pad -->
+          <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <p class="text-xs text-rare-muted">
+              Tip: Drag across the foil with your finger or cursor, or tap <button onclick="autoBurstScratch()" class="text-rare-berry font-medium underline underline-offset-2">Auto-Swatch</button> to test a blend.
+            </p>
+            <div class="flex items-center gap-2">
+              <button onclick="autoBurstScratch()" class="px-3.5 py-2 rounded-full text-xs font-medium bg-rare-blush hover:bg-rare-cream text-rare-berry border border-rare-berry/20 transition-colors">
+                + Swatch Burst
+              </button>
+              <button onclick="resetScratchFoil()" class="px-3.5 py-2 rounded-full text-xs font-medium bg-white hover:bg-rare-blush text-rare-ink border border-rare-border transition-colors">
+                Reset Foil
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Custom Layering Ratio Calibration & Botanical Accord Breakdown -->
+        <div class="bg-white rounded-3xl p-5 sm:p-6 border border-rare-border shadow-card">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <div>
+              <span class="text-[10px] uppercase tracking-[0.2em] text-rare-muted font-semibold block">Step 03 • Formula Calibration</span>
+              <h2 class="font-editorial text-2xl text-rare-ink">Your Layering Ratios</h2>
+            </div>
+            <span class="font-handwritten text-xl text-rare-mauve">fine-tune your blend</span>
+          </div>
+
+          <div class="space-y-4">
+            <!-- Ratio 1: Rare Eau de Parfum (Original) -->
+            <div class="p-3.5 rounded-2xl bg-rare-blush/50 border border-rare-border/80">
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-[#6E1E3A]"></span>
+                  <span class="font-editorial text-lg font-semibold text-rare-ink">Rare Eau de Parfum (Original)</span>
+                </div>
+                <span id="ratio-original-val" class="text-xs font-semibold text-rare-berry bg-white px-2.5 py-0.5 rounded-full border border-rare-border">34%</span>
+              </div>
+              <input id="slider-original" type="range" min="0" max="100" value="34" oninput="handleSliderChange('original', this.value)" class="rare-slider" />
+              <div class="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-1.5 text-[11px] text-rare-muted">
+                <div><strong class="text-rare-ink font-medium">Top:</strong> Caramel, Pistachio</div>
+                <div><strong class="text-rare-ink font-medium">Heart:</strong> Pink Pepper, Ginger</div>
+                <div><strong class="text-rare-ink font-medium">Base:</strong> Vanilla, Sandalwood</div>
+              </div>
+            </div>
+
+            <!-- Ratio 2: Rare Beginnings Eau de Parfum -->
+            <div class="p-3.5 rounded-2xl bg-rare-blush/50 border border-rare-border/80">
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-[#D4956A]"></span>
+                  <span class="font-editorial text-lg font-semibold text-rare-ink">Rare Beginnings Eau de Parfum</span>
+                </div>
+                <span id="ratio-beginnings-val" class="text-xs font-semibold text-[#A86A42] bg-white px-2.5 py-0.5 rounded-full border border-rare-border">33%</span>
+              </div>
+              <input id="slider-beginnings" type="range" min="0" max="100" value="33" oninput="handleSliderChange('beginnings', this.value)" class="rare-slider slider-beginnings" />
+              <div class="mt-2 text-[11px] text-rare-muted">
+                <strong class="text-rare-ink font-medium">Key Notes:</strong> Pear Nectar, Gardenia, Jasmine, Lotus Blossom, Vanilla Bean
+              </div>
+            </div>
+
+            <!-- Ratio 3: Rare Blossom -->
+            <div class="p-3.5 rounded-2xl bg-rare-blush/50 border border-rare-border/80">
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-[#E89AB0]"></span>
+                  <span class="font-editorial text-lg font-semibold text-rare-ink">Rare Blossom</span>
+                </div>
+                <span id="ratio-blossom-val" class="text-xs font-semibold text-[#A64D79] bg-white px-2.5 py-0.5 rounded-full border border-rare-border">33%</span>
+              </div>
+              <input id="slider-blossom" type="range" min="0" max="100" value="33" oninput="handleSliderChange('blossom', this.value)" class="rare-slider slider-blossom" />
+              <div class="mt-2 text-[11px] text-rare-muted">
+                <strong class="text-rare-ink font-medium">Key Notes:</strong> Peony, Freesia, Musk Blossom
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 2: FINAL CAMPAIGN WEBSITE DELIVERABLE PREVIEW                    -->
+  <!-- Shows how the experimental tool sits inside the Rare Beauty launch    -->
+  <!-- ===================================================================== -->
+  <section id="view-campaign" class="hidden">
+
+    <!-- Campaign Deliverable Context Banner -->
+    <div class="bg-rare-blush border-b border-rare-border py-3 px-4">
+      <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5 text-xs">
+          <span class="px-2.5 py-0.5 rounded-full bg-rare-berry text-white font-semibold uppercase tracking-wider text-[10px]">Final Deliverable Mockup</span>
+          <span class="text-rare-ink">Previewing how the <strong>Scent Scratch Studio</strong> integrates into the Rare Beauty Fragrance Campaign landing page.</span>
+        </div>
+        <button onclick="switchView('studio')" class="text-xs font-semibold text-rare-berry hover:underline flex items-center gap-1">
+          <span>← Back to Fullscreen Scratch Studio</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Landing Page Hero Banner -->
+    <div class="relative overflow-hidden bg-gradient-to-b from-[#F9ECE4] via-rare-bg to-rare-bg border-b border-rare-border">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <div class="lg:col-span-6 space-y-5">
+          <span class="inline-block text-[11px] uppercase tracking-[0.25em] text-rare-berry font-semibold">The Fragrance Collection</span>
+          <h1 class="font-editorial text-5xl sm:text-6xl lg:text-7xl font-normal text-rare-ink leading-[1.02]">
+            Luminous. Soft. <br /><span class="italic text-rare-berry">Unapologetically Rare.</span>
+          </h1>
+          <p class="text-base text-rare-muted leading-relaxed max-w-xl">
+            Designed to evolve with your skin and layer effortlessly. Pair the luminous fruity-floral warmth of <strong class="text-rare-ink font-medium">Rare Beginnings Eau de Parfum</strong> with our delicate <strong class="text-rare-ink font-medium">Rare Blossom</strong> (Peony, Freesia &amp; Musk Blossom).
+          </p>
+          <div class="pt-2 flex flex-wrap items-center gap-3">
+            <a href="#deliverable-embedded-studio" class="px-7 py-3.5 rounded-full bg-rare-berry hover:bg-rare-mauve text-white text-xs uppercase tracking-[0.18em] font-medium transition-all shadow-md">
+              Launch Interactive Scratch Tester
+            </a>
+            <button onclick="addCustomDuoToBag()" class="px-7 py-3.5 rounded-full bg-white hover:bg-rare-blush text-rare-ink border border-rare-ink/20 text-xs uppercase tracking-[0.18em] font-medium transition-all">
+              Shop The Layering Duo — $98
+            </button>
+          </div>
+        </div>
+
+        <!-- Editorial Bottle & Swatch Showcase (SVG + Live Generated Poster Card) -->
+        <div class="lg:col-span-6 flex justify-center">
+          <div class="relative w-full max-w-md">
+            <!-- Decorative organic blush aura -->
+            <div class="absolute -inset-4 rounded-[2.5rem] bg-gradient-to-tr from-rare-berry/15 via-rare-petal/20 to-rare-peony/15 blur-xl"></div>
+
+            <div class="relative bg-white rounded-[2rem] p-6 sm:p-8 border border-rare-border shadow-editorial text-center">
+              <!-- Bespoke Illustrated Fragrance Duo SVG -->
+              <svg viewBox="0 0 360 210" class="w-full h-48 mx-auto mb-4" aria-label="Rare Beauty Fragrance Duo Illustration">
+                <defs>
+                  <linearGradient id="bottleBeg" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#E5A9B4" />
+                    <stop offset="100%" stop-color="#B96A79" />
+                  </linearGradient>
+                  <linearGradient id="balmPeony" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#C46B97" />
+                    <stop offset="100%" stop-color="#8A3760" />
+                  </linearGradient>
+                </defs>
+                <!-- Soft Swatch Backdrop -->
+                <ellipse cx="180" cy="145" rx="140" ry="42" fill="#FDF6F0" />
+                <path d="M65,145 Q135,115 205,142 T295,138" fill="none" stroke="#C87D8B" stroke-width="18" stroke-linecap="round" opacity="0.32" />
+                <path d="M95,155 Q175,130 265,152" fill="none" stroke="#A64D79" stroke-width="12" stroke-linecap="round" opacity="0.22" />
+
+                <!-- Bottle 1: Rare Beginnings EDP (Left-Center) -->
+                <g transform="translate(106, 24)">
+                  <rect x="24" y="0" width="28" height="20" rx="10" fill="#F2E7E1" />
+                  <rect x="31" y="20" width="14" height="10" fill="#D5C8C0" />
+                  <rect x="4" y="30" width="68" height="115" rx="32" fill="url(#bottleBeg)" />
+                  <rect x="17" y="60" width="42" height="52" rx="6" fill="#FDFBF8" opacity="0.94" />
+                  <text x="38" y="81" text-anchor="middle" font-family="Cormorant Garamond, serif" font-size="11" font-weight="600" fill="#000914">Rare</text>
+                  <text x="38" y="94" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="5.5" letter-spacing="1" fill="#80294E">BEGINNINGS</text>
+                </g>
+
+                <!-- Bottle 2: Rare Blossom (Right-Center) -->
+                <g transform="translate(202, 66)">
+                  <rect x="14" y="0" width="26" height="16" rx="6" fill="#FDF6F0" stroke="#E8DFD7" />
+                  <path d="M8,16 L46,16 L42,90 C42,97 12,97 12,90 Z" fill="url(#balmPeony)" />
+                  <text x="27" y="54" text-anchor="middle" font-family="Cormorant Garamond, serif" font-size="10" font-style="italic" fill="#FDFBF8">Blossom</text>
+                  <text x="27" y="66" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="5.5" letter-spacing="1" fill="#FDFBF8">RARE</text>
+                </g>
+              </svg>
+
+              <p class="font-handwritten text-2xl text-rare-berry">“Every layer tells a different mood.”</p>
+              <p class="text-xs text-rare-muted mt-1">Ergonomic, easy-grip rounded cap crafted for effortless application.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Editorial Featurettes: The 3 Campaign Pillars -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-3xl border border-rare-border">
+          <span class="text-[10px] uppercase tracking-[0.2em] text-rare-berry font-semibold">01 • Accessible Design</span>
+          <h3 class="font-editorial text-2xl text-rare-ink mt-2">Thoughtfully Crafted</h3>
+          <p class="text-xs text-rare-muted leading-relaxed mt-2">
+            Developed with certified hand therapists and packaging engineers—featuring an oversized, rounded pump cap for effortless spraying from any angle.
+          </p>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl border border-rare-border">
+          <span class="text-[10px] uppercase tracking-[0.2em] text-rare-berry font-semibold">02 • Sensory Layering</span>
+          <h3 class="font-editorial text-2xl text-rare-ink mt-2">Petal-to-Skin Alchemy</h3>
+          <p class="text-xs text-rare-muted leading-relaxed mt-2">
+            Layer Rare Blossom’s airy Peony, Freesia, and Musk Blossom notes over pulse points to soften the luminous pear nectar, gardenia, and vanilla bean of Beginnings.
+          </p>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl border border-rare-border">
+          <span class="text-[10px] uppercase tracking-[0.2em] text-rare-berry font-semibold">03 • Digital Keepsake</span>
+          <h3 class="font-editorial text-2xl text-rare-ink mt-2">Your Custom Scent Print</h3>
+          <p class="text-xs text-rare-muted leading-relaxed mt-2">
+            Your custom scratch ratio is printed onto a complimentary collectible scent card included with every online fragrance duo order.
+          </p>
+        </div>
+      </div>
+
+      <!-- Embedded Live Custom Blend Checkout Module -->
+      <div id="deliverable-embedded-studio" class="mt-12 bg-rare-blush rounded-[2rem] p-6 sm:p-10 border border-rare-border shadow-editorial">
+        <div class="max-w-3xl mx-auto text-center space-y-5">
+          <span class="text-[11px] uppercase tracking-[0.22em] text-rare-berry font-semibold">Live From Your Scratch Studio Session</span>
+          <h2 class="font-editorial text-4xl sm:text-5xl text-rare-ink leading-tight">
+            Your Custom <span class="italic text-rare-berry">Rare Trio</span> Prescription
+          </h2>
+          <p class="text-sm text-rare-muted leading-relaxed max-w-xl mx-auto">
+            Based on your tactile foil scratch test, we’ve calibrated your personalized layering ritual across all three Rare Beauty fragrances.
+          </p>
+
+          <!-- Live Ratio Summary Pills -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-left">
+            <div class="bg-white p-4 rounded-2xl border border-rare-border">
+              <div class="text-[10px] uppercase tracking-wider text-rare-muted">Rare Original EDP</div>
+              <div id="deliv-orig-pct" class="font-editorial text-3xl font-semibold text-[#6E1E3A] mt-1">34%</div>
+              <div class="text-[11px] text-rare-muted mt-0.5">Warm Spiced Base</div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border border-rare-border">
+              <div class="text-[10px] uppercase tracking-wider text-rare-muted">Rare Beginnings EDP</div>
+              <div id="deliv-beg-pct" class="font-editorial text-3xl font-semibold text-[#A86A42] mt-1">33%</div>
+              <div class="text-[11px] text-rare-muted mt-0.5">Luminous Pear Heart</div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border border-rare-border">
+              <div class="text-[10px] uppercase tracking-wider text-rare-muted">Rare Blossom</div>
+              <div id="deliv-blos-pct" class="font-editorial text-3xl font-semibold text-[#A64D79] mt-1">33%</div>
+              <div class="text-[11px] text-rare-muted mt-0.5">Peony &amp; Freesia Veil</div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="pt-3 flex flex-wrap items-center justify-center gap-3">
+            <button onclick="addCustomTrioToBag()" class="px-8 py-4 rounded-full bg-rare-berry hover:bg-rare-mauve text-white text-xs uppercase tracking-[0.18em] font-medium transition-all shadow-md">
+              Add Custom Trio to Bag ($128)
+            </button>
+            <button onclick="switchView('studio')" class="px-6 py-4 rounded-full bg-white hover:bg-rare-cream text-rare-ink border border-rare-border text-xs uppercase tracking-[0.16em] font-medium transition-colors">
+              Edit Scratch Blend
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Minimal Editorial Footer -->
+  <footer class="border-t border-rare-border bg-rare-bg mt-16 py-10 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-rare-muted">
+      <div class="flex items-center gap-3">
+        <span class="font-editorial text-xl text-rare-ink font-semibold">Rare Beauty</span>
+        <span>•</span>
+        <span>Rare Scents Campaign Studio</span>
+      </div>
+      <div class="font-handwritten text-xl text-rare-berry">you are rare</div>
+      <div>Crafted for interactive brand storytelling &amp; sensory exploration.</div>
+    </div>
+  </footer>
+
+  <!-- ===================================================================== -->
+  <!-- JAVASCRIPT ENGINE: AUDIO, SCRATCH FOIL, PARTICLES & POSTER GENERATOR  -->
+  <!-- ===================================================================== -->
+  <script>
+    // -----------------------------------------------------------------------
+    // 1. FRAGRANCE DATA MODEL (Authentic Rare Beauty Notes & Swatch Palettes)
+    // -----------------------------------------------------------------------
+    const SCENTS = {
+      original: {
+        id: 'original',
+        name: 'Rare Eau de Parfum',
+        shortName: 'Rare Original',
+        subtitle: 'Warm Spiced Gourmand',
+        color: '#6E1E3A',
+        secondaryColor: '#9E3356',
+        glowColor: 'rgba(110, 30, 58, 0.45)',
+        freq: 329.63, // E4 warm tone
+        notes: [
+          'Caramel', 'Pistachio', 'Pink Pepper',
+          'Vanilla', 'Ginger', 'Sandalwood'
+        ]
+      },
+      beginnings: {
+        id: 'beginnings',
+        name: 'Rare Beginnings Eau de Parfum',
+        shortName: 'Rare Beginnings',
+        subtitle: 'Luminous Fruity Floral',
+        color: '#D4956A',
+        secondaryColor: '#E8B894',
+        glowColor: 'rgba(212, 149, 106, 0.48)',
+        freq: 440.00, // A4 bright luminous tone
+        notes: [
+          'Pear Nectar', 'Gardenia', 'Jasmine',
+          'Lotus Blossom', 'Vanilla Bean'
+        ]
+      },
+      blossom: {
+        id: 'blossom',
+        name: 'Rare Blossom',
+        shortName: 'Rare Blossom',
+        subtitle: 'Luminous Floral Musk',
+        color: '#E89AB0',
+        secondaryColor: '#A64D79',
+        glowColor: 'rgba(232, 154, 176, 0.48)',
+        freq: 523.25, // C5 airy floral chime
+        notes: [
+          'Peony', 'Freesia', 'Musk Blossom'
+        ]
+      }
+    };
+
+    // Application State
+    const state = {
+      activeApplicator: 'original', // 'original' | 'beginnings' | 'blossom'
+      ratios: {
+        original: 34,
+        beginnings: 33,
+        blossom: 33
+      },
+      scratchCounts: {
+        original: 10,
+        beginnings: 10,
+        blossom: 10
+      },
+      revealedPercent: 0,
+      soundEnabled: true,
+      isDrawing: false,
+      lastPoint: null,
+      lastSoundTime: 0,
+      lastParticleTime: 0,
+      canvasLogicalWidth: 640,
+      canvasLogicalHeight: 340
+    };
+
+    // -----------------------------------------------------------------------
+    // 2. WEB AUDIO API: SUBTLE SENSORY CHIME & FOIL SHIMMER SYNTHESIZER
+    // -----------------------------------------------------------------------
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+          audioCtx = new AudioContext();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSensoryShimmer(scentKey) {
+      if (!state.soundEnabled) return;
+      const now = performance.now();
+      if (now - state.lastSoundTime < 135) return; // Gentle rate limit
+      state.lastSoundTime = now;
+
+      try {
+        initAudio();
+        if (!audioCtx) return;
+
+        const t = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        // Pick base frequency by scent
+        let baseFreq = 392;
+        if (SCENTS[scentKey]) {
+          baseFreq = SCENTS[scentKey].freq;
+        }
+
+        // Subtle pentatonic harmonic shimmer
+        const harmonicRatios = [1, 1.25, 1.5, 1.875];
+        const ratio = harmonicRatios[Math.floor(Math.random() * harmonicRatios.length)];
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(baseFreq * ratio, t);
+        osc.frequency.exponentialRampToValueAtTime(baseFreq * ratio * 1.03, t + 0.28);
+
+        gain.gain.setValueAtTime(0.001, t);
+        gain.gain.linearRampToValueAtTime(0.032, t + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(t);
+        osc.stop(t + 0.36);
+      } catch (e) {
+        // Ignore audio errors on restricted devices
+      }
+    }
+
+    function toggleSound() {
+      state.soundEnabled = !state.soundEnabled;
+      const onIcon = document.getElementById('sound-icon-on');
+      const offIcon = document.getElementById('sound-icon-off');
+      const label = document.getElementById('sound-label');
+
+      if (state.soundEnabled) {
+        onIcon.classList.remove('hidden');
+        offIcon.classList.add('hidden');
+        label.textContent = 'Audio On';
+        playSensoryShimmer(state.activeApplicator);
+        showToast('Sensory audio shimmer enabled');
+      } else {
+        onIcon.classList.add('hidden');
+        offIcon.classList.remove('hidden');
+        label.textContent = 'Muted';
+        showToast('Audio muted');
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // 3. INTERACTIVE SCRATCH-AND-REVEAL CANVAS ENGINE
+    // -----------------------------------------------------------------------
+    const swatchCanvas = document.getElementById('swatchCanvas');
+    const foilCanvas = document.getElementById('foilCanvas');
+    const swatchCtx = swatchCanvas.getContext('2d');
+    const foilCtx = foilCanvas.getContext('2d');
+    const scratchStage = document.getElementById('scratch-stage');
+
+    function getStageDimensions() {
+      const rect = scratchStage ? scratchStage.getBoundingClientRect() : null;
+      const w = (rect && rect.width > 10) ? rect.width : (scratchStage?.clientWidth || 640);
+      const h = (rect && rect.height > 10) ? rect.height : (scratchStage?.clientHeight || 340);
+      return { width: Math.round(w), height: Math.round(h) };
+    }
+
+    function resizeScratchCanvases(forceRedraw = false) {
+      if (!swatchCanvas || !foilCanvas || !swatchCtx || !foilCtx) return;
+
+      const { width, height } = getStageDimensions();
+      if (!forceRedraw && width === state.canvasLogicalWidth && height === state.canvasLogicalHeight && foilCanvas.width > 0) {
+        return;
+      }
+
+      state.canvasLogicalWidth = width;
+      state.canvasLogicalHeight = height;
+
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      swatchCanvas.width = Math.round(width * dpr);
+      swatchCanvas.height = Math.round(height * dpr);
+      swatchCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      foilCanvas.width = Math.round(width * dpr);
+      foilCanvas.height = Math.round(height * dpr);
+      foilCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      drawBaseSwatchUnderlay(width, height);
+      drawMetallicFoilOverlay(width, height);
+    }
+
+    // Paints soft organic cream base & luminous cosmetic smears under the foil
+    function drawBaseSwatchUnderlay(w, h) {
+      swatchCtx.clearRect(0, 0, w, h);
+
+      // Warm silk paper base
+      const bgGrad = swatchCtx.createLinearGradient(0, 0, w, h);
+      bgGrad.addColorStop(0, '#FDF9F7');
+      bgGrad.addColorStop(0.5, '#F6ECE9');
+      bgGrad.addColorStop(1, '#F2E2DC');
+      swatchCtx.fillStyle = bgGrad;
+      swatchCtx.fillRect(0, 0, w, h);
+
+      // Rich pre-existing watercolor blooms across all 3 signature scents
+      paintOrganicSwatchStroke(w * 0.18, h * 0.45, w * 0.42, h * 0.56, 'original', 0.42);
+      paintOrganicSwatchStroke(w * 0.38, h * 0.32, w * 0.64, h * 0.52, 'beginnings', 0.44);
+      paintOrganicSwatchStroke(w * 0.58, h * 0.42, w * 0.84, h * 0.62, 'blossom', 0.45);
+
+      // Delicate botanical petal arcs & editorial watermark underneath
+      swatchCtx.save();
+      swatchCtx.strokeStyle = 'rgba(110, 30, 58, 0.16)';
+      swatchCtx.lineWidth = 1.25;
+      swatchCtx.beginPath();
+      swatchCtx.ellipse(w * 0.5, h * 0.5, w * 0.34, h * 0.32, -0.15, 0, Math.PI * 2);
+      swatchCtx.stroke();
+
+      swatchCtx.fillStyle = 'rgba(110, 30, 58, 0.28)';
+      swatchCtx.font = 'italic 600 28px "Playfair Display", Georgia, serif';
+      swatchCtx.textAlign = 'center';
+      swatchCtx.fillText('Rare Scents — Skin Chemistry Accord', w / 2, h / 2 + 8);
+      swatchCtx.restore();
+    }
+
+    // Paints organic cosmetic balm/perfume swatch strokes dynamically as the user scratches
+    function paintOrganicSwatchStroke(x1, y1, x2, y2, scentKey, alpha = 0.26) {
+      const scent = SCENTS[scentKey] || SCENTS.original;
+
+      swatchCtx.save();
+      swatchCtx.globalAlpha = alpha;
+      swatchCtx.lineCap = 'round';
+      swatchCtx.lineJoin = 'round';
+
+      // Soft radial watercolor bloom
+      const radius = 38 + Math.random() * 26;
+      const radGrad = swatchCtx.createRadialGradient(x2, y2, 3, x2, y2, radius);
+      radGrad.addColorStop(0, scent.color);
+      radGrad.addColorStop(0.55, scent.secondaryColor);
+      radGrad.addColorStop(1, 'rgba(253, 249, 247, 0)');
+
+      swatchCtx.fillStyle = radGrad;
+      swatchCtx.beginPath();
+      swatchCtx.arc(x2, y2, radius, 0, Math.PI * 2);
+      swatchCtx.fill();
+
+      // Satin cream streak connecting points
+      swatchCtx.strokeStyle = scent.secondaryColor;
+      swatchCtx.lineWidth = 24 + Math.random() * 14;
+      swatchCtx.beginPath();
+      swatchCtx.moveTo(x1, y1);
+      swatchCtx.lineTo(x2, y2);
+      swatchCtx.stroke();
+      swatchCtx.restore();
+    }
+
+    // Draws the tactile brushed metallic rose-berry & champagne gold foil coating on top
+    function drawMetallicFoilOverlay(w, h) {
+      foilCtx.save();
+      foilCtx.globalCompositeOperation = 'source-over';
+      foilCtx.clearRect(0, 0, w, h);
+
+      // Rich brushed metallic rose-gold (#D6B88D), champagne blush (#EAD5C7), & berry shimmer gradient
+      const foilGrad = foilCtx.createLinearGradient(0, 0, w, h);
+      foilGrad.addColorStop(0, '#9E3356');
+      foilGrad.addColorStop(0.22, '#C8987E');
+      foilGrad.addColorStop(0.45, '#D6B88D');
+      foilGrad.addColorStop(0.62, '#EAD5C7');
+      foilGrad.addColorStop(0.80, '#C8987E');
+      foilGrad.addColorStop(1, '#6E1E3A');
+
+      foilCtx.fillStyle = foilGrad;
+      foilCtx.fillRect(0, 0, w, h);
+
+      // Subtle diagonal metallic sheen band
+      const sheenGrad = foilCtx.createLinearGradient(w * 0.15, 0, w * 0.85, h);
+      sheenGrad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+      sheenGrad.addColorStop(0.5, 'rgba(255, 250, 245, 0.24)');
+      sheenGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      foilCtx.fillStyle = sheenGrad;
+      foilCtx.fillRect(0, 0, w, h);
+
+      // Fine brushed metallic foil micro-grain lines
+      foilCtx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      foilCtx.lineWidth = 1;
+      for (let i = -h; i < w + h; i += 5) {
+        foilCtx.beginPath();
+        foilCtx.moveTo(i, 0);
+        foilCtx.lineTo(i + h * 0.65, h);
+        foilCtx.stroke();
+      }
+
+      // Embossed Rare Beauty crest & monogram border pattern
+      foilCtx.strokeStyle = 'rgba(110, 30, 58, 0.22)';
+      foilCtx.lineWidth = 1.5;
+      foilCtx.strokeRect(14, 14, w - 28, h - 28);
+
+      // Subtle embossed "RB" monogram watermarks across the foil
+      foilCtx.fillStyle = 'rgba(110, 30, 58, 0.11)';
+      foilCtx.font = 'italic 600 18px "Playfair Display", serif';
+      foilCtx.textAlign = 'center';
+      for (let gx = 65; gx < w - 40; gx += 130) {
+        for (let gy = 52; gy < h - 35; gy += 85) {
+          foilCtx.fillText('RB', gx, gy);
+        }
+      }
+
+      // Embossed foil typography prompt in the center
+      foilCtx.textAlign = 'center';
+      foilCtx.fillStyle = '#6E1E3A';
+      foilCtx.font = '600 11px "DM Sans", sans-serif';
+      foilCtx.fillText('RARE BEAUTY  •  FRAGRANCE ATELIER', w / 2, h / 2 - 26);
+
+      foilCtx.fillStyle = '#3B0D1E';
+      foilCtx.font = 'italic 500 32px "Playfair Display", Georgia, serif';
+      foilCtx.fillText('Scratch Here to Awaken the Scent', w / 2, h / 2 + 10);
+
+      foilCtx.font = '500 12px "DM Sans", sans-serif';
+      foilCtx.fillStyle = '#6E1E3A';
+      foilCtx.fillText('Uncover Caramel, Pear Nectar, Peony & Freesia accords', w / 2, h / 2 + 36);
+      foilCtx.restore();
+
+      state.revealedPercent = 0;
+      const pctDisplay = document.getElementById('scratch-percent-display');
+      if (pctDisplay) pctDisplay.textContent = '0%';
+    }
+
+    // Spawns floating animated sensory note tags at pointer position
+    function spawnNoteParticle(x, y, scentKey) {
+      const now = performance.now();
+      if (now - state.lastParticleTime < 150) return;
+      state.lastParticleTime = now;
+
+      const scent = SCENTS[scentKey] || SCENTS.original;
+      const noteText = scent.notes[Math.floor(Math.random() * scent.notes.length)];
+
+      const container = document.getElementById('particle-container');
+      if (!container) return;
+      const pill = document.createElement('div');
+      pill.className = 'note-particle px-3 py-1 rounded-full text-[11px] font-medium tracking-wide shadow-md border backdrop-blur-sm';
+      pill.style.left = `${x}px`;
+      pill.style.top = `${y}px`;
+      pill.style.backgroundColor = 'rgba(253, 249, 247, 0.95)';
+      pill.style.borderColor = scent.color;
+      pill.style.color = '#6E1E3A';
+      pill.textContent = `+ ${noteText}`;
+
+      container.appendChild(pill);
+      setTimeout(() => {
+        if (pill.parentNode) pill.parentNode.removeChild(pill);
+      }, 1450);
+    }
+
+    // Performs scratch erasure & updates custom scent blend ratios organically
+    function performScratch(x, y) {
+      const prev = state.lastPoint || { x, y };
+
+      // 1. Paint lush swatch underneath
+      paintOrganicSwatchStroke(prev.x, prev.y, x, y, state.activeApplicator, 0.28);
+
+      // 2. Erase metallic foil using destination-out with soft feathered edge
+      foilCtx.save();
+      foilCtx.globalCompositeOperation = 'destination-out';
+      foilCtx.lineCap = 'round';
+      foilCtx.lineJoin = 'round';
+      foilCtx.shadowBlur = 12;
+      foilCtx.shadowColor = 'rgba(0,0,0,1)';
+      foilCtx.lineWidth = 44;
+      foilCtx.beginPath();
+      foilCtx.moveTo(prev.x, prev.y);
+      foilCtx.lineTo(x, y);
+      foilCtx.stroke();
+      foilCtx.restore();
+
+      // 3. Sound & floating botanical note particle
+      playSensoryShimmer(state.activeApplicator);
+      spawnNoteParticle(x, y, state.activeApplicator);
+
+      // 4. Increment scent weights dynamically based on what the user is scratching
+      state.scratchCounts[state.activeApplicator] += 1;
+
+      recalculateRatiosFromScratch();
+      state.lastPoint = { x, y };
+    }
+
+    function recalculateRatiosFromScratch() {
+      const total = state.scratchCounts.original + state.scratchCounts.beginnings + state.scratchCounts.blossom;
+      if (total <= 0) return;
+
+      const origPct = Math.round((state.scratchCounts.original / total) * 100);
+      const begPct = Math.round((state.scratchCounts.beginnings / total) * 100);
+      const blosPct = Math.max(0, 100 - origPct - begPct);
+
+      state.ratios.original = origPct;
+      state.ratios.beginnings = begPct;
+      state.ratios.blossom = blosPct;
+
+      syncRatioUI();
+    }
+
+    // Estimates percentage of foil scratched away
+    function updateRevealedPercentage() {
+      const w = foilCanvas.width;
+      const h = foilCanvas.height;
+      if (!w || !h) return;
+
+      const imgData = foilCtx.getImageData(0, 0, w, h).data;
+      let transparentPixels = 0;
+      const step = 32; // Sample every 8th pixel for speed
+      let totalSampled = 0;
+
+      for (let i = 3; i < imgData.length; i += step) {
+        totalSampled++;
+        if (imgData[i] < 128) transparentPixels++;
+      }
+
+      const pct = Math.min(100, Math.round((transparentPixels / totalSampled) * 100));
+      state.revealedPercent = pct;
+      document.getElementById('scratch-percent-display').textContent = `${pct}%`;
+    }
+
+    // Pointer Event Listeners (Mouse + Touch unified)
+    function getPointerPos(e) {
+      const rect = foilCanvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+    }
+
+    foilCanvas.addEventListener('pointerdown', (e) => {
+      state.isDrawing = true;
+      const pos = getPointerPos(e);
+      state.lastPoint = pos;
+      performScratch(pos.x, pos.y);
+    });
+
+    foilCanvas.addEventListener('pointermove', (e) => {
+      if (!state.isDrawing) return;
+      const pos = getPointerPos(e);
+      performScratch(pos.x, pos.y);
+    });
+
+    window.addEventListener('pointerup', () => {
+      if (state.isDrawing) {
+        state.isDrawing = false;
+        state.lastPoint = null;
+        updateRevealedPercentage();
+      }
+    });
+
+    // Programmatic Swatch Burst (for quick exploration or accessibility)
+    function autoBurstScratch() {
+      const rect = scratchStage.getBoundingClientRect();
+      const cx = rect.width * (0.25 + Math.random() * 0.5);
+      const cy = rect.height * (0.25 + Math.random() * 0.5);
+      state.lastPoint = { x: cx - 45, y: cy - 15 };
+
+      for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI * 2;
+        const nx = cx + Math.cos(angle) * (35 + Math.random() * 35);
+        const ny = cy + Math.sin(angle) * (25 + Math.random() * 25);
+        performScratch(nx, ny);
+      }
+      state.lastPoint = null;
+      updateRevealedPercentage();
+    }
+
+    function resetScratchFoil() {
+      const { width, height } = getStageDimensions();
+      drawBaseSwatchUnderlay(width, height);
+      drawMetallicFoilOverlay(width, height);
+      showToast('Fresh metallic foil card applied');
+    }
+
+    // -----------------------------------------------------------------------
+    // 4. APPLICATOR SELECTION & RATIO SLIDER SYNCHRONIZATION
+    // -----------------------------------------------------------------------
+    function selectApplicator(appKey) {
+      state.activeApplicator = appKey;
+
+      document.querySelectorAll('.applicator-btn').forEach((btn) => {
+        if (btn.dataset.app === appKey) {
+          btn.classList.add('border-2', 'border-rare-berry', 'bg-rare-blush/70');
+          btn.classList.remove('border', 'border-rare-border', 'bg-white');
+        } else {
+          btn.classList.remove('border-2', 'border-rare-berry', 'bg-rare-blush/70');
+          btn.classList.add('border', 'border-rare-border', 'bg-white');
+        }
+      });
+
+      playSensoryShimmer(appKey);
+    }
+
+    function handleSliderChange(changedKey, newValue) {
+      const val = parseInt(newValue, 10);
+      const otherKeys = ['original', 'beginnings', 'blossom'].filter(k => k !== changedKey);
+      const remaining = 100 - val;
+
+      const prevOtherSum = state.ratios[otherKeys[0]] + state.ratios[otherKeys[1]];
+      if (prevOtherSum === 0) {
+        state.ratios[otherKeys[0]] = Math.floor(remaining / 2);
+        state.ratios[otherKeys[1]] = remaining - state.ratios[otherKeys[0]];
+      } else {
+        state.ratios[otherKeys[0]] = Math.round((state.ratios[otherKeys[0]] / prevOtherSum) * remaining);
+        state.ratios[otherKeys[1]] = Math.max(0, remaining - state.ratios[otherKeys[0]]);
+      }
+      state.ratios[changedKey] = val;
+
+      // Sync scratchCounts proportionally so future scratches stay smooth
+      state.scratchCounts.original = Math.max(1, state.ratios.original / 4);
+      state.scratchCounts.beginnings = Math.max(1, state.ratios.beginnings / 4);
+      state.scratchCounts.blossom = Math.max(1, state.ratios.blossom / 4);
+
+      syncRatioUI();
+    }
+
+    function syncRatioUI() {
+      const { original, beginnings, blossom } = state.ratios;
+
+      document.getElementById('slider-original').value = original;
+      document.getElementById('slider-beginnings').value = beginnings;
+      document.getElementById('slider-blossom').value = blossom;
+
+      document.getElementById('ratio-original-val').textContent = `${original}%`;
+      document.getElementById('ratio-beginnings-val').textContent = `${beginnings}%`;
+      document.getElementById('ratio-blossom-val').textContent = `${blossom}%`;
+
+      // Also update Deliverable View counters
+      const delivOrig = document.getElementById('deliv-orig-pct');
+      const delivBeg = document.getElementById('deliv-beg-pct');
+      const delivBlos = document.getElementById('deliv-blos-pct');
+      if (delivOrig) delivOrig.textContent = `${original}%`;
+      if (delivBeg) delivBeg.textContent = `${beginnings}%`;
+      if (delivBlos) delivBlos.textContent = `${blossom}%`;
+    }
+
+    // -----------------------------------------------------------------------
+    // 5. VIEW NAVIGATION (STUDIO vs. CAMPAIGN WEBSITE DELIVERABLE) & TOASTS
+    // -----------------------------------------------------------------------
+    function switchView(viewName) {
+      const studioView = document.getElementById('view-studio');
+      const campaignView = document.getElementById('view-campaign');
+      const studioBtn = document.getElementById('nav-studio-btn');
+      const campaignBtn = document.getElementById('nav-campaign-btn');
+
+      if (viewName === 'studio') {
+        studioView.classList.remove('hidden');
+        campaignView.classList.add('hidden');
+        studioBtn.classList.add('tab-active');
+        studioBtn.classList.remove('text-rare-ink');
+        campaignBtn.classList.remove('tab-active');
+        campaignBtn.classList.add('text-rare-ink');
+        requestAnimationFrame(() => resizeScratchCanvases(false));
+      } else {
+        studioView.classList.add('hidden');
+        campaignView.classList.remove('hidden');
+        campaignBtn.classList.add('tab-active');
+        campaignBtn.classList.remove('text-rare-ink');
+        studioBtn.classList.remove('tab-active');
+        studioBtn.classList.add('text-rare-ink');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function addCustomTrioToBag() {
+      const { original, beginnings, blossom } = state.ratios;
+      showToast(`Added Custom Trio (${original}/${beginnings}/${blossom}) to Bag`);
+    }
+
+    let toastTimeout = null;
+    function showToast(msg) {
+      const banner = document.getElementById('toast-banner');
+      const textEl = document.getElementById('toast-message');
+      textEl.textContent = msg;
+
+      banner.classList.remove('translate-y-20', 'opacity-0');
+      banner.classList.add('translate-y-0', 'opacity-100');
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        banner.classList.add('translate-y-20', 'opacity-0');
+        banner.classList.remove('translate-y-0', 'opacity-100');
+      }, 3000);
+    }
+
+    // -----------------------------------------------------------------------
+    // 6. INITIALIZATION ON WINDOW LOAD & RESIZE OBSERVER
+    // -----------------------------------------------------------------------
+    function initStudio() {
+      resizeScratchCanvases(true);
+      syncRatioUI();
+    }
+
+    if (typeof ResizeObserver !== 'undefined' && scratchStage) {
+      const ro = new ResizeObserver(() => {
+        if (!document.getElementById('view-studio').classList.contains('hidden')) {
+          resizeScratchCanvases(false);
+        }
+      });
+      ro.observe(scratchStage);
+    }
+
+    window.addEventListener('resize', () => {
+      if (!document.getElementById('view-studio').classList.contains('hidden')) {
+        resizeScratchCanvases(false);
+      }
+    });
+
+    if (document.readyState === 'complete') {
+      initStudio();
+    } else {
+      window.addEventListener('load', initStudio);
+    }
+  </script>
+</body>
+</html>
